@@ -146,16 +146,18 @@ fun TelaLoginPlaceholder(
         // RF02.7: Botão Primeiro Acesso (Navegação)
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "Primeiro Acesso? ", color = Color.Gray, fontSize = 14.sp)
-            Text(
-                text = "Cadastre-se",
-                color = Color(0xFF1C64F2),
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                modifier = Modifier.clickable { onIrParaCadastro() }
-            )
+            TextButton(onClick = { onIrParaCadastro() }) {
+                Text(
+                    text = "Cadastre-se",
+                    color = Color(0xFF1C64F2),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
