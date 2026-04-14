@@ -126,12 +126,16 @@ fun TelaLoginPlaceholder(
         Spacer(modifier = Modifier.height(24.dp))
 
         // RF02.6: Botão Esqueceu a senha? (Navegação)
-        Text(
-            text = "Esqueceu a senha?",
-            color = Color(0xFF1C64F2),
-            fontSize = 14.sp,
-            modifier = Modifier.clickable { onEsqueceuSenha() }
-        )
+        TextButton(
+            onClick = { onEsqueceuSenha() },
+            contentPadding = PaddingValues(0.dp)
+        ) {
+            Text(
+                text = "Esqueceu a senha?",
+                color = Color(0xFF1C64F2),
+                fontSize = 14.sp
+            )
+        }
 
         // Mola que empurra o resto para baixo
         Spacer(modifier = Modifier.weight(1f))
