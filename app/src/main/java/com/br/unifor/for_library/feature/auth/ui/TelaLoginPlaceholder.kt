@@ -65,7 +65,7 @@ fun TelaLoginPlaceholder(
             singleLine = true
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(8.dp))
 
         // RF02.4: Campo Senha Oculto + Ícone de Olho
         OutlinedTextField(
