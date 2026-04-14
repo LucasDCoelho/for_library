@@ -8,16 +8,9 @@ import androidx.activity.enableEdgeToEdge
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
-
         setContent {
-            // O ideal é envolver isso no tema do seu app futuramente
-            // ForLibraryTheme {
-
             ForLibraryApp()
-
-            // }
         }
     }
 }
