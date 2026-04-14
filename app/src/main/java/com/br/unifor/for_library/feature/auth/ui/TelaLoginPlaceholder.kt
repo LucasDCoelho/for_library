@@ -30,9 +30,9 @@ fun TelaLoginPlaceholder(
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
-    // Deixei true apenas para a tela ficar idêntica à imagem do protótipo que você mandou.
+    // Inicializado como false; será atualizado para true somente após falha de autenticação.
     // No futuro, isso virá de fora (da sua ViewModel).
-    var showError by remember { mutableStateOf(true) }
+    var showError by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
