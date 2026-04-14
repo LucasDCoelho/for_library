@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.*
@@ -62,7 +61,8 @@ fun TelaLoginPlaceholder(
             onValueChange = { email = it },
             label = { Text("Matrícula ou Email Institucional") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            isError = showError
         )
 
         Spacer(Modifier.height(8.dp))
@@ -74,6 +74,12 @@ fun TelaLoginPlaceholder(
             label = { Text("Senha") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            isError = showError,
+            supportingText = {
+                if (showError) {
+                    Text(text = "Credenciais inválidas", color = MaterialTheme.colorScheme.error)
+                }
+            },
             visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 val image = if (isPasswordVisible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff
@@ -82,25 +88,6 @@ fun TelaLoginPlaceholder(
                 }
             }
         )
-
-        // RF02.8: Mensagem de Erro Visual
-        if (showError) {
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = "Erro",
-                    tint = Color.Red,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Credenciais inválidas",
-                    color = Color.Red,
-                    fontSize = 14.sp
-                )
-            }
-        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
