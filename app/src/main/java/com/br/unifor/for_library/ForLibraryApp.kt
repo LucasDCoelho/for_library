@@ -10,6 +10,8 @@ import androidx.navigation.compose.rememberNavController
 import com.br.unifor.for_library.core.navigation.ForLibraryBottomBar
 import com.br.unifor.for_library.core.navigation.Rota
 import com.br.unifor.for_library.feature.auth.ui.TelaLoginPlaceholder
+import com.br.unifor.for_library.feature.splash.ui.TelaSplashScreen
+import com.br.unifor.for_library.feature.auth.ui.TelaRecuperarSenha
 
 @Composable
 fun ForLibraryApp() {
@@ -24,23 +26,45 @@ fun ForLibraryApp() {
         // O NavHost é onde as rotas são ligadas às telas
         NavHost(
             navController = navController,
-            startDestination = Rota.Login.path,
+            startDestination = Rota.Splash.path,
             modifier = Modifier.padding(paddingValues)
         ) {
 
             // --- ÁREA DE AUTENTICAÇÃO ---
-            composable(Rota.Login.path) {
-                TelaLoginPlaceholder(
-                    onLoginSucesso = {
-                        navController.navigate(Rota.HomeAluno.path) {
-                            // Limpa o histórico para o usuário não voltar pro Login apertando o botão "Voltar" do celular
-                            popUpTo(Rota.Login.path) { inclusive = true }
+            composable(route = Rota.Splash.path) {
+                TelaSplashScreen(
+                    onSplashFinished = {
+                        // Navega para o Login e remove a Splash do histórico
+                        navController.navigate(Rota.Login.path) {
+                            popUpTo(Rota.Splash.path) { inclusive = true }
                         }
-                    },
-                    onIrParaCadastro = { navController.navigate(Rota.Cadastro.path) }
+                    }
                 )
             }
 
+            composable(route = Rota.Login.path) {
+                TelaLoginPlaceholder(
+                    onLoginSucesso = {
+                        navController.navigate(route = Rota.HomeAluno.path) {
+                            popUpTo(route = Rota.Login.path) { inclusive = true }
+                        }
+                    },
+                    onIrParaCadastro = {
+                        navController.navigate(route = Rota.Cadastro.path)
+                    },
+                    onIrParaEsqueciSenha = {
+                        navController.navigate(route = Rota.RecuperarSenha.path)
+                    }
+                )
+            }
+            composable(route = Rota.RecuperarSenha.path) {
+                TelaRecuperarSenha(
+                    onVoltar = {
+                        // O popBackStack destrói essa tela e volta automaticamente para a anterior (Login)
+                        navController.popBackStack()
+                    }
+                )
+            }
 
         }
     }

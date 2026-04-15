@@ -10,7 +10,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TelaLoginPlaceholder(
     onLoginSucesso: () -> Unit,
-    onIrParaCadastro: () -> Unit
+    onIrParaCadastro: () -> Unit,
+    onIrParaEsqueciSenha: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -27,6 +28,10 @@ fun TelaLoginPlaceholder(
 
         TextButton(onClick = onIrParaCadastro) {
             Text("Primeiro Acesso? Cadastre-se")
+        }
+        //Botão improvisado
+        TextButton(onClick = onIrParaEsqueciSenha) {
+            Text("Esqueceu sua senha?")
         }
     }
 }
