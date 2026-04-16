@@ -6,8 +6,13 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import kotlin.collections.forEach
+import kotlin.collections.listOf
 
 data class ItemNav(
     val rota: Rota,
@@ -28,6 +33,13 @@ private val itens = listOf(
 fun ForLibraryBottomBar(navController: NavController) {
     val backStack by navController.currentBackStackEntryAsState()
     val rotaAtual = backStack?.destination?.route
+
+    val rotasSemBottomBar = listOf(
+        Rota.Splash.path,
+        Rota.Login.path,
+        Rota.Cadastro.path,
+        Rota.RecuperarSenha.path
+    )
 
     // Só exibe a bottom bar nas telas principais (não no Login/Cadastro)
     val rotasComBar = listOf(

@@ -1,11 +1,21 @@
-package com.br.unifor.for_library.core.navigation
+package com.br.unifor.for_library.core.navigation;
 
 sealed class Rota(val path: String) {
-    object Login      : Rota("login")
-    object Cadastro   : Rota("cadastro")
-    object HomeAluno  : Rota("home_aluno")
-    object Acervo     : Rota("acervo")
-    object Estante    : Rota("estante")
-    object Eventos    : Rota("eventos")
-    object Perfil     : Rota("perfil")
+    // Rotas de Entrada (Sem BottomBar)
+    object Splash : Rota("splash")
+    object Login : Rota("login")
+    object Cadastro : Rota("cadastro")
+
+    object RecuperarSenha : Rota("recuperar_senha")
+
+    // Rotas da Bottom Navigation (Aluno)
+    object HomeAluno : Rota("home_aluno")
+    object Acervo : Rota("acervo")
+    object Estante : Rota("estante")
+    object Eventos : Rota("eventos")
+    object Perfil : Rota("perfil")
+
+    object DetalhesLivro : Rota("detalhes_livro/{livroId}") {
+        fun criarRota(livroId: String) = "detalhes_livro/$livroId"
+    }
 }
