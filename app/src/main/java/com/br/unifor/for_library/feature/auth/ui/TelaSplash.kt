@@ -16,11 +16,13 @@ import androidx.compose.ui.unit.sp
 import com.br.unifor.for_library.R
 import kotlinx.coroutines.delay
 
+private const val SPLASH_DELAY_MS = 3000L
+
 @Composable
 fun TelaSplashScreen(onSplashFinished: () -> Unit) {
     // Coloquei um tempo de espera 3 segundos
     LaunchedEffect(Unit) {
-        delay(3000)
+        delay(SPLASH_DELAY_MS)
         onSplashFinished()
     }
     //Colocar em res? nao sei
