@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.br.unifor.for_library.core.navigation.ForLibraryBottomBar
 import com.br.unifor.for_library.core.navigation.Rota
+import com.br.unifor.for_library.feature.acervo.ui.TelaAcervoDigital
 import com.br.unifor.for_library.feature.auth.ui.TelaLoginPlaceholder
 
 @Composable
@@ -58,7 +59,7 @@ fun ForLibraryApp() {
 
             // ── Bottom Nav ────────────────────────────────────────────────────
             composable(Rota.Acervo.path) {
-                TelaPlaceholder("Acervo")
+                TelaAcervoDigital()
             }
 
             composable(Rota.Estante.path) {
