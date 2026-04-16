@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.sp
 fun TelaLoginPlaceholder(
     onLoginSucesso: () -> Unit,
     onIrParaCadastro: () -> Unit,
-    onEsqueceuSenha: () -> Unit = {} // Adicionado com valor padrão para não quebrar seu Rotas.kt
+    onIrParaEsqueciSenha: () -> Unit,
+    onEsqueceuSenha: () -> Unit = {}
 ) {
     // Estados puramente visuais (para permitir digitação e ver a senha)
     var email by remember { mutableStateOf("") }
@@ -109,6 +110,10 @@ fun TelaLoginPlaceholder(
                 Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Seta Entrar")
             }
         }
+        //Botão improvisado
+        TextButton(onClick = onIrParaEsqueciSenha) {
+            Text("Esqueceu sua senha?")
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -149,19 +154,4 @@ fun TelaLoginPlaceholder(
 
         Spacer(modifier = Modifier.height(32.dp))
     }
-}
-
-
-
-// A anotação @Preview diz ao Android Studio: "Desenhe isso na tela ao lado!"
-// showBackground = true coloca um fundo branco, simulando a tela do celular.
-@Preview(showBackground = true)
-@Composable
-fun TelaLoginPreview() {
-    // Aqui nós chamamos a sua tela, passando funções vazias "{}" só para o Preview funcionar
-    TelaLoginPlaceholder(
-        onLoginSucesso = {},
-        onIrParaCadastro = {},
-        onEsqueceuSenha = {}
-    )
 }

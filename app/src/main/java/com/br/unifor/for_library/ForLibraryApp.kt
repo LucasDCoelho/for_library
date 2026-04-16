@@ -1,4 +1,4 @@
-package com.br.unifor.for_library
+package com.br.unifor.for_library;
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,20 +15,37 @@ import com.br.unifor.for_library.core.navigation.ForLibraryBottomBar
 import com.br.unifor.for_library.core.navigation.Rota
 import com.br.unifor.for_library.feature.acervo.ui.TelaAcervoDigital
 import com.br.unifor.for_library.feature.auth.ui.TelaLoginPlaceholder
+import com.br.unifor.for_library.feature.splash.ui.TelaSplashScreen
+import com.br.unifor.for_library.feature.auth.ui.TelaRecuperarSenha
+import com.br.unifor.for_library.feature.auth.ui.TelaSplashScreen
 
 @Composable
 fun ForLibraryApp() {
+    // Esse é o controlador mestre. Ele só é instanciado UMA vez aqui.
     val navController = rememberNavController()
 
+    // O Scaffold gerencia o layout da tela, incluindo a BottomBar
     Scaffold(
         bottomBar = { ForLibraryBottomBar(navController = navController) }
     ) { paddingValues ->
 
+        // O NavHost é onde as rotas são ligadas às telas
         NavHost(
             navController = navController,
-            startDestination = Rota.Login.path,
+            startDestination = Rota.Splash.path,
             modifier = Modifier.padding(paddingValues)
         ) {
+
+            composable(route = Rota.Splash.path) {
+                TelaSplashScreen(
+                    onSplashFinished = {
+                        // Navega para o Login e remove a Splash do histórico
+                        navController.navigate(Rota.Login.path) {
+                            popUpTo(Rota.Splash.path) { inclusive = true }
+                        }
+                    }
+                )
+            }
 
             // ── Autenticação ──────────────────────────────────────────────────
             composable(Rota.Login.path) {
@@ -38,7 +55,20 @@ fun ForLibraryApp() {
                             popUpTo(Rota.Login.path) { inclusive = true }
                         }
                     },
-                    onIrParaCadastro = { navController.navigate(Rota.Cadastro.path) }
+                    onIrParaCadastro = {
+                        navController.navigate(route = Rota.Cadastro.path)
+                    },
+                    onIrParaEsqueciSenha = {
+                        navController.navigate(route = Rota.RecuperarSenha.path)
+                    }
+                )
+            }
+            composable(route = Rota.RecuperarSenha.path) {
+                TelaRecuperarSenha(
+                    onVoltar = {
+                        // O popBackStack destrói essa tela e volta automaticamente para a anterior (Login)
+                        navController.popBackStack()
+                    }
                 )
             }
 
@@ -68,6 +98,9 @@ fun ForLibraryApp() {
 
             composable(Rota.Eventos.path) {
                 TelaPlaceholder("Eventos")
+            }
+            composable(route = Rota.Cadastro.path) {
+                Text(text = "Tela de cadastro (em construção)")
             }
 
             composable(Rota.Perfil.path) {
