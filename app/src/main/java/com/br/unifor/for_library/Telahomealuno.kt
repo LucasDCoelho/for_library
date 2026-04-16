@@ -29,9 +29,9 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 
 // ── Cores ─────────────────────────────────────────────────────────────────────
-private val AzulPrimario = Color(0xFF1565C0)
+val AzulPrimario = Color(0xFF1565C0)
 private val AzulChip     = Color(0xFF1E88E5)
-private val CinzaTexto   = Color(0xFF616161)
+val CinzaTexto   = Color(0xFF616161)
 private val FundoTela    = Color(0xFFF2F4F8)
 
 // ── Modelos ───────────────────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ private val mockDestaques = listOf(
     LivroDestaque(5, "Atomic Habits", "James Clear",       isbn = "9780735211292", salvo = false),
 )
 
-private val coresFallback = listOf(
+val coresFallback = listOf(
     Color(0xFF1565C0), Color(0xFF283593), Color(0xFF4527A0),
     Color(0xFF00695C), Color(0xFF558B2F)
 )
@@ -346,7 +346,7 @@ fun TelaHomeAluno(
 // ── Componente de capa ────────────────────────────────────────────────────────
 // Busca pela Open Library via ISBN. Se não encontrar, exibe fallback colorido com iniciais.
 @Composable
-private fun CapaLivro(
+public fun CapaLivro(
     isbn: String,
     tituloFallback: String,
     modifier: Modifier = Modifier,
