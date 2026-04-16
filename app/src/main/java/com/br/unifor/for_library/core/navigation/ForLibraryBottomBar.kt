@@ -38,7 +38,12 @@ fun ForLibraryBottomBar(navController: NavController) {
     val rotaAtual = navBackStackEntry?.destination?.route
 
     // Define em quais telas a BottomBar NÃO deve aparecer
-    val rotasSemBottomBar = listOf(Rota.Splash.path, Rota.Login.path, Rota.Cadastro.path,Rota.RecuperarSenha.path)
+    val rotasSemBottomBar = listOf(
+        Rota.Splash.path,
+        Rota.Login.path,
+        Rota.Cadastro.path,
+        Rota.RecuperarSenha.path
+    )
 
     if (rotaAtual !in rotasSemBottomBar) {
         NavigationBar {
