@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.splash.ui
+package com.br.unifor.for_library.feature.auth.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
