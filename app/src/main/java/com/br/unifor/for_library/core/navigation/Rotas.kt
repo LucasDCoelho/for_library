@@ -6,7 +6,7 @@ sealed class Rota(val path: String) {
     object Login : Rota("login")
     object Cadastro : Rota("cadastro")
 
-    object RecuperarSenha : Rota("esquecisenha")
+    object RecuperarSenha : Rota("recuperar_senha")
 
     // Rotas da Bottom Navigation (Aluno)
     object HomeAluno : Rota("home_aluno")
