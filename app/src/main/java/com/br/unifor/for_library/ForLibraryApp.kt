@@ -13,11 +13,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.br.unifor.for_library.core.navigation.ForLibraryBottomBar
 import com.br.unifor.for_library.core.navigation.Rota
+import com.br.unifor.for_library.feature.perfil.ui.TelaPerfil
 import com.br.unifor.for_library.feature.acervo.ui.TelaAcervoDigital
 import com.br.unifor.for_library.feature.auth.ui.TelaLoginPlaceholder
-import com.br.unifor.for_library.feature.splash.ui.TelaSplashScreen
 import com.br.unifor.for_library.feature.auth.ui.TelaRecuperarSenha
 import com.br.unifor.for_library.feature.auth.ui.TelaSplashScreen
+import com.br.unifor.for_library.feature.notificaçao.ui.TelaNotificacoes
+import com.br.unifor.for_library.feature.perfil.ui.TelaEditarPerfil
+import com.br.unifor.for_library.feature.perfil.ui.TelaDuvidas
 
 @Composable
 fun ForLibraryApp() {
@@ -48,6 +51,7 @@ fun ForLibraryApp() {
             }
 
             // ── Autenticação ──────────────────────────────────────────────────
+            //Login
             composable(Rota.Login.path) {
                 TelaLoginPlaceholder(
                     onLoginSucesso = {
@@ -63,33 +67,54 @@ fun ForLibraryApp() {
                     }
                 )
             }
+            //Recuperar senhnha
             composable(route = Rota.RecuperarSenha.path) {
                 TelaRecuperarSenha(
                     onVoltar = {
-                        // O popBackStack destrói essa tela e volta automaticamente para a anterior (Login)
                         navController.popBackStack()
                     }
                 )
             }
-
+            //Cadastro
             composable(Rota.Cadastro.path) {
                 TelaPlaceholder("Cadastro")
             }
 
-            // ── Home ──────────────────────────────────────────────────────────
+            // HOME
             composable(Rota.HomeAluno.path) {
                 TelaHomeAluno(
                     onPontosClick        = { /* TODO: Rota.MeusPontos */ },
-                    onSinoClick          = { /* TODO: Rota.Notificacoes */ },
+                    onSinoClick          = { navController.navigate(Rota.Notificacoes.path) },
                     onContinueLendoClick = { /* TODO: Rota.Leitor */ },
                     onVerTodosClick      = { navController.navigate(Rota.Acervo.path) },
                     onLivroClick         = { /* TODO: Rota.DetalhesLivro */ }
                 )
             }
-
+            //Notificações
+            composable(Rota.Notificacoes.path) {
+                TelaNotificacoes(
+                    onVoltar = { navController.popBackStack() }
+                )
+            }
+            //Editar perfil
+            composable(Rota.EditarPerfil.path) {
+                TelaEditarPerfil(
+                    onVoltar = { navController.popBackStack() }
+                )
+            }
+            //F.A.Q
+            composable(Rota.Duvida.path) {
+                TelaDuvidas(
+                    onVoltar = { navController.popBackStack() }
+                )
+            }
             // ── Bottom Nav ────────────────────────────────────────────────────
             composable(Rota.Acervo.path) {
-                TelaAcervoDigital()
+                TelaAcervoDigital(
+                    onSinoClick = {
+                        navController.navigate(Rota.Notificacoes.path)
+                    }
+                )
             }
 
             composable(Rota.Estante.path) {
@@ -104,7 +129,17 @@ fun ForLibraryApp() {
             }
 
             composable(Rota.Perfil.path) {
-                TelaPlaceholder("Perfil")
+                TelaPerfil(
+                    onEditarPerfilClick = { navController.navigate(Rota.EditarPerfil.path) },
+                    onEnvioObraClick = { /*TODO*/ },
+                    onDuvidasClick = { navController.navigate(Rota.Duvida.path) },
+                    onConfiguracoesClick = { /*TODO*/ },
+                    onSairClick = {
+                        navController.navigate(Rota.Login.path) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
             }
         }
     }

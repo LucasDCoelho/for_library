@@ -73,7 +73,8 @@ private val mockDestaques = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaAcervoDigital(
-    onLivroClick: (Int) -> Unit = {}
+    onLivroClick: (Int) -> Unit = {} ,
+    onSinoClick: () -> Unit = {}
 ) {
     // Estados do Grid
     var destaques by remember { mutableStateOf(mockDestaques) }
@@ -124,8 +125,7 @@ fun TelaAcervoDigital(
                     color = Color.Black
                 )
             }
-
-            IconButton(onClick = { /* Ação Notificação */ }) {
+            IconButton(onClick = onSinoClick) {
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
                     contentDescription = "Notificações",
