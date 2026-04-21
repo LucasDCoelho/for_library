@@ -1,4 +1,4 @@
-package com.br.unifor.for_library
+package com.br.unifor.for_library.feature.home.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,11 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.br.unifor.for_library.core.LivrosSalvosState
 
 // ── Cores ─────────────────────────────────────────────────────────────────────
-private val AzulPrimario = Color(0xFF1565C0)
+val AzulPrimario = Color(0xFF1565C0)
 private val AzulChip     = Color(0xFF1E88E5)
-private val CinzaTexto   = Color(0xFF616161)
+val CinzaTexto   = Color(0xFF616161)
 private val FundoTela    = Color(0xFFF2F4F8)
 
 // ── Modelos ───────────────────────────────────────────────────────────────────
@@ -70,7 +71,7 @@ private val mockDestaques = listOf(
     LivroDestaque(5, "Atomic Habits", "James Clear",       isbn = "9780735211292", salvo = false),
 )
 
-private val coresFallback = listOf(
+val coresFallback = listOf(
     Color(0xFF1565C0), Color(0xFF283593), Color(0xFF4527A0),
     Color(0xFF00695C), Color(0xFF558B2F)
 )
@@ -94,7 +95,7 @@ fun TelaHomeAluno(
     onVerTodosClick: () -> Unit = {},
     onLivroClick: (Int) -> Unit = {},
 ) {
-    var destaques by remember { mutableStateOf(mockDestaques) }
+    val destaques = mockDestaques
 
     Column(
         modifier = Modifier
@@ -281,17 +282,13 @@ fun TelaHomeAluno(
                                 .size(26.dp)
                                 .clip(CircleShape)
                                 .background(Color.White.copy(alpha = 0.88f))
-                                .clickable {
-                                    destaques = destaques.map {
-                                        if (it.id == livro.id) it.copy(salvo = !it.salvo) else it
-                                    }
-                                },
+                                .clickable { LivrosSalvosState.toggleSalvo(livro.isbn) },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = if (livro.salvo) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                                imageVector = if (LivrosSalvosState.isSalvo(livro.isbn)) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                                 contentDescription = null,
-                                tint = if (livro.salvo) AzulPrimario else Color(0xFF757575),
+                                tint = if (LivrosSalvosState.isSalvo(livro.isbn)) AzulPrimario else Color(0xFF757575),
                                 modifier = Modifier.size(15.dp)
                             )
                         }
@@ -346,7 +343,7 @@ fun TelaHomeAluno(
 // ── Componente de capa ────────────────────────────────────────────────────────
 // Busca pela Open Library via ISBN. Se não encontrar, exibe fallback colorido com iniciais.
 @Composable
-private fun CapaLivro(
+public fun CapaLivro(
     isbn: String,
     tituloFallback: String,
     modifier: Modifier = Modifier,
