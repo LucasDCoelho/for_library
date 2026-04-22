@@ -15,9 +15,10 @@ import com.br.unifor.for_library.core.navigation.ForLibraryBottomBar
 import com.br.unifor.for_library.core.navigation.Rota
 import com.br.unifor.for_library.feature.acervo.ui.TelaAcervoDigital
 import com.br.unifor.for_library.feature.auth.ui.TelaLoginPlaceholder
-import com.br.unifor.for_library.feature.splash.ui.TelaSplashScreen
 import com.br.unifor.for_library.feature.auth.ui.TelaRecuperarSenha
 import com.br.unifor.for_library.feature.auth.ui.TelaSplashScreen
+import com.br.unifor.for_library.feature.acervo.ui.TelaDetalhesLivro
+import com.br.unifor.for_library.feature.acervo.ui.TelaLeitorDigital
 
 @Composable
 fun ForLibraryApp() {
@@ -83,7 +84,29 @@ fun ForLibraryApp() {
                     onSinoClick          = { /* TODO: Rota.Notificacoes */ },
                     onContinueLendoClick = { /* TODO: Rota.Leitor */ },
                     onVerTodosClick      = { navController.navigate(Rota.Acervo.path) },
-                    onLivroClick         = { /* TODO: Rota.DetalhesLivro */ }
+                    onLivroClick = { navController.navigate(Rota.DetalhesLivro.criarRota("livro_id_exemplo")) }                )
+            }
+
+            composable(Rota.DetalhesLivro.path) { backStackEntry ->
+                val livroId = backStackEntry.arguments?.getString("livroId") ?: ""
+
+                TelaDetalhesLivro(
+                    livroId = livroId,
+                    onVoltar = { navController.popBackStack() },
+                    onNotificacoes = { /* TODO */ },
+                    onLerAgora = {
+                        // Clicou no botão, navega para o Leitor passando o título!
+                        navController.navigate(Rota.LeitorDigital.criarRota(livroId, "O Horizonte de Eventos"))
+                    }
+                )
+            }
+
+            composable(route = Rota.LeitorDigital.path) { backStackEntry ->
+                val titulo = backStackEntry.arguments?.getString("titulo") ?: "Livro Desconhecido"
+
+                TelaLeitorDigital(
+                    tituloLivro = titulo,
+                    onVoltar = { navController.popBackStack() }
                 )
             }
 
