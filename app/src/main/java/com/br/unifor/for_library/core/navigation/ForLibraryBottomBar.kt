@@ -38,7 +38,10 @@ fun ForLibraryBottomBar(navController: NavController) {
         Rota.Splash.path,
         Rota.Login.path,
         Rota.Cadastro.path,
-        Rota.RecuperarSenha.path
+        Rota.RecuperarSenha.path,
+        Rota.Notificacoes.path,
+        Rota.EditarPerfil.path,
+        Rota.Duvida.path,
     )
 
     // Só exibe a bottom bar nas telas principais (não no Login/Cadastro)
