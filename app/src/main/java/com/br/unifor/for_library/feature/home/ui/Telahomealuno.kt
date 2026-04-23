@@ -1,4 +1,4 @@
-package com.br.unifor.for_library
+package com.br.unifor.for_library.feature.home.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.br.unifor.for_library.core.LivrosSalvosState
 
 // ── Cores ─────────────────────────────────────────────────────────────────────
 val AzulPrimario = Color(0xFF1565C0)
@@ -94,7 +95,7 @@ fun TelaHomeAluno(
     onVerTodosClick: () -> Unit = {},
     onLivroClick: (Int) -> Unit = {},
 ) {
-    var destaques by remember { mutableStateOf(mockDestaques) }
+    val destaques = mockDestaques
 
     Column(
         modifier = Modifier
@@ -281,17 +282,13 @@ fun TelaHomeAluno(
                                 .size(26.dp)
                                 .clip(CircleShape)
                                 .background(Color.White.copy(alpha = 0.88f))
-                                .clickable {
-                                    destaques = destaques.map {
-                                        if (it.id == livro.id) it.copy(salvo = !it.salvo) else it
-                                    }
-                                },
+                                .clickable { LivrosSalvosState.toggleSalvo(livro.isbn) },
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = if (livro.salvo) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                                imageVector = if (LivrosSalvosState.isSalvo(livro.isbn)) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                                 contentDescription = null,
-                                tint = if (livro.salvo) AzulPrimario else Color(0xFF757575),
+                                tint = if (LivrosSalvosState.isSalvo(livro.isbn)) AzulPrimario else Color(0xFF757575),
                                 modifier = Modifier.size(15.dp)
                             )
                         }
