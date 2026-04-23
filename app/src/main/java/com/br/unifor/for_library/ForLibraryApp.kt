@@ -168,7 +168,7 @@ fun ForLibraryApp() {
 
             composable(Rota.Eventos.path) {
                 TelaEventos(
-                    onSinoClick   = { /* TODO: Rota.Notificacoes */ },
+                    onSinoClick   = { navController.navigate(Rota.Notificacoes.path) },
                     onEventoClick = { /* TODO: Rota.DetalhesEvento */ }
                 )
             }
