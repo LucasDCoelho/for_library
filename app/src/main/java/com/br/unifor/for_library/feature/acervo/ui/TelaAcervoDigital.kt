@@ -49,6 +49,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.br.unifor.for_library.core.LivrosSalvosState
+import com.br.unifor.for_library.core.components.FiltroAvancadoBottomSheet
+import com.br.unifor.for_library.core.components.FiltroAvancadoState
 import com.br.unifor.for_library.feature.home.ui.AzulPrimario
 import com.br.unifor.for_library.feature.home.ui.CapaLivro
 import com.br.unifor.for_library.feature.home.ui.CinzaTexto
@@ -79,6 +81,15 @@ fun TelaAcervoDigital(
     var searchQuery by remember { mutableStateOf("") }
     val categorias = listOf("Tudo", "Ficção", "Tecnologia", "História", "Design")
     var categoriaSelecionada by remember { mutableStateOf("Tudo") }
+    var mostrarFiltro by remember { mutableStateOf(false) }
+    var filtroState by remember { mutableStateOf(FiltroAvancadoState()) }
+
+    FiltroAvancadoBottomSheet(
+        visivel = mostrarFiltro,
+        estadoInicial = filtroState,
+        onDismiss = { mostrarFiltro = false },
+        onAplicar = { novoFiltro -> filtroState = novoFiltro }
+    )
 
     Column(
         modifier = Modifier
@@ -153,7 +164,7 @@ fun TelaAcervoDigital(
                     .size(52.dp)
                     .clip(RoundedCornerShape(4.dp))
                     .background(Color(0xFFF5F5F5))
-                    .clickable { /* Filtros */ },
+                    .clickable { mostrarFiltro = true },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(Icons.Outlined.FilterList, contentDescription = "Filtros", tint = Color.DarkGray)
