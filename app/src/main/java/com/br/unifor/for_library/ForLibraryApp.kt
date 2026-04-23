@@ -132,7 +132,7 @@ fun ForLibraryApp() {
                     onConfiguracoesClick = { /*TODO*/ },
                     onSairClick = {
                         navController.navigate(Rota.Login.path) {
-                            popUpTo(0) { inclusive = true }
+                            popUpTo(Rota.Splash.path) { inclusive = true }
                         }
                     }
                 )
