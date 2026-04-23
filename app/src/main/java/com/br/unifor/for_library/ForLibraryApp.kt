@@ -67,7 +67,7 @@ fun ForLibraryApp() {
                     }
                 )
             }
-            //Recuperar senhnha
+            //Recuperar senha
             composable(route = Rota.RecuperarSenha.path) {
                 TelaRecuperarSenha(
                     onVoltar = {
