@@ -73,7 +73,8 @@ private val mockDestaques = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaAcervoDigital(
-    onLivroClick: (Int) -> Unit = {}
+    onLivroClick: (Int) -> Unit = {},
+    onSinoClick: () -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
     val categorias = listOf("Tudo", "Ficção", "Tecnologia", "História", "Design")
@@ -114,7 +115,7 @@ fun TelaAcervoDigital(
                     color = Color.Black
                 )
             }
-            IconButton(onClick = { /* Notificações */ }) {
+            IconButton(onClick = onSinoClick) {
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
                     contentDescription = "Notificações",

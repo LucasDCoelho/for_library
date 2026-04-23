@@ -20,7 +20,6 @@ private const val SPLASH_DELAY_MS = 3000L
 
 @Composable
 fun TelaSplashScreen(onSplashFinished: () -> Unit) {
-    // Coloquei um tempo de espera 3 segundos
     LaunchedEffect(Unit) {
         delay(SPLASH_DELAY_MS)
         onSplashFinished()

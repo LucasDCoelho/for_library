@@ -1,4 +1,4 @@
-package com.br.unifor.for_library
+package com.br.unifor.for_library;
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +22,10 @@ import com.br.unifor.for_library.feature.auth.ui.TelaLoginPlaceholder
 import com.br.unifor.for_library.feature.auth.ui.TelaRecuperarSenha
 import com.br.unifor.for_library.feature.auth.ui.TelaSplashScreen
 import com.br.unifor.for_library.feature.home.ui.TelaHomeAluno
+import com.br.unifor.for_library.feature.perfil.ui.TelaPerfil
+import com.br.unifor.for_library.feature.notificaçao.ui.TelaNotificacoes
+import com.br.unifor.for_library.feature.perfil.ui.TelaEditarPerfil
+import com.br.unifor.for_library.feature.perfil.ui.TelaDuvidas
 
 private val rotasComPadding = setOf(
     Rota.HomeAluno.path,
@@ -33,10 +37,12 @@ private val rotasComPadding = setOf(
 
 @Composable
 fun ForLibraryApp() {
+    // Esse é o controlador mestre. Ele só é instanciado UMA vez aqui.
     val navController = rememberNavController()
     val backStack by navController.currentBackStackEntryAsState()
     val rotaAtual = backStack?.destination?.route
 
+    // O Scaffold gerencia o layout da tela, incluindo a BottomBar
     Scaffold(
         bottomBar = { ForLibraryBottomBar(navController = navController) }
     ) { paddingValues ->
@@ -83,17 +89,38 @@ fun ForLibraryApp() {
             }
 
             composable(Rota.Cadastro.path) {
-                TelaPlaceholder("Cadastro")
+                Text(text = "Tela de cadastro (em construção)")
             }
 
             // ── Home ──────────────────────────────────────────────────────────
             composable(Rota.HomeAluno.path) {
                 TelaHomeAluno(
                     onPontosClick        = { /* TODO: Rota.MeusPontos */ },
-                    onSinoClick          = { /* TODO: Rota.Notificacoes */ },
+                    onSinoClick          = { navController.navigate(Rota.Notificacoes.path) },
                     onContinueLendoClick = { /* TODO: Rota.Leitor */ },
                     onVerTodosClick      = { navController.navigate(Rota.Acervo.path) },
                     onLivroClick         = { /* TODO: Rota.DetalhesLivro */ }
+                )
+            }
+
+            // ── Notificações ──────────────────────────────────────────────────
+            composable(Rota.Notificacoes.path) {
+                TelaNotificacoes(
+                    onVoltar = { navController.popBackStack() }
+                )
+            }
+
+            // ── Editar Perfil ─────────────────────────────────────────────────
+            composable(Rota.EditarPerfil.path) {
+                TelaEditarPerfil(
+                    onVoltar = { navController.popBackStack() }
+                )
+            }
+
+            // ── F.A.Q ─────────────────────────────────────────────────────────
+            composable(Rota.Duvida.path) {
+                TelaDuvidas(
+                    onVoltar = { navController.popBackStack() }
                 )
             }
 
@@ -102,6 +129,9 @@ fun ForLibraryApp() {
                 TelaAcervoDigital(
                     onLivroClick = { livroId ->
                         navController.navigate(Rota.DetalhesLivro.criarRota(livroId.toString()))
+                    },
+                    onSinoClick = {
+                        navController.navigate(Rota.Notificacoes.path)
                     }
                 )
             }
@@ -119,7 +149,19 @@ fun ForLibraryApp() {
                 )
             }
 
-            composable(Rota.Perfil.path) { TelaPlaceholder("Perfil") }
+            composable(Rota.Perfil.path) {
+                TelaPerfil(
+                    onEditarPerfilClick = { navController.navigate(Rota.EditarPerfil.path) },
+                    onEnvioObraClick = { /*TODO*/ },
+                    onDuvidasClick = { navController.navigate(Rota.Duvida.path) },
+                    onConfiguracoesClick = { /*TODO*/ },
+                    onSairClick = {
+                        navController.navigate(Rota.Login.path) {
+                            popUpTo(Rota.Splash.path) { inclusive = true }
+                        }
+                    }
+                )
+            }
         }
     }
 }

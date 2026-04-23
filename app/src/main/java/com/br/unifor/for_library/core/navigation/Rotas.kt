@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.core.navigation
+package com.br.unifor.for_library.core.navigation;
 
 sealed class Rota(val path: String) {
     // Rotas de Entrada (Sem BottomBar)
@@ -6,6 +6,9 @@ sealed class Rota(val path: String) {
     object Login          : Rota("login")
     object Cadastro       : Rota("cadastro")
     object RecuperarSenha : Rota("recuperar_senha")
+    object Notificacoes   : Rota("notificacoes")
+    object EditarPerfil   : Rota("editar_perfil")
+    object Duvida         : Rota("duvida")
 
     // Rotas da Bottom Navigation (Aluno)
     object HomeAluno : Rota("home_aluno")
