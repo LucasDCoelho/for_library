@@ -73,7 +73,7 @@ private val mockDestaques = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaAcervoDigital(
-    onLivroClick: (Int) -> Unit = {} ,
+    onLivroClick: (Int) -> Unit = {},
     onSinoClick: () -> Unit = {}
 ) {
     // Estados do Grid
