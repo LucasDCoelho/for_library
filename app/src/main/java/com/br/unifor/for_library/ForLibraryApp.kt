@@ -75,10 +75,6 @@ fun ForLibraryApp() {
                     }
                 )
             }
-            //Cadastro
-            composable(Rota.Cadastro.path) {
-                TelaPlaceholder("Cadastro")
-            }
 
             // HOME
             composable(Rota.HomeAluno.path) {
