@@ -15,7 +15,6 @@ import com.br.unifor.for_library.core.navigation.ForLibraryBottomBar
 import com.br.unifor.for_library.core.navigation.Rota
 import com.br.unifor.for_library.feature.acervo.ui.TelaAcervoDigital
 import com.br.unifor.for_library.feature.auth.ui.TelaLoginPlaceholder
-import com.br.unifor.for_library.feature.splash.ui.TelaSplashScreen
 import com.br.unifor.for_library.feature.auth.ui.TelaRecuperarSenha
 import com.br.unifor.for_library.feature.auth.ui.TelaSplashScreen
 
