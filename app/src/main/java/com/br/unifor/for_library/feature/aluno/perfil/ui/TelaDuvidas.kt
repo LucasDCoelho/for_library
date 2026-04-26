@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.perfil.ui
+﻿package com.br.unifor.for_library.feature.aluno.perfil.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ── Modelo de Dados ──
+// â”€â”€ Modelo de Dados â”€â”€
 data class Duvida(
     val pergunta: String,
     val resposta: String
@@ -35,7 +35,7 @@ fun TelaDuvidas(
     val listaDuvidas = listOf(
         Duvida(
             pergunta = "Como renovar um livro?",
-            resposta = "Para renovar uma obra, acesse a aba \"Empréstimos\", selecione o livro desejado e clique no botão \"Renovar\". Certifique-se de que não há reservas pendentes para este título."
+            resposta = "Para renovar uma obra, acesse a aba \"EmprÃ©stimos\", selecione o livro desejado e clique no botÃ£o \"Renovar\". Certifique-se de que nÃ£o hÃ¡ reservas pendentes para este tÃ­tulo."
         ),
         // As demais com texto vazio conforme solicitado
         Duvida("Como funciona o sistema de pontos?", "tem rep ainda naum kk 1"),
@@ -43,7 +43,7 @@ fun TelaDuvidas(
         Duvida("Como reportar um erro na obra?", "tem rep ainda naum kk 3")
     )
 
-    // Controla qual item está expandido (começa com o índice 0 expandido)
+    // Controla qual item estÃ¡ expandido (comeÃ§a com o Ã­ndice 0 expandido)
     var expandedIndex by remember { mutableStateOf<Int?>(0) }
 
     Scaffold(
@@ -51,7 +51,7 @@ fun TelaDuvidas(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Dúvidas Frequentes",
+                        text = "DÃºvidas Frequentes",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = Color(0xFF212121)
@@ -76,7 +76,7 @@ fun TelaDuvidas(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // ── Cabeçalho da Tela ──
+            // â”€â”€ CabeÃ§alho da Tela â”€â”€
             item {
                 Column(modifier = Modifier.padding(20.dp)) {
                     Text(
@@ -87,7 +87,7 @@ fun TelaDuvidas(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Encontre respostas para as dúvidas mais comuns sobre o uso da ForLibrary.",
+                        text = "Encontre respostas para as dÃºvidas mais comuns sobre o uso da ForLibrary.",
                         fontSize = 14.sp,
                         color = Color(0xFF757575),
                         lineHeight = 20.sp
@@ -96,11 +96,11 @@ fun TelaDuvidas(
                 HorizontalDivider(color = Color(0xFFEEEEEE), thickness = 1.dp)
             }
 
-            // ── Lista de Perguntas (Accordion) ──
+            // â”€â”€ Lista de Perguntas (Accordion) â”€â”€
             itemsIndexed(listaDuvidas) { index, duvida ->
                 val isExpanded = expandedIndex == index
 
-                // Animação de rotação da setinha
+                // AnimaÃ§Ã£o de rotaÃ§Ã£o da setinha
                 val rotationAngle by animateFloatAsState(
                     targetValue = if (isExpanded) 180f else 0f,
                     label = "SetaAnimacao"
@@ -111,12 +111,12 @@ fun TelaDuvidas(
                         .fillMaxWidth()
                         .background(Color.White)
                 ) {
-                    // Linha clicável da pergunta
+                    // Linha clicÃ¡vel da pergunta
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                // Se clicar no que já está aberto, ele fecha. Se não, abre o clicado.
+                                // Se clicar no que jÃ¡ estÃ¡ aberto, ele fecha. Se nÃ£o, abre o clicado.
                                 expandedIndex = if (isExpanded) null else index
                             }
                             .padding(20.dp),
@@ -138,7 +138,7 @@ fun TelaDuvidas(
                         )
                     }
 
-                    // Conteúdo expansível (Resposta)
+                    // ConteÃºdo expansÃ­vel (Resposta)
                     AnimatedVisibility(visible = isExpanded) {
                         Box(
                             modifier = Modifier

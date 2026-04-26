@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.eventos.ui
+﻿package com.br.unifor.for_library.feature.aluno.eventos.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,17 +29,17 @@ import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 
-// ── Cores ─────────────────────────────────────────────────────────────────────
+// â”€â”€ Cores â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 private val AzulPrimario = Color(0xFF1565C0)
 private val FundoTela    = Color(0xFFF5F7FA)
 private val CinzaTexto   = Color(0xFF616161)
 
-// ── Modelos ───────────────────────────────────────────────────────────────────
+// â”€â”€ Modelos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 enum class TipoEvento(val label: String) {
     TODOS("Todos"),
     WORKSHOP("Workshops"),
     PALESTRA("Palestras"),
-    LANCAMENTO("Lançamentos")
+    LANCAMENTO("LanÃ§amentos")
 }
 
 data class Evento(
@@ -53,13 +53,13 @@ data class Evento(
     val bannerUrl: String = ""
 )
 
-// ── Mock ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Mock â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 private val mockEventos = listOf(
     Evento(
         id = 1,
         titulo = "Workshop de Escrita Criativa",
-        local = "Auditório Central",
-        descricao = "Desenvolva suas habilidades narrativas com técnicas práticas de estruturação de personagens.",
+        local = "AuditÃ³rio Central",
+        descricao = "Desenvolva suas habilidades narrativas com tÃ©cnicas prÃ¡ticas de estruturaÃ§Ã£o de personagens.",
         mes = "MAI",
         dia = "15",
         tipo = TipoEvento.WORKSHOP,
@@ -67,9 +67,9 @@ private val mockEventos = listOf(
     ),
     Evento(
         id = 2,
-        titulo = "Noite de Poesia Contemporânea",
+        titulo = "Noite de Poesia ContemporÃ¢nea",
         local = "Sala de Leitura 04",
-        descricao = "Um encontro dedicado a explorar as novas vozes da poesia nacional com leitura aberta ao público.",
+        descricao = "Um encontro dedicado a explorar as novas vozes da poesia nacional com leitura aberta ao pÃºblico.",
         mes = "MAI",
         dia = "22",
         tipo = TipoEvento.PALESTRA,
@@ -77,9 +77,9 @@ private val mockEventos = listOf(
     ),
     Evento(
         id = 3,
-        titulo = "Lançamento: O Eco do Silêncio",
+        titulo = "LanÃ§amento: O Eco do SilÃªncio",
         local = "Foyer Principal",
-        descricao = "Sessão de autógrafos e bate-papo com a autora premiada Marina Silva sobre seu novo romance.",
+        descricao = "SessÃ£o de autÃ³grafos e bate-papo com a autora premiada Marina Silva sobre seu novo romance.",
         mes = "JUN",
         dia = "05",
         tipo = TipoEvento.LANCAMENTO,
@@ -88,8 +88,8 @@ private val mockEventos = listOf(
     Evento(
         id = 4,
         titulo = "Palestra: O Futuro da Literatura Digital",
-        local = "Auditório B",
-        descricao = "Como as novas tecnologias estão transformando a forma de escrever e consumir literatura.",
+        local = "AuditÃ³rio B",
+        descricao = "Como as novas tecnologias estÃ£o transformando a forma de escrever e consumir literatura.",
         mes = "JUN",
         dia = "18",
         tipo = TipoEvento.PALESTRA,
@@ -97,9 +97,9 @@ private val mockEventos = listOf(
     ),
     Evento(
         id = 5,
-        titulo = "Workshop: Revisão e Edição de Textos",
+        titulo = "Workshop: RevisÃ£o e EdiÃ§Ã£o de Textos",
         local = "Sala de Leitura 02",
-        descricao = "Aprenda técnicas profissionais de revisão para aprimorar seus textos antes da publicação.",
+        descricao = "Aprenda tÃ©cnicas profissionais de revisÃ£o para aprimorar seus textos antes da publicaÃ§Ã£o.",
         mes = "JUL",
         dia = "03",
         tipo = TipoEvento.WORKSHOP,
@@ -107,7 +107,7 @@ private val mockEventos = listOf(
     )
 )
 
-// ── Tela principal ────────────────────────────────────────────────────────────
+// â”€â”€ Tela principal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @Composable
 fun TelaEventos(
     onSinoClick: () -> Unit = {},
@@ -125,7 +125,7 @@ fun TelaEventos(
             .fillMaxSize()
             .background(FundoTela)
     ) {
-        // ── Header (RF16.1) ───────────────────────────────────────────────────
+        // â”€â”€ Header (RF16.1) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -151,7 +151,7 @@ fun TelaEventos(
             }
 
             Text(
-                text = "Eventos Literários",
+                text = "Eventos LiterÃ¡rios",
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1A1A2E)
@@ -164,14 +164,14 @@ fun TelaEventos(
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
-                    contentDescription = "Notificações",
+                    contentDescription = "NotificaÃ§Ãµes",
                     tint = Color(0xFF424242),
                     modifier = Modifier.size(22.dp)
                 )
             }
         }
 
-        // ── Filtros (RF16.2) ──────────────────────────────────────────────────
+        // â”€â”€ Filtros (RF16.2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -203,7 +203,7 @@ fun TelaEventos(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // ── Lista de cards (RF16.3) ───────────────────────────────────────────
+        // â”€â”€ Lista de cards (RF16.3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -220,7 +220,7 @@ fun TelaEventos(
     }
 }
 
-// ── Card de Evento (RF16.4 + RF16.5) ─────────────────────────────────────────
+// â”€â”€ Card de Evento (RF16.4 + RF16.5) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @Composable
 private fun CardEvento(
     evento: Evento,
@@ -308,11 +308,11 @@ private fun CardEvento(
                 }
             }
 
-            // Conteúdo do card
+            // ConteÃºdo do card
             Column(
                 modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 10.dp)
             ) {
-                // Título
+                // TÃ­tulo
                 Text(
                     text = evento.titulo,
                     fontSize = 15.sp,
@@ -344,7 +344,7 @@ private fun CardEvento(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // Descrição
+                // DescriÃ§Ã£o
                 Text(
                     text = evento.descricao,
                     fontSize = 13.sp,
@@ -356,7 +356,7 @@ private fun CardEvento(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Botão seta (RF16.5)
+                // BotÃ£o seta (RF16.5)
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.CenterEnd
@@ -381,3 +381,4 @@ private fun CardEvento(
         }
     }
 }
+

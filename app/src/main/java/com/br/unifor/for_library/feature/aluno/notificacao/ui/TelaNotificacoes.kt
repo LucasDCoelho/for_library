@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.`notificaçao`.ui
+﻿package com.br.unifor.for_library.feature.aluno.notificacao.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -52,20 +52,20 @@ fun TelaNotificacoes(
         SecaoNotificacao(
             tituloSecao = "HOJE",
             notificacoes = listOf(
-                Notificacao(1, "Sua resenha foi aprovada!", "Parabéns! Sua análise de \"Dom Casmurro\" agora está visível para a comunidade.", "10:45", Icons.Default.ChatBubbleOutline, false),
-                Notificacao(2, "Novo evento literário disponível!", "O Clube de Leitura DarkRomanceLovers acaba de abrir vagas para o debate de Sábado.", "08:20", Icons.Default.CalendarMonth, false)
+                Notificacao(1, "Sua resenha foi aprovada!", "ParabÃ©ns! Sua anÃ¡lise de \"Dom Casmurro\" agora estÃ¡ visÃ­vel para a comunidade.", "10:45", Icons.Default.ChatBubbleOutline, false),
+                Notificacao(2, "Novo evento literÃ¡rio disponÃ­vel!", "O Clube de Leitura DarkRomanceLovers acaba de abrir vagas para o debate de SÃ¡bado.", "08:20", Icons.Default.CalendarMonth, false)
             )
         ),
         SecaoNotificacao(
             tituloSecao = "ONTEM",
             notificacoes = listOf(
-                Notificacao(3, "Livro salvo atualizado", "\"A Metamorfose\" recebeu uma nova edição digital na biblioteca.", "Ontem, 16:30", Icons.Default.BookmarkBorder, true)
+                Notificacao(3, "Livro salvo atualizado", "\"A Metamorfose\" recebeu uma nova ediÃ§Ã£o digital na biblioteca.", "Ontem, 16:30", Icons.Default.BookmarkBorder, true)
             )
         ),
         SecaoNotificacao(
             tituloSecao = "ANTERIORES",
             notificacoes = listOf(
-                Notificacao(4, "Conta verificada", "Seu perfil de Bibliotecário foi validado com sucesso.", "12 Out, 09:00", Icons.Default.VerifiedUser, true)
+                Notificacao(4, "Conta verificada", "Seu perfil de BibliotecÃ¡rio foi validado com sucesso.", "12 Out, 09:00", Icons.Default.VerifiedUser, true)
             )
         )
     )
@@ -75,7 +75,7 @@ fun TelaNotificacoes(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Notificações", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text("NotificaÃ§Ãµes", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 },
                 navigationIcon = {
                     IconButton(onClick = onVoltar) {
@@ -83,7 +83,7 @@ fun TelaNotificacoes(
                     }
                 },
                 actions = {
-                    TextButton(onClick = { /* Lógica para marcar todas como lidas */ }) {
+                    TextButton(onClick = { /* LÃ³gica para marcar todas como lidas */ }) {
                         Text("Marcar todas como lidas", color = azulPrimario, fontSize = 13.sp)
                     }
                 },
@@ -97,7 +97,7 @@ fun TelaNotificacoes(
                 .padding(paddingValues)
         ) {
             secoes.forEach { secao ->
-                // Cabeçalho da Seção (HOJE, ONTEM, ANTERIORES)
+                // CabeÃ§alho da SeÃ§Ã£o (HOJE, ONTEM, ANTERIORES)
                 item {
                     Text(
                         text = secao.tituloSecao,
@@ -109,7 +109,7 @@ fun TelaNotificacoes(
                     )
                 }
 
-                // Itens da Seção
+                // Itens da SeÃ§Ã£o
                 items(secao.notificacoes) { notif ->
                     Row(
                         modifier = Modifier
@@ -118,7 +118,7 @@ fun TelaNotificacoes(
                             .padding(horizontal = 16.dp, vertical = 16.dp),
                         verticalAlignment = Alignment.Top
                     ) {
-                        // Bolinha de Não Lida + Ícone
+                        // Bolinha de NÃ£o Lida + Ãcone
                         Box(
                             modifier = Modifier.width(32.dp),
                             contentAlignment = Alignment.TopStart
@@ -145,7 +145,7 @@ fun TelaNotificacoes(
 
                         Spacer(modifier = Modifier.width(12.dp))
 
-                        // Textos (Título, Mensagem, Horário)
+                        // Textos (TÃ­tulo, Mensagem, HorÃ¡rio)
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = notif.titulo,
@@ -176,3 +176,4 @@ fun TelaNotificacoes(
         }
     }
 }
+

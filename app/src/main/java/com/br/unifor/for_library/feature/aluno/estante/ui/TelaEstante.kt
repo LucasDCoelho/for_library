@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.estante.ui
+﻿package com.br.unifor.for_library.feature.aluno.estante.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -26,17 +25,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.br.unifor.for_library.core.LivrosSalvosState
-import com.br.unifor.for_library.core.catalogoGlobal
-import com.br.unifor.for_library.feature.home.ui.CapaLivro
-import com.br.unifor.for_library.feature.home.ui.coresFallback
+import com.br.unifor.for_library.core.data.LivrosSalvosState
+import com.br.unifor.for_library.core.data.catalogoGlobal
+import com.br.unifor.for_library.core.components.CapaLivro
+import com.br.unifor.for_library.core.designsystem.coresFallback
 
-// ── Cores ─────────────────────────────────────────────────────────────────────
+// â”€â”€ Cores â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 private val AzulPrimario  = Color(0xFF1565C0)
 private val CinzaTexto    = Color(0xFF616161)
 private val FundoTela     = Color(0xFFF5F7FA)
 
-// ── Modelos ───────────────────────────────────────────────────────────────────
+// â”€â”€ Modelos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 data class LivroLendo(
     val id: Int,
     val titulo: String,
@@ -49,17 +48,17 @@ data class LivroLendo(
 
 
 
-// ── Mock ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Mock â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 private val mockLendo = listOf(
     LivroLendo(1, "O Design do Dia a Dia",          "Don Norman",       "9780465050659", 248, 390),
-    LivroLendo(2, "Sistemas Ágeis no Enterprise",   "Kent Beck",        "9780321125217",  45, 952),
+    LivroLendo(2, "Sistemas Ãgeis no Enterprise",   "Kent Beck",        "9780321125217",  45, 952),
     LivroLendo(3, "Arquitetura de Software Moderno","Martin Fowler",    "9780134494166", 412, 448),
-    LivroLendo(4, "Psicologia da Cognição",         "Daniel Kahneman",  "9788535921311", 130, 418),
+    LivroLendo(4, "Psicologia da CogniÃ§Ã£o",         "Daniel Kahneman",  "9788535921311", 130, 418),
 )
 
 
 
-// ── Tela principal ────────────────────────────────────────────────────────────
+// â”€â”€ Tela principal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaEstante(
@@ -74,7 +73,7 @@ fun TelaEstante(
             .fillMaxSize()
             .background(FundoTela)
     ) {
-        // ── Header (RF12.1 / RF13.1) ──────────────────────────────────────────
+        // â”€â”€ Header (RF12.1 / RF13.1) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -119,7 +118,7 @@ fun TelaEstante(
             }
         }
 
-        // ── Tabs (RF12.2) ─────────────────────────────────────────────────────
+        // â”€â”€ Tabs (RF12.2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         TabRow(
             selectedTabIndex = tabSelecionada,
             containerColor = Color.White,
@@ -146,7 +145,7 @@ fun TelaEstante(
             }
         }
 
-        // ── Conteúdo das abas ─────────────────────────────────────────────────
+        // â”€â”€ ConteÃºdo das abas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         when (tabSelecionada) {
             0 -> AbaLendo()
             1 -> AbaFavoritos(
@@ -158,7 +157,7 @@ fun TelaEstante(
     }
 }
 
-// ── Aba Lendo (RF12.3) ────────────────────────────────────────────────────────
+// â”€â”€ Aba Lendo (RF12.3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @Composable
 private fun AbaLendo() {
     LazyColumn(
@@ -221,7 +220,7 @@ private fun CardLivroLendo(livro: LivroLendo) {
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Text(
-                        text = "${(livro.progressoPct * 100).toInt()}% concluído",
+                        text = "${(livro.progressoPct * 100).toInt()}% concluÃ­do",
                         fontSize = 11.sp,
                         color = AzulPrimario,
                         fontWeight = FontWeight.SemiBold
@@ -239,7 +238,7 @@ private fun CardLivroLendo(livro: LivroLendo) {
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "${livro.paginaAtual} de ${livro.totalPaginas} páginas",
+                    text = "${livro.paginaAtual} de ${livro.totalPaginas} pÃ¡ginas",
                     fontSize = 11.sp,
                     color = CinzaTexto
                 )
@@ -248,7 +247,7 @@ private fun CardLivroLendo(livro: LivroLendo) {
     }
 }
 
-// ── Aba Favoritos (RF13.2 / RF13.3) ──────────────────────────────────────────
+// â”€â”€ Aba Favoritos (RF13.2 / RF13.3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @Composable
 private fun AbaFavoritos(
     onToggleFavorito: (String) -> Unit
@@ -300,7 +299,7 @@ private fun CardLivroFavorito(
                 corFallback = corFallback
             )
 
-            // Botão bookmark (RF13.3)
+            // BotÃ£o bookmark (RF13.3)
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -339,3 +338,4 @@ private fun CardLivroFavorito(
         )
     }
 }
+

@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.acervo.ui
+﻿package com.br.unifor.for_library.feature.aluno.livro.ui
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -28,13 +28,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // ---------------------------------------------------------------------------
-// Cores centralizadas — futuramente migrar para MaterialTheme.colorScheme
+// Cores centralizadas â€” futuramente migrar para MaterialTheme.colorScheme
 // ---------------------------------------------------------------------------
 private val AzulPrimario   = Color(0xFF1565C0)
 private val AmareloEstrela = Color(0xFFFFC107)
 
 // ---------------------------------------------------------------------------
-// Modelo de dados simulado para as avaliações (Mock)
+// Modelo de dados simulado para as avaliaÃ§Ãµes (Mock)
 // TODO: mover para DetalhesLivroViewModel + UiState quando a camada de dados
 //       estiver pronta.
 // ---------------------------------------------------------------------------
@@ -50,7 +50,7 @@ fun TelaDetalhesLivro(
     // Estado para o "Ler mais" da Sinopse (RF09.6)
     var sinopseExpandida by remember { mutableStateOf(false) }
 
-    // CORREÇÃO RF09.5 — estado de favorito controla ícone E cor
+    // CORREÃ‡ÃƒO RF09.5 â€” estado de favorito controla Ã­cone E cor
     var favoritado by remember { mutableStateOf(false) }
 
     // Dados simulados
@@ -59,15 +59,15 @@ fun TelaDetalhesLivro(
     val totalAvaliacoes = 1_240
 
     val avaliacoes = listOf(
-        Avaliacao("Mariana Silva",  "Há 2 dias", 5, "Absolutamente fascinante. A construção de mundo é impecável e o final me deixou sem palavras..."),
-        Avaliacao("Carlos Eduardo", "Há 5 dias", 4, "Ótimo livro, leitura muito fluída, mas o meio da história é um pouco lento.")
+        Avaliacao("Mariana Silva",  "HÃ¡ 2 dias", 5, "Absolutamente fascinante. A construÃ§Ã£o de mundo Ã© impecÃ¡vel e o final me deixou sem palavras..."),
+        Avaliacao("Carlos Eduardo", "HÃ¡ 5 dias", 4, "Ã“timo livro, leitura muito fluÃ­da, mas o meio da histÃ³ria Ã© um pouco lento.")
     )
 
     val sinopseCompleta =
-        "Em um futuro onde as viagens interestelares tornaram-se rotina, o capitão Elias Thorne " +
-                "descobre uma anomalia nos confins da galáxia de Andrômeda que desafia todas as leis " +
-                "conhecidas da física. Enquanto a tripulação da nave 'Vanguard' luta pela sobrevivência, " +
-                "segredos ancestrais sobre a origem da humanidade começam a emergir das sombras do espaço profundo."
+        "Em um futuro onde as viagens interestelares tornaram-se rotina, o capitÃ£o Elias Thorne " +
+                "descobre uma anomalia nos confins da galÃ¡xia de AndrÃ´meda que desafia todas as leis " +
+                "conhecidas da fÃ­sica. Enquanto a tripulaÃ§Ã£o da nave 'Vanguard' luta pela sobrevivÃªncia, " +
+                "segredos ancestrais sobre a origem da humanidade comeÃ§am a emergir das sombras do espaÃ§o profundo."
 
     LazyColumn(
         modifier = Modifier
@@ -75,7 +75,7 @@ fun TelaDetalhesLivro(
             .background(Color.White)
     ) {
 
-        // ── RF09.1: Cabeçalho ────────────────────────────────────────────────
+        // â”€â”€ RF09.1: CabeÃ§alho â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         item {
             Row(
                 modifier = Modifier
@@ -93,12 +93,12 @@ fun TelaDetalhesLivro(
                     fontSize = 18.sp
                 )
                 IconButton(onClick = onNotificacoes) {
-                    Icon(Icons.Outlined.Notifications, contentDescription = "Notificações")
+                    Icon(Icons.Outlined.Notifications, contentDescription = "NotificaÃ§Ãµes")
                 }
             }
         }
 
-        // ── RF09.2: Capa do Livro ─────────────────────────────────────────────
+        // â”€â”€ RF09.2: Capa do Livro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         item {
             Box(
                 modifier = Modifier
@@ -107,7 +107,7 @@ fun TelaDetalhesLivro(
                     .padding(horizontal = 16.dp)
                     .clip(RoundedCornerShape(8.dp))
                     // TODO: substituir por AsyncImage (Coil) quando a URL da capa
-                    //       estiver disponível no UiState:
+                    //       estiver disponÃ­vel no UiState:
                     //       AsyncImage(model = state.capaUrl, contentDescription = "Capa")
                     .background(Color(0xFFE3EEF9)),
                 contentAlignment = Alignment.Center
@@ -125,7 +125,7 @@ fun TelaDetalhesLivro(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // ── RF09.2: Metadados (Gênero, Ano, Título, Autor) ───────────────────
+        // â”€â”€ RF09.2: Metadados (GÃªnero, Ano, TÃ­tulo, Autor) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         item {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Row(
@@ -133,7 +133,7 @@ fun TelaDetalhesLivro(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "GÊNERO: FICÇÃO CIENTÍFICA",
+                        text = "GÃŠNERO: FICÃ‡ÃƒO CIENTÃFICA",
                         color = AzulPrimario,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
@@ -155,15 +155,15 @@ fun TelaDetalhesLivro(
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // ── RF09.3: Nota Média — CORRIGIDO ────────────────────────────────────
+        // â”€â”€ RF09.3: Nota MÃ©dia â€” CORRIGIDO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Antes: repeat(5) sempre renderizava 5 estrelas cheias.
-        // Agora: estrelas preenchidas até o inteiro da nota, restantes em cinza.
+        // Agora: estrelas preenchidas atÃ© o inteiro da nota, restantes em cinza.
         item {
             Row(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val notaInt = notaMedia.toInt() // 4.2 → 4
+                val notaInt = notaMedia.toInt() // 4.2 â†’ 4
                 repeat(5) { index ->
                     val tint = if (index < notaInt) AmareloEstrela else Color.LightGray
                     Icon(
@@ -175,7 +175,7 @@ fun TelaDetalhesLivro(
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "$notaMedia ($totalAvaliacoes avaliações)",
+                    text = "$notaMedia ($totalAvaliacoes avaliaÃ§Ãµes)",
                     fontSize = 14.sp,
                     color = Color.DarkGray
                 )
@@ -183,8 +183,8 @@ fun TelaDetalhesLivro(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // ── RF09.4 e RF09.5: Botões de Ação — CORRIGIDO ───────────────────────
-        // Antes: ícone de favorito era sempre FavoriteBorder independente do estado.
+        // â”€â”€ RF09.4 e RF09.5: BotÃµes de AÃ§Ã£o â€” CORRIGIDO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Antes: Ã­cone de favorito era sempre FavoriteBorder independente do estado.
         // Agora: alterna entre Favorite (preenchido) e FavoriteBorder (contorno).
         item {
             Row(
@@ -207,7 +207,7 @@ fun TelaDetalhesLivro(
                 }
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // CORREÇÃO RF09.5 — ícone preenchido quando favoritado
+                // CORREÃ‡ÃƒO RF09.5 â€” Ã­cone preenchido quando favoritado
                 OutlinedIconButton(
                     onClick = { favoritado = !favoritado },
                     shape = RoundedCornerShape(8.dp),
@@ -231,7 +231,7 @@ fun TelaDetalhesLivro(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // ── RF09.6: Sinopse com "Ler Mais" ────────────────────────────────────
+        // â”€â”€ RF09.6: Sinopse com "Ler Mais" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         item {
             Column(
                 modifier = Modifier
@@ -270,10 +270,10 @@ fun TelaDetalhesLivro(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // ── RF09.7: Avaliações de Usuários ────────────────────────────────────
+        // â”€â”€ RF09.7: AvaliaÃ§Ãµes de UsuÃ¡rios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         item {
             Text(
-                text = "Avaliações de Usuários",
+                text = "AvaliaÃ§Ãµes de UsuÃ¡rios",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -294,7 +294,7 @@ fun TelaDetalhesLivro(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        // Avatar circular simulado — inicial do nome
+                        // Avatar circular simulado â€” inicial do nome
                         Box(
                             modifier = Modifier
                                 .size(32.dp)
@@ -315,7 +315,7 @@ fun TelaDetalhesLivro(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp
                             )
-                            // Estrelas da avaliação individual
+                            // Estrelas da avaliaÃ§Ã£o individual
                             Row {
                                 repeat(5) { index ->
                                     val tint = if (index < avaliacao.nota) AmareloEstrela
@@ -351,3 +351,4 @@ fun TelaDetalhesLivroPreview() {
         onLerAgora = {}
     )
 }
+

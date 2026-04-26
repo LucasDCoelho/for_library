@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.home.ui
+﻿package com.br.unifor.for_library.feature.aluno.home.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,23 +19,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
-import com.br.unifor.for_library.core.LivrosSalvosState
+import com.br.unifor.for_library.core.components.CapaLivro
+import com.br.unifor.for_library.core.data.LivrosSalvosState
+import com.br.unifor.for_library.core.designsystem.AzulPrimario
+import com.br.unifor.for_library.core.designsystem.CinzaTexto
+import com.br.unifor.for_library.core.designsystem.coresFallback
 
-// ── Cores ─────────────────────────────────────────────────────────────────────
-val AzulPrimario = Color(0xFF1565C0)
-private val AzulChip     = Color(0xFF1E88E5)
-val CinzaTexto   = Color(0xFF616161)
-private val FundoTela    = Color(0xFFF2F4F8)
+// â”€â”€ Cores locais da Home â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+private val AzulChip  = Color(0xFF1E88E5)
+private val FundoTela = Color(0xFFF2F4F8)
 
-// ── Modelos ───────────────────────────────────────────────────────────────────
+// â”€â”€ Modelos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 private data class LivroEmLeitura(
     val titulo: String,
     val autor: String,
@@ -51,38 +49,25 @@ private data class LivroDestaque(
     val salvo: Boolean = false
 )
 
-// ── Mock ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Mock â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 private val mockLivroEmLeitura = LivroEmLeitura(
-    titulo       = "Cem Anos de Solidão",
-    autor        = "Gabriel García Márquez",
-    capitulo     = "Capítulo 12",
+    titulo       = "Cem Anos de SolidÃ£o",
+    autor        = "Gabriel GarcÃ­a MÃ¡rquez",
+    capitulo     = "CapÃ­tulo 12",
     progressoPct = 0.64f
 )
 
-// ISBN do livro em leitura (Cem Anos de Solidão)
 private const val isbnLivroEmLeitura = "9780060883287"
 
-// ISBN-13 de edições amplamente disponíveis na Open Library
 private val mockDestaques = listOf(
-    LivroDestaque(1, "O Alquimista",  "Paulo Coelho",      isbn = "9780062315007", salvo = false),
-    LivroDestaque(2, "Dom Casmurro",  "Machado de Assis",  isbn = "9788535902778", salvo = true),
-    LivroDestaque(3, "1984",          "George Orwell",     isbn = "9780451524935", salvo = false),
-    LivroDestaque(4, "Clean Code",    "Robert C. Martin",  isbn = "9780132350884", salvo = true),
-    LivroDestaque(5, "Atomic Habits", "James Clear",       isbn = "9780735211292", salvo = false),
+    LivroDestaque(1, "O Alquimista",   "Paulo Coelho",     isbn = "9780062315007"),
+    LivroDestaque(2, "Dom Casmurro",   "Machado de Assis", isbn = "9788535902778", salvo = true),
+    LivroDestaque(3, "1984",           "George Orwell",    isbn = "9780451524935"),
+    LivroDestaque(4, "Clean Code",     "Robert C. Martin", isbn = "9780132350884", salvo = true),
+    LivroDestaque(5, "Atomic Habits",  "James Clear",      isbn = "9780735211292"),
 )
 
-val coresFallback = listOf(
-    Color(0xFF1565C0), Color(0xFF283593), Color(0xFF4527A0),
-    Color(0xFF00695C), Color(0xFF558B2F)
-)
-
-// ── URL da Open Library por ISBN ──────────────────────────────────────────────
-// Endpoint: https://covers.openlibrary.org/b/isbn/{isbn}-M.jpg
-// "M" = médio. Muito mais confiável que busca por título.
-private fun capaUrlIsbn(isbn: String): String =
-    "https://covers.openlibrary.org/b/isbn/$isbn-M.jpg?default=false"
-
-// ── Tela principal ────────────────────────────────────────────────────────────
+// â”€â”€ Tela principal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @Composable
 fun TelaHomeAluno(
     nomeAluno: String = "Ricardo",
@@ -103,8 +88,7 @@ fun TelaHomeAluno(
             .background(FundoTela)
             .verticalScroll(rememberScrollState())
     ) {
-
-        // ── Header (RF05.1 + RF05.2) ──────────────────────────────────────────
+        // â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -130,7 +114,7 @@ fun TelaHomeAluno(
 
             Column(Modifier.weight(1f)) {
                 Text("Bem-vindo", fontSize = 11.sp, color = CinzaTexto)
-                Text("Olá, $nomeAluno!", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color(0xFF212121))
+                Text("OlÃ¡, $nomeAluno!", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color(0xFF212121))
             }
 
             Surface(
@@ -144,7 +128,7 @@ fun TelaHomeAluno(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("⭐", fontSize = 13.sp)
+                    Text("â­", fontSize = 13.sp)
                     Spacer(Modifier.width(4.dp))
                     Text("%,d pts".format(pontos), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                 }
@@ -153,11 +137,11 @@ fun TelaHomeAluno(
             Spacer(Modifier.width(8.dp))
 
             IconButton(onClick = onSinoClick) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificações", tint = Color(0xFF424242))
+                Icon(Icons.Default.Notifications, contentDescription = "NotificaÃ§Ãµes", tint = Color(0xFF424242))
             }
         }
 
-        // ── Continue Lendo (RF05.3) ───────────────────────────────────────────
+        // â”€â”€ Continue Lendo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Text(
             "Continue Lendo",
             fontWeight = FontWeight.Bold,
@@ -179,7 +163,6 @@ fun TelaHomeAluno(
                 modifier = Modifier.padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Capa via Open Library (ISBN)
                 CapaLivro(
                     isbn = isbnLivroEmLeitura,
                     tituloFallback = mockLivroEmLeitura.titulo,
@@ -198,7 +181,7 @@ fun TelaHomeAluno(
                     Text(mockLivroEmLeitura.autor, fontSize = 12.sp, color = CinzaTexto)
                     Spacer(Modifier.height(4.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("📖", fontSize = 11.sp)
+                        Text("ðŸ“–", fontSize = 11.sp)
                         Spacer(Modifier.width(4.dp))
                         Text(mockLivroEmLeitura.capitulo, fontSize = 11.sp, color = CinzaTexto)
                     }
@@ -227,7 +210,7 @@ fun TelaHomeAluno(
 
         Spacer(Modifier.height(20.dp))
 
-        // ── Destaques do Acervo (RF05.4 + RF05.5) ────────────────────────────
+        // â”€â”€ Destaques do Acervo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -237,7 +220,7 @@ fun TelaHomeAluno(
         ) {
             Text("Destaques do Acervo", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF212121))
             Text(
-                "ver todos →",
+                "ver todos â†’",
                 fontSize = 13.sp,
                 color = AzulPrimario,
                 fontWeight = FontWeight.SemiBold,
@@ -264,7 +247,6 @@ fun TelaHomeAluno(
                             .fillMaxWidth()
                             .height(150.dp)
                     ) {
-                        // Capa via Open Library (ISBN)
                         CapaLivro(
                             isbn = livro.isbn,
                             tituloFallback = livro.titulo,
@@ -273,8 +255,6 @@ fun TelaHomeAluno(
                                 .clip(RoundedCornerShape(10.dp)),
                             corFallback = corFallback
                         )
-
-                        // RF05.5 — Bookmark
                         Box(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
@@ -303,7 +283,7 @@ fun TelaHomeAluno(
 
         Spacer(Modifier.height(20.dp))
 
-        // ── Cards Estatísticas (RF05.6 + RF05.7) ─────────────────────────────
+        // â”€â”€ EstatÃ­sticas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -311,8 +291,8 @@ fun TelaHomeAluno(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             listOf(
-                Triple("📚", "LIVROS LIDOS", livrosLidos.toString()),
-                Triple("⏱️", "TEMPO TOTAL", tempoTotal)
+                Triple("ðŸ“š", "LIVROS LIDOS", livrosLidos.toString()),
+                Triple("â±ï¸", "TEMPO TOTAL", tempoTotal)
             ).forEach { (icone, titulo, valor) ->
                 Card(
                     modifier = Modifier.weight(1f),
@@ -340,44 +320,4 @@ fun TelaHomeAluno(
     }
 }
 
-// ── Componente de capa ────────────────────────────────────────────────────────
-// Busca pela Open Library via ISBN. Se não encontrar, exibe fallback colorido com iniciais.
-@Composable
-public fun CapaLivro(
-    isbn: String,
-    tituloFallback: String,
-    modifier: Modifier = Modifier,
-    corFallback: Color = Color(0xFF1565C0)
-) {
-    SubcomposeAsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(capaUrlIsbn(isbn))
-            .crossfade(true)
-            .build(),
-        contentDescription = "Capa de $tituloFallback",
-        contentScale = ContentScale.Crop,
-        modifier = modifier,
-        loading = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFFE0E0E0))
-            )
-        },
-        error = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(corFallback),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = tituloFallback.take(2).uppercase(),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-            }
-        }
-    )
-}
+

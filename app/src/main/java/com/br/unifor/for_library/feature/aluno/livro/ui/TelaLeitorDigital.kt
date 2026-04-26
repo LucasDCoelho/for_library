@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.acervo.ui
+﻿package com.br.unifor.for_library.feature.aluno.livro.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
 // ---------------------------------------------------------------------------
-// Cor centralizada — futuramente migrar para MaterialTheme.colorScheme
+// Cor centralizada â€” futuramente migrar para MaterialTheme.colorScheme
 // ---------------------------------------------------------------------------
 private val AzulPrimario     = Color(0xFF1565C0)
 private val AzulPrimarioClaro = Color(0xFFE3EEF9)
@@ -39,7 +39,8 @@ private val AzulPrimarioClaro = Color(0xFFE3EEF9)
 @Composable
 fun TelaLeitorDigital(
     tituloLivro: String,
-    onVoltar: () -> Unit
+    onVoltar: () -> Unit,
+    onIrAvaliarLivro: () -> Unit
 ) {
     val totalPages = 340
     val pagerState = rememberPagerState(pageCount = { totalPages })
@@ -48,7 +49,7 @@ fun TelaLeitorDigital(
     var mostrarPopupFim by remember { mutableStateOf(false) }
     var showControls    by remember { mutableStateOf(true) }
 
-    // RF11.1: ao chegar na última página, exibe o popup de fim de leitura
+    // RF11.1: ao chegar na Ãºltima pÃ¡gina, exibe o popup de fim de leitura
     LaunchedEffect(pagerState.currentPage) {
         if (pagerState.currentPage == totalPages - 1) {
             mostrarPopupFim = true
@@ -56,12 +57,12 @@ fun TelaLeitorDigital(
     }
 
     // RF10.5: salva o progresso ao sair da tela
-    // TODO: substituir o println pela chamada real ao repositório:
+    // TODO: substituir o println pela chamada real ao repositÃ³rio:
     //       repositorio.salvarProgresso(livroId, paginaSalva)
     DisposableEffect(Unit) {
         onDispose {
             val paginaSalva = pagerState.currentPage + 1
-            println("Log: Salvando no banco de dados a página $paginaSalva do livro '$tituloLivro'")
+            println("Log: Salvando no banco de dados a pÃ¡gina $paginaSalva do livro '$tituloLivro'")
         }
     }
 
@@ -70,7 +71,7 @@ fun TelaLeitorDigital(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // ── RF10.2 e RF10.3: Conteúdo em tela cheia com swipe horizontal ─────
+        // â”€â”€ RF10.2 e RF10.3: ConteÃºdo em tela cheia com swipe horizontal â”€â”€â”€â”€â”€
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize()
@@ -83,7 +84,7 @@ fun TelaLeitorDigital(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Ele virou a página. O papel era firme, uma textura que uma tela nunca poderia substituir...\n\n(Página simulada ${page + 1})",
+                    text = "Ele virou a pÃ¡gina. O papel era firme, uma textura que uma tela nunca poderia substituir...\n\n(PÃ¡gina simulada ${page + 1})",
                     fontSize = 18.sp,
                     lineHeight = 28.sp,
                     color = Color.DarkGray,
@@ -92,11 +93,11 @@ fun TelaLeitorDigital(
             }
         }
 
-        // ── RF10.4: Overlay transparente dedicado para capturar taps ─────────
-        // CORREÇÃO: o pointerInput foi movido para uma camada separada acima do
+        // â”€â”€ RF10.4: Overlay transparente dedicado para capturar taps â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // CORREÃ‡ÃƒO: o pointerInput foi movido para uma camada separada acima do
         // HorizontalPager. Antes estava no Box pai, causando conflito entre o
-        // detectTapGestures e o gesture de swipe do Pager — a barra podia sumir
-        // no meio de uma troca de página.
+        // detectTapGestures e o gesture de swipe do Pager â€” a barra podia sumir
+        // no meio de uma troca de pÃ¡gina.
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -107,7 +108,7 @@ fun TelaLeitorDigital(
                 }
         )
 
-        // ── RF10.1: Barra Superior (Animada) ─────────────────────────────────
+        // â”€â”€ RF10.1: Barra Superior (Animada) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         AnimatedVisibility(
             visible = showControls,
             enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
@@ -132,8 +133,8 @@ fun TelaLeitorDigital(
                             contentDescription = "Voltar"
                         )
                     }
-                    // CORREÇÃO: adicionado TextOverflow.Ellipsis para títulos longos
-                    // não serem cortados abruptamente.
+                    // CORREÃ‡ÃƒO: adicionado TextOverflow.Ellipsis para tÃ­tulos longos
+                    // nÃ£o serem cortados abruptamente.
                     Text(
                         text = tituloLivro,
                         fontWeight = FontWeight.Bold,
@@ -145,7 +146,7 @@ fun TelaLeitorDigital(
             }
         }
 
-        // ── RF10.4: Barra Inferior com Slider (Animada) ──────────────────────
+        // â”€â”€ RF10.4: Barra Inferior com Slider (Animada) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         AnimatedVisibility(
             visible = showControls,
             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
@@ -190,7 +191,7 @@ fun TelaLeitorDigital(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Botão: página anterior
+                        // BotÃ£o: pÃ¡gina anterior
                         TextButton(
                             onClick = {
                                 coroutineScope.launch {
@@ -202,13 +203,13 @@ fun TelaLeitorDigital(
                         ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                contentDescription = "Página anterior",
+                                contentDescription = "PÃ¡gina anterior",
                                 tint = Color.Gray
                             )
                             Text("Anterior", color = Color.Gray, fontSize = 12.sp)
                         }
 
-                        // Centro: ícone + número da página atual
+                        // Centro: Ã­cone + nÃºmero da pÃ¡gina atual
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Outlined.MenuBook,
@@ -218,14 +219,14 @@ fun TelaLeitorDigital(
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = "Página ${pagerState.currentPage + 1} de $totalPages",
+                                text = "PÃ¡gina ${pagerState.currentPage + 1} de $totalPages",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = AzulPrimario
                             )
                         }
 
-                        // Botão: próxima página
+                        // BotÃ£o: prÃ³xima pÃ¡gina
                         TextButton(
                             onClick = {
                                 coroutineScope.launch {
@@ -235,10 +236,10 @@ fun TelaLeitorDigital(
                                 }
                             }
                         ) {
-                            Text("Próximo", color = Color.Gray, fontSize = 12.sp)
+                            Text("PrÃ³ximo", color = Color.Gray, fontSize = 12.sp)
                             Icon(
                                 Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                contentDescription = "Próxima página",
+                                contentDescription = "PrÃ³xima pÃ¡gina",
                                 tint = Color.Gray
                             )
                         }
@@ -248,13 +249,13 @@ fun TelaLeitorDigital(
         }
     }
 
-    // ── RF11: Popup de fim de leitura ────────────────────────────────────────
+    // â”€â”€ RF11: Popup de fim de leitura â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (mostrarPopupFim) {
         PopupFimLeitura(
             pontosGanhos = 50,
             onAvaliarLivro = {
                 mostrarPopupFim = false
-                // TODO: navegar para a Tela de Resenha (RF14)
+                onIrAvaliarLivro()
             },
             onFechar = {
                 mostrarPopupFim = false
@@ -269,6 +270,8 @@ fun TelaLeitorDigital(
 fun TelaLeitorDigitalPreview() {
     TelaLeitorDigital(
         tituloLivro = "O Horizonte de Eventos",
-        onVoltar = {}
+        onVoltar = {},
+        onIrAvaliarLivro = {}
     )
 }
+

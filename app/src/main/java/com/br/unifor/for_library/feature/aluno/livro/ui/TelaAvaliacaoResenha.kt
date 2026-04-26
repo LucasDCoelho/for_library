@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.acervo.ui
+﻿package com.br.unifor.for_library.feature.aluno.livro.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 // ---------------------------------------------------------------------------
-// Cores centralizadas — futuramente migrar para MaterialTheme.colorScheme
+// Cores centralizadas â€” futuramente migrar para MaterialTheme.colorScheme
 // ---------------------------------------------------------------------------
 private val AzulPrimario     = Color(0xFF1565C0)
 private val AzulDesabilitado = Color(0xFFB0C4DE)
@@ -35,8 +35,8 @@ private val AmareloEstrela   = Color(0xFFFFD700)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaAvaliacaoResenha(
-    tituloLivro: String = "O Pequeno Príncipe",
-    autor: String = "Antoine de Saint-Exupéry",
+    tituloLivro: String = "O Pequeno PrÃ­ncipe",
+    autor: String = "Antoine de Saint-ExupÃ©ry",
     anoPublicacao: String = "1943",
     onClose: () -> Unit,
     onCancelar: () -> Unit
@@ -47,13 +47,13 @@ fun TelaAvaliacaoResenha(
 
     val maxChars = 500
 
-    // Regra de validação: nota obrigatória; resenha opcional, mas se preenchida
+    // Regra de validaÃ§Ã£o: nota obrigatÃ³ria; resenha opcional, mas se preenchida
     // precisa ter ao menos 20 caracteres.
     val resenhaInvalida = resenha.isNotEmpty() && resenha.length < 20
     val isValido = rating > 0 && !resenhaInvalida
 
-    // CORREÇÃO RF14.6: após exibir o feedback de sucesso, navega automaticamente
-    // para fora da tela após 2 segundos, evitando que o usuário fique preso.
+    // CORREÃ‡ÃƒO RF14.6: apÃ³s exibir o feedback de sucesso, navega automaticamente
+    // para fora da tela apÃ³s 2 segundos, evitando que o usuÃ¡rio fique preso.
     LaunchedEffect(mensagemSucesso) {
         if (mensagemSucesso != null) {
             delay(2000L)
@@ -78,16 +78,16 @@ fun TelaAvaliacaoResenha(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── RF14.1 e RF14.2: Cabeçalho ───────────────────────────────────────
+        // â”€â”€ RF14.1 e RF14.2: CabeÃ§alho â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Top
         ) {
             Column {
-                // CORREÇÃO: fontSize aumentado de 10.sp para 12.sp (mínimo legível)
+                // CORREÃ‡ÃƒO: fontSize aumentado de 10.sp para 12.sp (mÃ­nimo legÃ­vel)
                 Text(
-                    text = "AVALIAÇÃO",
+                    text = "AVALIAÃ‡ÃƒO",
                     fontSize = 12.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
@@ -105,9 +105,9 @@ fun TelaAvaliacaoResenha(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── RF14.3: Card do livro ─────────────────────────────────────────────
-        // CORREÇÃO: o card exibia apenas o autor em negrito, omitindo o título.
-        // A ordem correta é: título → autor → ano de publicação.
+        // â”€â”€ RF14.3: Card do livro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // CORREÃ‡ÃƒO: o card exibia apenas o autor em negrito, omitindo o tÃ­tulo.
+        // A ordem correta Ã©: tÃ­tulo â†’ autor â†’ ano de publicaÃ§Ã£o.
         Surface(
             color = Color(0xFFF9F9F9),
             shape = RoundedCornerShape(8.dp),
@@ -117,7 +117,7 @@ fun TelaAvaliacaoResenha(
                 modifier = Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // TODO: substituir por AsyncImage quando a URL da capa estiver disponível
+                // TODO: substituir por AsyncImage quando a URL da capa estiver disponÃ­vel
                 Box(
                     modifier = Modifier
                         .size(50.dp, 70.dp)
@@ -134,7 +134,7 @@ fun TelaAvaliacaoResenha(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // ── RF14.4: Sistema de avaliação por estrelas ────────────────────────
+        // â”€â”€ RF14.4: Sistema de avaliaÃ§Ã£o por estrelas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
@@ -152,9 +152,9 @@ fun TelaAvaliacaoResenha(
                         contentDescription = "Estrela $i",
                         tint = if (i <= rating) AmareloEstrela else Color.LightGray,
                         modifier = Modifier
-                            // CORREÇÃO: clickable aplicado antes do padding para que
-                            // a área de toque seja 48dp (mínimo Material Design),
-                            // e não 32dp como estava antes.
+                            // CORREÃ‡ÃƒO: clickable aplicado antes do padding para que
+                            // a Ã¡rea de toque seja 48dp (mÃ­nimo Material Design),
+                            // e nÃ£o 32dp como estava antes.
                             .size(48.dp)
                             .clickable { rating = i }
                             .padding(4.dp)
@@ -165,8 +165,8 @@ fun TelaAvaliacaoResenha(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // ── RF14.5: Campo de resenha (opcional, mínimo 20 caracteres) ────────
-        // CORREÇÃO: fontSize aumentado de 10.sp para 12.sp (mínimo legível)
+        // â”€â”€ RF14.5: Campo de resenha (opcional, mÃ­nimo 20 caracteres) â”€â”€â”€â”€â”€â”€â”€â”€
+        // CORREÃ‡ÃƒO: fontSize aumentado de 10.sp para 12.sp (mÃ­nimo legÃ­vel)
         Text("SUA RESENHA", fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -196,13 +196,13 @@ fun TelaAvaliacaoResenha(
                 .padding(top = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Mínimo 20 caracteres", fontSize = 11.sp, color = Color.Gray)
+            Text("MÃ­nimo 20 caracteres", fontSize = 11.sp, color = Color.Gray)
             Text("${resenha.length} / $maxChars", fontSize = 11.sp, color = Color.Gray)
         }
 
-        // CORREÇÃO RF14.5: mensagem de erro visível quando a resenha foi iniciada
-        // mas ainda não atingiu o mínimo de 20 caracteres. Antes o botão ficava
-        // desabilitado silenciosamente, confundindo o usuário.
+        // CORREÃ‡ÃƒO RF14.5: mensagem de erro visÃ­vel quando a resenha foi iniciada
+        // mas ainda nÃ£o atingiu o mÃ­nimo de 20 caracteres. Antes o botÃ£o ficava
+        // desabilitado silenciosamente, confundindo o usuÃ¡rio.
         AnimatedVisibility(visible = resenhaInvalida) {
             Text(
                 text = "A resenha deve ter ao menos 20 caracteres",
@@ -214,16 +214,16 @@ fun TelaAvaliacaoResenha(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // ── RF14.6: Botão "Enviar Resenha" ───────────────────────────────────
+        // â”€â”€ RF14.6: BotÃ£o "Enviar Resenha" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Button(
             onClick = {
                 mensagemSucesso = if (resenha.isNotEmpty()) {
-                    "ENVIADO PARA MODERAÇÃO!"
+                    "ENVIADO PARA MODERAÃ‡ÃƒO!"
                 } else {
-                    "AVALIAÇÃO REGISTRADA!"
+                    "AVALIAÃ‡ÃƒO REGISTRADA!"
                 }
-                // O LaunchedEffect acima detecta a mudança de mensagemSucesso
-                // e chama onClose() após 2 segundos automaticamente.
+                // O LaunchedEffect acima detecta a mudanÃ§a de mensagemSucesso
+                // e chama onClose() apÃ³s 2 segundos automaticamente.
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -248,7 +248,7 @@ fun TelaAvaliacaoResenha(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // ── RF14.7: Botão "Cancelar" ──────────────────────────────────────────
+        // â”€â”€ RF14.7: BotÃ£o "Cancelar" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         TextButton(
             onClick = onCancelar,
             modifier = Modifier
@@ -258,7 +258,7 @@ fun TelaAvaliacaoResenha(
             Text("Cancelar", color = Color.Gray)
         }
 
-        // ── Feedback de sucesso animado ───────────────────────────────────────
+        // â”€â”€ Feedback de sucesso animado â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         AnimatedVisibility(visible = mensagemSucesso != null) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -302,3 +302,4 @@ fun TelaAvaliacaoResenhaPreview() {
         onCancelar = {}
     )
 }
+

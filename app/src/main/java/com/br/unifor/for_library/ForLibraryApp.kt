@@ -15,19 +15,20 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.br.unifor.for_library.core.navigation.ForLibraryBottomBar
 import com.br.unifor.for_library.core.navigation.Rota
-import com.br.unifor.for_library.feature.acervo.ui.TelaAcervoDigital
-import com.br.unifor.for_library.feature.eventos.ui.TelaEventos
-import com.br.unifor.for_library.feature.estante.ui.TelaEstante
+import com.br.unifor.for_library.feature.aluno.acervo.ui.TelaAcervoDigital
+import com.br.unifor.for_library.feature.aluno.eventos.ui.TelaEventos
+import com.br.unifor.for_library.feature.aluno.estante.ui.TelaEstante
 import com.br.unifor.for_library.feature.auth.ui.TelaLoginPlaceholder
 import com.br.unifor.for_library.feature.auth.ui.TelaRecuperarSenha
 import com.br.unifor.for_library.feature.auth.ui.TelaSplashScreen
-import com.br.unifor.for_library.feature.acervo.ui.TelaDetalhesLivro
-import com.br.unifor.for_library.feature.acervo.ui.TelaLeitorDigital
-import com.br.unifor.for_library.feature.home.ui.TelaHomeAluno
-import com.br.unifor.for_library.feature.perfil.ui.TelaPerfil
-import com.br.unifor.for_library.feature.notificaçao.ui.TelaNotificacoes
-import com.br.unifor.for_library.feature.perfil.ui.TelaEditarPerfil
-import com.br.unifor.for_library.feature.perfil.ui.TelaDuvidas
+import com.br.unifor.for_library.feature.aluno.livro.ui.TelaDetalhesLivro
+import com.br.unifor.for_library.feature.aluno.livro.ui.TelaLeitorDigital
+import com.br.unifor.for_library.feature.aluno.livro.ui.TelaAvaliacaoResenha
+import com.br.unifor.for_library.feature.aluno.home.ui.TelaHomeAluno
+import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaPerfil
+import com.br.unifor.for_library.feature.aluno.notificacao.ui.TelaNotificacoes
+import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaEditarPerfil
+import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaDuvidas
 
 private val rotasComPadding = setOf(
     Rota.HomeAluno.path,
@@ -123,7 +124,15 @@ fun ForLibraryApp() {
 
                 TelaLeitorDigital(
                     tituloLivro = titulo,
-                    onVoltar = { navController.popBackStack() }
+                    onVoltar = { navController.popBackStack() },
+                    onIrAvaliarLivro = { navController.navigate(Rota.AvalicaoLivro.path) }
+                )
+            }
+
+            composable(Rota.AvalicaoLivro.path) {
+                TelaAvaliacaoResenha(
+                    onClose = { navController.popBackStack() },
+                    onCancelar = { navController.popBackStack() },
                 )
             }
 

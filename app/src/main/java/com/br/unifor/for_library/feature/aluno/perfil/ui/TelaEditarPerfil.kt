@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.perfil.ui
+﻿package com.br.unifor.for_library.feature.aluno.perfil.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,15 +30,15 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaEditarPerfil(
-    onVoltar: () -> Unit // Callback para retornar à tela de Perfil
+    onVoltar: () -> Unit // Callback para retornar Ã  tela de Perfil
 ) {
-    // ── Estados dos Campos de Texto ──
+    // â”€â”€ Estados dos Campos de Texto â”€â”€
     var nomeExibicao by remember { mutableStateOf("Ricardo Ferreira") }
-    var biografia by remember { mutableStateOf("Bibliotecário sênior apaixonado por digitalização de acervos históricos e gestão de dados acadêmicos.") }
+    var biografia by remember { mutableStateOf("BibliotecÃ¡rio sÃªnior apaixonado por digitalizaÃ§Ã£o de acervos histÃ³ricos e gestÃ£o de dados acadÃªmicos.") }
     var matricula by remember { mutableStateOf("2510453-9") }
     var emailInstitucional by remember { mutableStateOf("ricardo.ferreira@eduuu.unifor.br") }
 
-    // ── Estados para o Pop-up de Sucesso ──
+    // â”€â”€ Estados para o Pop-up de Sucesso â”€â”€
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -47,14 +47,14 @@ fun TelaEditarPerfil(
     val verdeSucesso = Color(0xFF4CAF50) // Verde para o pop-up
 
     Scaffold(
-        // ── Configuração do Pop-up (Snackbar) customizado ──
+        // â”€â”€ ConfiguraÃ§Ã£o do Pop-up (Snackbar) customizado â”€â”€
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
                 Snackbar(
                     containerColor = verdeSucesso,
                     contentColor = Color.White,
                     shape = MaterialTheme.shapes.small,
-                    // Botão 'X' para fechar o pop-up
+                    // BotÃ£o 'X' para fechar o pop-up
                     dismissAction = {
                         IconButton(onClick = { data.dismiss() }) {
                             Icon(imageVector = Icons.Default.Close, contentDescription = "Fechar", tint = Color.White)
@@ -66,7 +66,7 @@ fun TelaEditarPerfil(
                 }
             }
         },
-        // ── Barra Superior com Botão Voltar ──
+        // â”€â”€ Barra Superior com BotÃ£o Voltar â”€â”€
         topBar = {
             TopAppBar(
                 title = { Text("Editar Perfil", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
@@ -85,12 +85,12 @@ fun TelaEditarPerfil(
                 .background(Color.White)
                 .padding(paddingValues)
                 .padding(horizontal = 20.dp)
-                .verticalScroll(rememberScrollState()), // Permite rolagem se necessário
+                .verticalScroll(rememberScrollState()), // Permite rolagem se necessÃ¡rio
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ── Foto de Perfil com Botão de Câmera ──
+            // â”€â”€ Foto de Perfil com BotÃ£o de CÃ¢mera â”€â”€
             Box(
                 contentAlignment = Alignment.BottomEnd,
                 modifier = Modifier.size(100.dp)
@@ -109,7 +109,7 @@ fun TelaEditarPerfil(
                         modifier = Modifier.size(55.dp)
                     )
                 }
-                // Botão Câmera simulado (X na imagem, troquei por ícone de câmera para UX melhor)
+                // BotÃ£o CÃ¢mera simulado (X na imagem, troquei por Ã­cone de cÃ¢mera para UX melhor)
                 Box(
                     modifier = Modifier
                         .size(30.dp)
@@ -125,9 +125,9 @@ fun TelaEditarPerfil(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Label da Seção
+            // Label da SeÃ§Ã£o
             Text(
-                text = "CONFIGURAÇÃO DE PERFIL",
+                text = "CONFIGURAÃ‡ÃƒO DE PERFIL",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray,
@@ -136,11 +136,11 @@ fun TelaEditarPerfil(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ── Caixas de Texto (Inputs) ──
+            // â”€â”€ Caixas de Texto (Inputs) â”€â”€
 
-            // 1. Nome de Exibição
+            // 1. Nome de ExibiÃ§Ã£o
             InputPerfil(
-                label = "Nome de Exibição",
+                label = "Nome de ExibiÃ§Ã£o",
                 value = nomeExibicao,
                 onValueChange = { nomeExibicao = it }
             )
@@ -157,35 +157,35 @@ fun TelaEditarPerfil(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 3. Matrícula (Simulando bloqueada com ícone de cadeado)
+            // 3. MatrÃ­cula (Simulando bloqueada com Ã­cone de cadeado)
             InputPerfil(
-                label = "Matrícula",
+                label = "MatrÃ­cula",
                 value = matricula,
                 onValueChange = { /* Bloqueado */ },
                 trailingIcon = Icons.Default.Lock,
-                readOnly = true // Não permite edição visualmente
+                readOnly = true // NÃ£o permite ediÃ§Ã£o visualmente
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 4. Email Institucional (Simulando bloqueada com ícone de cadeado)
+            // 4. Email Institucional (Simulando bloqueada com Ã­cone de cadeado)
             InputPerfil(
                 label = "Email Institucional",
                 value = emailInstitucional,
                 onValueChange = { /* Bloqueado */ },
                 trailingIcon = Icons.Default.Lock,
-                readOnly = true // Não permite edição visualmente
+                readOnly = true // NÃ£o permite ediÃ§Ã£o visualmente
             )
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // ── Botão Salvar Alterações ──
+            // â”€â”€ BotÃ£o Salvar AlteraÃ§Ãµes â”€â”€
             Button(
                 onClick = {
                     // Dispara o pop-up de sucesso usando uma corrotina
                     scope.launch {
                         snackbarHostState.showSnackbar(
-                            message = "ALTERAÇÕES SALVAS!", // Texto do pop-up
+                            message = "ALTERAÃ‡Ã•ES SALVAS!", // Texto do pop-up
                             duration = SnackbarDuration.Short
                         )
                     }
@@ -197,7 +197,7 @@ fun TelaEditarPerfil(
                 shape = RoundedCornerShape(6.dp) // Shape quadrado como na imagem
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Salvar Alterações", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = "Salvar AlteraÃ§Ãµes", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(imageVector = Icons.Default.Verified, contentDescription = null, modifier = Modifier.size(18.dp))
                 }
@@ -208,7 +208,7 @@ fun TelaEditarPerfil(
     }
 }
 
-// ── Componente Reutilizável de Input baseado no design ──
+// â”€â”€ Componente ReutilizÃ¡vel de Input baseado no design â”€â”€
 @Composable
 private fun InputPerfil(
     label: String,

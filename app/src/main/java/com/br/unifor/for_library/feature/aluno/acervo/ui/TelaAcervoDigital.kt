@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.acervo.ui
+﻿package com.br.unifor.for_library.feature.aluno.acervo.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,13 +48,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.br.unifor.for_library.core.LivrosSalvosState
+import com.br.unifor.for_library.core.data.LivrosSalvosState
 import com.br.unifor.for_library.core.components.FiltroAvancadoBottomSheet
 import com.br.unifor.for_library.core.components.FiltroAvancadoState
-import com.br.unifor.for_library.feature.home.ui.AzulPrimario
-import com.br.unifor.for_library.feature.home.ui.CapaLivro
-import com.br.unifor.for_library.feature.home.ui.CinzaTexto
-import com.br.unifor.for_library.feature.home.ui.coresFallback
+import com.br.unifor.for_library.core.designsystem.AzulPrimario
+import com.br.unifor.for_library.feature.acervo.ui.BuscaVaziaPlaceholder
+import com.br.unifor.for_library.core.components.CapaLivro
+import com.br.unifor.for_library.core.designsystem.CinzaTexto
+import com.br.unifor.for_library.core.designsystem.coresFallback
 
 private data class LivroDestaque(
     val id: Int,
@@ -65,10 +66,10 @@ private data class LivroDestaque(
 
 private val mockDestaques = listOf(
     LivroDestaque(1, "O Design do Dia a Dia",    "Don Norman",               "9780465050659"),
-    LivroDestaque(2, "Sapiens: Uma Breve História","Yuval Noah Harari",      "9788543102146"),
+    LivroDestaque(2, "Sapiens: Uma Breve HistÃ³ria","Yuval Noah Harari",      "9788543102146"),
     LivroDestaque(3, "Clean Code",               "Robert C. Martin",         "9780132350884"),
-    LivroDestaque(4, "O Pequeno Príncipe",        "Antoine de Saint-Exupéry","9788522031412"),
-    LivroDestaque(5, "Fundamentos da Gestão",     "Peter Drucker",           "9788522102716"),
+    LivroDestaque(4, "O Pequeno PrÃ­ncipe",        "Antoine de Saint-ExupÃ©ry","9788522031412"),
+    LivroDestaque(5, "Fundamentos da GestÃ£o",     "Peter Drucker",           "9788522102716"),
     LivroDestaque(6, "Atomic Habits",             "James Clear",             "9780735211292")
 )
 
@@ -79,7 +80,7 @@ fun TelaAcervoDigital(
     onSinoClick: () -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    val categorias = listOf("Tudo", "Ficção", "Tecnologia", "História", "Design")
+    val categorias = listOf("Tudo", "FicÃ§Ã£o", "Tecnologia", "HistÃ³ria", "Design")
     var categoriaSelecionada by remember { mutableStateOf("Tudo") }
     var mostrarFiltro by remember { mutableStateOf(false) }
     var filtroState by remember { mutableStateOf(FiltroAvancadoState()) }
@@ -96,7 +97,7 @@ fun TelaAcervoDigital(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // ── Top Bar ───────────────────────────────────────────────────────────
+        // â”€â”€ Top Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -129,13 +130,13 @@ fun TelaAcervoDigital(
             IconButton(onClick = onSinoClick) {
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
-                    contentDescription = "Notificações",
+                    contentDescription = "NotificaÃ§Ãµes",
                     tint = Color.DarkGray
                 )
             }
         }
 
-        // ── Barra de Pesquisa ─────────────────────────────────────────────────
+        // â”€â”€ Barra de Pesquisa â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -146,7 +147,7 @@ fun TelaAcervoDigital(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 modifier = Modifier.weight(1f).height(52.dp),
-                placeholder = { Text("Busque por título ou autor", color = Color.Gray, fontSize = 14.sp) },
+                placeholder = { Text("Busque por tÃ­tulo ou autor", color = Color.Gray, fontSize = 14.sp) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
                 singleLine = true,
                 shape = RoundedCornerShape(4.dp),
@@ -173,7 +174,7 @@ fun TelaAcervoDigital(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // ── Categorias ────────────────────────────────────────────────────────
+        // â”€â”€ Categorias â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         LazyRow(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -200,7 +201,7 @@ fun TelaAcervoDigital(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // ── Grid ou Placeholder ───────────────────────────────────────────────
+        // â”€â”€ Grid ou Placeholder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         val destinosFiltrados = mockDestaques.filter { livro ->
             searchQuery.isBlank() ||
                     livro.titulo.contains(searchQuery, ignoreCase = true) ||
@@ -263,3 +264,5 @@ fun TelaAcervoDigital(
         }
     }
 }
+
+

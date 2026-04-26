@@ -1,4 +1,4 @@
-package com.br.unifor.for_library
+package com.br.unifor.for_library.core.designsystem
 
 import androidx.compose.ui.graphics.Color
 

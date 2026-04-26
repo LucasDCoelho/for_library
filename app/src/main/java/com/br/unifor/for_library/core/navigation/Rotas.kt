@@ -24,4 +24,6 @@ sealed class Rota(val path: String) {
     object LeitorDigital : Rota("leitor/{livroId}/{titulo}") {
         fun criarRota(livroId: String, titulo: String) = "leitor/$livroId/$titulo"
     }
+
+    object AvalicaoLivro : Rota("avaliacao")
 }

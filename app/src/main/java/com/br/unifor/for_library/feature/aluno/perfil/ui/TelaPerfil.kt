@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.perfil.ui
+﻿package com.br.unifor.for_library.feature.aluno.perfil.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun TelaPerfil(
-    // ── Callbacks de clique prontos para uso ──
+    // â”€â”€ Callbacks de clique prontos para uso â”€â”€
     onEditarPerfilClick: () -> Unit,
     onEnvioObraClick: () -> Unit,
     onDuvidasClick: () -> Unit,
@@ -34,7 +34,7 @@ fun TelaPerfil(
 ) {
     val azulPrimario = Color(0xFF1E88E5)
     val cinzaTexto = Color(0xFF757575)
-    val corSair = Color(0xFFD32F2F) // Vermelho para o botão sair
+    val corSair = Color(0xFFD32F2F) // Vermelho para o botÃ£o sair
     val corDivisoria = Color(0xFFEEEEEE)
 
     Column(
@@ -42,7 +42,7 @@ fun TelaPerfil(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // ── Cabeçalho Simples ──
+        // â”€â”€ CabeÃ§alho Simples â”€â”€
         Text(
             text = "Perfil do Aluno",
             fontSize = 18.sp,
@@ -53,7 +53,7 @@ fun TelaPerfil(
 
         HorizontalDivider(color = corDivisoria)
 
-        // ── Informações do Usuário (Foto, Nome, Matrícula) ──
+        // â”€â”€ InformaÃ§Ãµes do UsuÃ¡rio (Foto, Nome, MatrÃ­cula) â”€â”€
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -70,7 +70,7 @@ fun TelaPerfil(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "Foto de perfil padrão",
+                    contentDescription = "Foto de perfil padrÃ£o",
                     tint = Color.LightGray,
                     modifier = Modifier.size(50.dp)
                 )
@@ -94,7 +94,7 @@ fun TelaPerfil(
 
         HorizontalDivider(color = corDivisoria)
 
-        // ── Estatísticas (Livros, Resenhas, Pontos) ──
+        // â”€â”€ EstatÃ­sticas (Livros, Resenhas, Pontos) â”€â”€
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -108,9 +108,9 @@ fun TelaPerfil(
             EstatisticaItem(valor = "1.250", titulo = "PONTOS", azulPrimario, Modifier.weight(1f))
         }
 
-        HorizontalDivider(color = corDivisoria, thickness = 4.dp) // Divisão um pouco mais grossa
+        HorizontalDivider(color = corDivisoria, thickness = 4.dp) // DivisÃ£o um pouco mais grossa
 
-        // ── Menu de Ações (5 Botões) ──
+        // â”€â”€ Menu de AÃ§Ãµes (5 BotÃµes) â”€â”€
         Column(modifier = Modifier.fillMaxWidth()) {
             ItemMenuPerfil(
                 icone = Icons.Default.Edit,
@@ -124,16 +124,16 @@ fun TelaPerfil(
             )
             ItemMenuPerfil(
                 icone = Icons.Default.HelpOutline,
-                texto = "Dúvidas (FAQ)",
+                texto = "DÃºvidas (FAQ)",
                 onClick = onDuvidasClick
             )
             ItemMenuPerfil(
                 icone = Icons.Default.Settings,
-                texto = "Configurações",
+                texto = "ConfiguraÃ§Ãµes",
                 onClick = onConfiguracoesClick
             )
 
-            // Botão Sair (Vermelho)
+            // BotÃ£o Sair (Vermelho)
             ItemMenuPerfil(
                 icone = Icons.AutoMirrored.Filled.ExitToApp,
                 texto = "Sair",
@@ -145,7 +145,7 @@ fun TelaPerfil(
     }
 }
 
-// ── Componentes Reutilizáveis Internos ──
+// â”€â”€ Componentes ReutilizÃ¡veis Internos â”€â”€
 
 @Composable
 private fun EstatisticaItem(valor: String, titulo: String, corValor: Color, modifier: Modifier = Modifier) {

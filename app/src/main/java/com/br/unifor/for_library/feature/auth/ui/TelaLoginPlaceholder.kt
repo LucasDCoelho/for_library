@@ -23,7 +23,8 @@ fun TelaLoginPlaceholder(
     onLoginSucesso: () -> Unit,
     onIrParaCadastro: () -> Unit,
     onIrParaEsqueciSenha: () -> Unit,
-    onEsqueceuSenha: () -> Unit = {}
+    onEsqueceuSenha: () -> Unit = {},
+    onAdm: () -> Unit = {},
 ) {
     // Estados puramente visuais (para permitir digitação e ver a senha)
     var email by remember { mutableStateOf("") }
@@ -107,6 +108,26 @@ fun TelaLoginPlaceholder(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Entrar", fontSize = 16.sp)
+                Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Seta Entrar")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = { onAdm() }, // Navega direto sem validar nada!
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1264c2)),
+            shape = MaterialTheme.shapes.small // Deixa o botão mais retangular, igual ao protótipo
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Entrar ADM", fontSize = 16.sp)
                 Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Seta Entrar")
             }
         }

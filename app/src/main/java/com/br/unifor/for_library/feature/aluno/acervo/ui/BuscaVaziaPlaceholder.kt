@@ -1,4 +1,4 @@
-package com.br.unifor.for_library.feature.acervo.ui
+﻿package com.br.unifor.for_library.feature.aluno.acervo.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 
 private val AzulPrimario = Color(0xFF1565C0)
 
-// ── Ilustração de documento dormindo ─────────────────────────────────────────
+// â”€â”€ IlustraÃ§Ã£o de documento dormindo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @Composable
 private fun IlustracaoDocumentoDormindo() {
     val cinzaFundo   = Color(0xFFF0F2F5)
@@ -79,7 +79,7 @@ private fun IlustracaoDocumentoDormindo() {
     }
 }
 
-// ── Placeholder principal (RF08.3 + RF08.4 + RF08.5) ─────────────────────────
+// â”€â”€ Placeholder principal (RF08.3 + RF08.4 + RF08.5) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @Composable
 fun BuscaVaziaPlaceholder(
     onLimparFiltros: () -> Unit,
@@ -92,7 +92,7 @@ fun BuscaVaziaPlaceholder(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Ilustração (RF08.3)
+        // IlustraÃ§Ã£o (RF08.3)
         Box(contentAlignment = Alignment.TopEnd) {
             IlustracaoDocumentoDormindo()
             // ZZZ
@@ -107,9 +107,9 @@ fun BuscaVaziaPlaceholder(
 
         Spacer(Modifier.height(28.dp))
 
-        // Título (RF08.4)
+        // TÃ­tulo (RF08.4)
         Text(
-            text = "Ops! Silêncio na biblioteca",
+            text = "Ops! SilÃªncio na biblioteca",
             fontSize = 17.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF1A1A2E),
@@ -118,7 +118,7 @@ fun BuscaVaziaPlaceholder(
 
         Spacer(Modifier.height(8.dp))
 
-        // Subtítulo (RF08.4)
+        // SubtÃ­tulo (RF08.4)
         Text(
             text = "Nenhum livro encontrado para esta pesquisa.",
             fontSize = 13.sp,
@@ -140,17 +140,18 @@ fun BuscaVaziaPlaceholder(
 
         Spacer(Modifier.height(28.dp))
 
-        // Botão Limpar filtros (RF08.5)
+        // BotÃ£o Limpar filtros (RF08.5)
         Button(
             onClick = onLimparFiltros,
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = AzulPrimario)
         ) {
             Text(
-                text = "Limpar filtros  ×",
+                text = "Limpar filtros  Ã—",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
         }
     }
 }
+
