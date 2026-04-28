@@ -52,7 +52,7 @@ import com.br.unifor.for_library.core.data.LivrosSalvosState
 import com.br.unifor.for_library.core.components.FiltroAvancadoBottomSheet
 import com.br.unifor.for_library.core.components.FiltroAvancadoState
 import com.br.unifor.for_library.core.designsystem.AzulPrimario
-import com.br.unifor.for_library.feature.acervo.ui.BuscaVaziaPlaceholder
+import com.br.unifor.for_library.feature.aluno.acervo.ui.BuscaVaziaPlaceholder
 import com.br.unifor.for_library.core.components.CapaLivro
 import com.br.unifor.for_library.core.designsystem.CinzaTexto
 import com.br.unifor.for_library.core.designsystem.coresFallback
