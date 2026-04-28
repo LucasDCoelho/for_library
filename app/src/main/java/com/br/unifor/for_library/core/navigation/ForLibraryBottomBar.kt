@@ -42,6 +42,10 @@ fun ForLibraryBottomBar(navController: NavController) {
         Rota.Notificacoes.path,
         Rota.EditarPerfil.path,
         Rota.Duvida.path,
+        // rotas de adm
+        Rota.AdicionarLivro.path,
+        Rota.ModeracaoResenhas.path,
+        Rota.AnaliseResenha.path
     )
 
     // Só exibe a bottom bar nas telas principais (não no Login/Cadastro)

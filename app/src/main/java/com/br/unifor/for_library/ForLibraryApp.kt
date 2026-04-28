@@ -15,6 +15,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.br.unifor.for_library.core.navigation.ForLibraryBottomBar
 import com.br.unifor.for_library.core.navigation.Rota
+import com.br.unifor.for_library.feature.adm.TelaConfiguracoesSistema
+import com.br.unifor.for_library.feature.adm.acervo.TelaAdicionarObra
+import com.br.unifor.for_library.feature.adm.moderacao.modresenha.TelaAnaliseResenha
+import com.br.unifor.for_library.feature.adm.moderacao.modresenha.TelaModeracaoResenhas
 import com.br.unifor.for_library.feature.aluno.acervo.ui.TelaAcervoDigital
 import com.br.unifor.for_library.feature.aluno.eventos.ui.TelaEventos
 import com.br.unifor.for_library.feature.aluno.estante.ui.TelaEstante
@@ -29,6 +33,7 @@ import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaPerfil
 import com.br.unifor.for_library.feature.aluno.notificacao.ui.TelaNotificacoes
 import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaEditarPerfil
 import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaDuvidas
+
 
 private val rotasComPadding = setOf(
     Rota.HomeAluno.path,
@@ -82,7 +87,7 @@ fun ForLibraryApp() {
                             popUpTo(Rota.Login.path) { inclusive = true }
                         }
                     },
-                    onIrParaCadastro     = { navController.navigate(Rota.Cadastro.path) },
+                    onIrParaCadastro     = {navController.navigate(Rota.ConfiguracoesSistema.path) },
                     onIrParaEsqueciSenha = { navController.navigate(Rota.RecuperarSenha.path) }
                 )
             }
@@ -195,6 +200,61 @@ fun ForLibraryApp() {
                     }
                 )
             }
+            //NAVEGAÇÃO DE ADM
+
+            //CONFIG ADM
+
+            composable(Rota.ConfiguracoesSistema.path) {
+                TelaConfiguracoesSistema(
+                    onVoltar = { navController.popBackStack() },
+
+                    onSairClick = {
+                        navController.navigate(Rota.Login.path) {
+                            popUpTo(0) { inclusive = true } // Limpa todo o histórico
+                        }
+                    }
+                )
+            }
+
+
+            // Moderação de obras
+
+            composable(Rota.AdicionarLivro.path) {
+                TelaAdicionarObra(
+                    onVoltar = { navController.popBackStack() }
+                )
+            }
+
+
+            // MOD RESENHA
+            composable(Rota.ModeracaoResenhas.path) {
+                TelaModeracaoResenhas(
+                    onVoltar = { navController.popBackStack() },
+                    onResenhaClick = { idDaResenha ->
+                        navController.navigate(Rota.AnaliseResenha.criarRota(idDaResenha))
+                    }
+                )
+            }
+
+
+            composable(Rota.AnaliseResenha.path) { backStackEntry ->
+                val id = backStackEntry.arguments?.getString("resenhaId") ?: ""
+
+                TelaAnaliseResenha(
+                    resenhaId = id,
+                    onVoltar = { navController.popBackStack() },
+                    onAprovar = {
+                        /* Lógica de aprovação */
+                        navController.popBackStack()
+                    },
+                    onRejeitar = { motivo ->
+                        /* Lógica de rejeição usando o motivo */
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+
         }
     }
 }
