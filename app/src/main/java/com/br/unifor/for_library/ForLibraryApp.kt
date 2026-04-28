@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,8 +32,13 @@ import com.br.unifor.for_library.feature.aluno.livro.ui.TelaAvaliacaoResenha
 import com.br.unifor.for_library.feature.aluno.home.ui.TelaHomeAluno
 import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaPerfil
 import com.br.unifor.for_library.feature.aluno.notificacao.ui.TelaNotificacoes
+import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaConfiguracoes
 import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaEditarPerfil
 import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaDuvidas
+import com.br.unifor.for_library.feature.aluno.perfil.ui.PopupLogout
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
 
 private val rotasComPadding = setOf(
@@ -50,6 +56,20 @@ fun ForLibraryApp() {
     val backStack by navController.currentBackStackEntryAsState()
     val rotaAtual = backStack?.destination?.route
 
+    var mostrarPopupSair by remember { mutableStateOf(false) }
+
+    if (mostrarPopupSair) {
+        PopupLogout(
+            onDismiss = { mostrarPopupSair = false }, // RF25.3: Fecha ao cancelar
+            onConfirm = {
+                mostrarPopupSair = false
+                // RF25.3: Vai para o Login limpando o histórico
+                navController.navigate(Rota.Login.path) {
+                    popUpTo(Rota.Splash.path) { inclusive = true }
+                }
+            }
+        )
+    }
     // O Scaffold gerencia o layout da tela, incluindo a BottomBar
     Scaffold(
         bottomBar = { ForLibraryBottomBar(navController = navController) }
@@ -192,12 +212,19 @@ fun ForLibraryApp() {
                     onEditarPerfilClick = { navController.navigate(Rota.EditarPerfil.path) },
                     onEnvioObraClick = { /*TODO*/ },
                     onDuvidasClick = { navController.navigate(Rota.Duvida.path) },
-                    onConfiguracoesClick = { /*TODO*/ },
-                    onSairClick = {
-                        navController.navigate(Rota.Login.path) {
-                            popUpTo(Rota.Splash.path) { inclusive = true }
-                        }
-                    }
+                    onConfiguracoesClick = { navController.navigate(Rota.Configuracoes.path) },
+
+                    // ── MUDANÇA AQUI: Aciona o popup em vez de navegar direto ──
+                    onSairClick = { mostrarPopupSair = true }
+                )
+            }
+
+            composable(route = Rota.Configuracoes.path) {
+                TelaConfiguracoes(
+                    onVoltar = { navController.popBackStack() },
+
+                    // ── MUDANÇA AQUI: Aciona o popup em vez de navegar direto ──
+                    onSairClick = { mostrarPopupSair = true }
                 )
             }
             //NAVEGAÇÃO DE ADM

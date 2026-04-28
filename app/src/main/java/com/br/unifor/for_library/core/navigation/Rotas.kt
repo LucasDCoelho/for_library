@@ -9,6 +9,7 @@ sealed class Rota(val path: String) {
     object Notificacoes   : Rota("notificacoes")
     object EditarPerfil   : Rota("editar_perfil")
     object Duvida         : Rota("duvida")
+    object Configuracoes  : Rota("configuracoes")
 
     // NOVAS ROTAS ADM
     object AcervoAdmin : Rota("acervo_admin")
