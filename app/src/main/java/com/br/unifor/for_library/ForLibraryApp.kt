@@ -14,10 +14,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.br.unifor.for_library.core.navigation.AdminBottomBar
 import com.br.unifor.for_library.core.navigation.ForLibraryBottomBar
 import com.br.unifor.for_library.core.navigation.Rota
 import com.br.unifor.for_library.feature.adm.TelaConfiguracoesSistema
 import com.br.unifor.for_library.feature.adm.acervo.TelaAdicionarObra
+import com.br.unifor.for_library.feature.adm.acervo.TelaEditarObra
+import com.br.unifor.for_library.feature.adm.acervo.TelaGestaoAcervo
+import com.br.unifor.for_library.feature.adm.dashboard.TelaDashboardAdmin
+import com.br.unifor.for_library.feature.adm.moderacao.TelaGestaoUsuarios
 import com.br.unifor.for_library.feature.adm.moderacao.modresenha.TelaAnaliseResenha
 import com.br.unifor.for_library.feature.adm.moderacao.modresenha.TelaModeracaoResenhas
 import com.br.unifor.for_library.feature.aluno.acervo.ui.TelaAcervoDigital
@@ -46,7 +51,12 @@ private val rotasComPadding = setOf(
     Rota.Acervo.path,
     Rota.Estante.path,
     Rota.Eventos.path,
-    Rota.Perfil.path
+    Rota.Perfil.path,
+    // Rotas admin com bottom bar
+    Rota.DashboardAdmin.path,
+    Rota.AcervoAdmin.path,
+    Rota.GestaoUsuarios.path,
+    Rota.EditarObra.path
 )
 
 @Composable
@@ -70,9 +80,23 @@ fun ForLibraryApp() {
             }
         )
     }
+    // Rotas que usam a bottom bar do Admin
+    val rotasAdmin = setOf(
+        Rota.DashboardAdmin.path,
+        Rota.AcervoAdmin.path,
+        Rota.GestaoUsuarios.path,
+        Rota.EditarObra.path
+    )
+
     // O Scaffold gerencia o layout da tela, incluindo a BottomBar
     Scaffold(
-        bottomBar = { ForLibraryBottomBar(navController = navController) }
+        bottomBar = {
+            if (rotaAtual in rotasAdmin) {
+                AdminBottomBar(navController = navController)
+            } else {
+                ForLibraryBottomBar(navController = navController)
+            }
+        }
     ) { paddingValues ->
 
         // Só aplica padding nas telas com bottom bar — null e rotas de auth ficam sem padding
@@ -108,7 +132,12 @@ fun ForLibraryApp() {
                         }
                     },
                     onIrParaCadastro     = {navController.navigate(Rota.ConfiguracoesSistema.path) },
-                    onIrParaEsqueciSenha = { navController.navigate(Rota.RecuperarSenha.path) }
+                    onIrParaEsqueciSenha = { navController.navigate(Rota.RecuperarSenha.path) },
+                    onAdm                = {
+                        navController.navigate(Rota.DashboardAdmin.path) {
+                            popUpTo(Rota.Login.path) { inclusive = true }
+                        }
+                    }
                 )
             }
 
@@ -243,6 +272,42 @@ fun ForLibraryApp() {
                 )
             }
 
+
+            // ── Dashboard Admin (RF26) ───────────────────────────────────────
+            composable(Rota.DashboardAdmin.path) {
+                TelaDashboardAdmin(
+                    onSinoClick = { navController.navigate(Rota.Notificacoes.path) },
+                    onVerTodasAtividades = { /* TODO */ }
+                )
+            }
+
+            // ── Gestão de Acervo (RF27) ──────────────────────────────────────
+            composable(Rota.AcervoAdmin.path) {
+                TelaGestaoAcervo(
+                    onVoltar = { navController.popBackStack() },
+                    onAdicionarLivro = { navController.navigate(Rota.AdicionarLivro.path) },
+                    onEditarLivro = { livroId ->
+                        navController.navigate(Rota.EditarObra.criarRota(livroId))
+                    },
+                    onExcluirLivro = { /* TODO */ }
+                )
+            }
+
+            // ── Editar Obra (RF29) ───────────────────────────────────────────
+            composable(Rota.EditarObra.path) { backStackEntry ->
+                val livroId = backStackEntry.arguments?.getString("livroId") ?: ""
+                TelaEditarObra(
+                    livroId = livroId,
+                    onVoltar = { navController.popBackStack() },
+                    onAtualizar = { navController.popBackStack() },
+                    onCancelar = { navController.popBackStack() }
+                )
+            }
+
+            // ── Gestão de Usuários (RF38 mínima → trigger RF39) ──────────────
+            composable(Rota.GestaoUsuarios.path) {
+                TelaGestaoUsuarios()
+            }
 
             // Moderação de obras
 

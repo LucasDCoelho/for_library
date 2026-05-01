@@ -12,10 +12,17 @@ sealed class Rota(val path: String) {
     object Configuracoes  : Rota("configuracoes")
 
     // NOVAS ROTAS ADM
+    object DashboardAdmin : Rota("dashboard_admin")
     object AcervoAdmin : Rota("acervo_admin")
     object AdicionarLivro : Rota("adicionar_livro")
 
+    object EditarObra : Rota("editar_obra/{livroId}") {
+        fun criarRota(livroId: String) = "editar_obra/$livroId"
+    }
+
     object PainelModeracao : Rota("painel_moderacao")
+
+    object GestaoUsuarios : Rota("gestao_usuarios")
 
     object ModeracaoResenhas : Rota("moderacao_resenhas")
 
