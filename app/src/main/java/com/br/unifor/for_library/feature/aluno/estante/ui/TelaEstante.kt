@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -62,7 +63,8 @@ private val mockLendo = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaEstante(
-    onSearchClick: () -> Unit = {}
+    onSearchClick: () -> Unit = {},
+    onHistoricoClick: () -> Unit = {}
 ) {
     var tabSelecionada by remember { mutableIntStateOf(0) }
 
@@ -108,6 +110,14 @@ fun TelaEstante(
                 )
             }
 
+            IconButton(onClick = onHistoricoClick) {
+                Icon(
+                    imageVector = Icons.Default.History,
+                    contentDescription = "Histórico",
+                    tint = Color(0xFF424242),
+                    modifier = Modifier.size(22.dp)
+                )
+            }
             IconButton(onClick = onSearchClick) {
                 Icon(
                     imageVector = Icons.Default.Search,

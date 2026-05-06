@@ -1,11 +1,8 @@
 package com.br.unifor.for_library.feature.adm.acervo
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -15,6 +12,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.br.unifor.for_library.core.components.CapaLivro
 import com.br.unifor.for_library.core.designsystem.AzulPrimario
 import com.br.unifor.for_library.core.designsystem.CinzaTexto
+import com.br.unifor.for_library.feature.PopupExclusaoObra
 
 data class LivroAdminMock(
     val id: String,
@@ -50,8 +49,34 @@ fun TelaGestaoAcervo(
     onEditarLivro: (String) -> Unit,
     onExcluirLivro: (String) -> Unit
 ) {
-    var busca by remember { mutableStateOf("") }
-    val livros = mockLivrosAdmin
+    // ✅ rememberSaveable: busca sobrevive à rotação de tela
+    var busca by rememberSaveable { mutableStateOf("") }
+
+    // ✅ derivedStateOf: filtro aplicado corretamente (era ignorado antes)
+    val livrosFiltrados by remember {
+        derivedStateOf {
+            mockLivrosAdmin.filter { livro ->
+                busca.isBlank() ||
+                livro.titulo.contains(busca, ignoreCase = true) ||
+                livro.autor.contains(busca, ignoreCase = true)
+            }
+        }
+    }
+
+    // Bug 6: estado do popup de exclusão
+    var livroParaExcluir by remember { mutableStateOf<LivroAdminMock?>(null) }
+
+    // Exibe popup de confirmação quando há livro selecionado para exclusão
+    livroParaExcluir?.let { livro ->
+        PopupExclusaoObra(
+            mensagem = "A obra \"${livro.titulo}\" será removida permanentemente do acervo e das estantes de todos os alunos. Deseja continuar?",
+            onDismiss = { livroParaExcluir = null },
+            onConfirm = {
+                onExcluirLivro(livro.id)
+                livroParaExcluir = null
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -107,7 +132,7 @@ fun TelaGestaoAcervo(
                 horizontalArrangement = Arrangement.End
             ) {
                 Text(
-                    text = "${livros.size} livros",
+                    text = "${livrosFiltrados.size} livros",
                     fontSize = 12.sp,
                     color = CinzaTexto
                 )
@@ -118,11 +143,12 @@ fun TelaGestaoAcervo(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 contentPadding = PaddingValues(bottom = 80.dp)
             ) {
-                items(livros) { livro ->
+                // ✅ key estável: evita recomposições desnecessárias
+                items(livrosFiltrados, key = { it.id }) { livro ->
                     ItemLivroAdmin(
                         livro = livro,
                         onEditar = { onEditarLivro(livro.id) },
-                        onExcluir = { onExcluirLivro(livro.id) }
+                        onExcluir = { livroParaExcluir = livro } // Bug 6: abre popup
                     )
                 }
             }
