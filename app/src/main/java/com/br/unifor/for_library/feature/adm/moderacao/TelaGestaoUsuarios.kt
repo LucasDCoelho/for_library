@@ -8,10 +8,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,61 +42,93 @@ private val mockUsuarios = listOf(
     UsuarioMock("6", "Juliana Lima",   "2023156", "juliana.lima@unifor.edu.br",   true,  0),
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TelaGestaoUsuarios() {
-    var busca by remember { mutableStateOf("") }
+fun TelaGestaoUsuarios(onVoltar: () -> Unit = {}) {
+    // ✅ rememberSaveable: busca sobrevive à rotação de tela
+    var busca by rememberSaveable { mutableStateOf("") }
     var usuarioSelecionado by remember { mutableStateOf<UsuarioMock?>(null) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 16.dp)
-    ) {
-        Spacer(Modifier.height(16.dp))
-        Text(
-            "Gestão de Usuários",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF212121)
-        )
-        Spacer(Modifier.height(12.dp))
+    // ✅ derivedStateOf: re-filtra apenas quando busca ou lista mudam
+    val usuariosFiltrados by remember {
+        derivedStateOf {
+            mockUsuarios.filter {
+                busca.isBlank() ||
+                it.nome.contains(busca, ignoreCase = true) ||
+                it.matricula.contains(busca, ignoreCase = true)
+            }
+        }
+    }
 
-        OutlinedTextField(
-            value = busca,
-            onValueChange = { busca = it },
-            placeholder = { Text("Buscar por matrícula ou nome", fontSize = 13.sp, color = Color.LightGray) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(6.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color(0xFFE0E0E0),
-                focusedBorderColor = AzulPrimario
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Gestão de Usuários",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF212121)
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onVoltar) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Voltar"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        Text(
-            "${mockUsuarios.size} USUÁRIOS ENCONTRADOS",
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = CinzaTexto,
-            letterSpacing = 0.5.sp
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(bottom = 16.dp)
+        },
+        containerColor = Color.White
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
         ) {
-            items(mockUsuarios) { usuario ->
-                ItemUsuario(
-                    usuario = usuario,
-                    onClick = { usuarioSelecionado = usuario }
+            Spacer(Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = busca,
+                onValueChange = { busca = it },
+                placeholder = { Text("Buscar por matrícula ou nome", fontSize = 13.sp, color = Color.LightGray) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(6.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = Color(0xFFE0E0E0),
+                    focusedBorderColor = AzulPrimario
                 )
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                "${usuariosFiltrados.size} USUÁRIOS ENCONTRADOS",
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = CinzaTexto,
+                letterSpacing = 0.5.sp
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
+                // ✅ key estável: evita recomposições desnecessárias ao filtrar
+                items(usuariosFiltrados, key = { it.id }) { usuario ->
+                    ItemUsuario(
+                        usuario = usuario,
+                        onClick = { usuarioSelecionado = usuario }
+                    )
+                }
             }
         }
     }

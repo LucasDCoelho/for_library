@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.LibraryAdd
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.RateReview
@@ -67,6 +68,7 @@ private val mockAtividades = listOf(
 fun TelaDashboardAdmin(
     nomeAdmin: String = "Admin",
     onSinoClick: () -> Unit = {},
+    onConfiguracoesClick: () -> Unit = {}, // Bug 7: acesso às configurações do sistema
     onVerTodasAtividades: () -> Unit = {},
 ) {
     Column(
@@ -88,6 +90,9 @@ fun TelaDashboardAdmin(
                 color = Color(0xFF424242),
                 modifier = Modifier.weight(1f)
             )
+            IconButton(onClick = onConfiguracoesClick) {
+                Icon(Icons.Default.Settings, contentDescription = "Configurações", tint = Color(0xFF424242))
+            }
             IconButton(onClick = onSinoClick) {
                 Icon(Icons.Default.Notifications, contentDescription = "Notificações", tint = Color(0xFF424242))
             }
