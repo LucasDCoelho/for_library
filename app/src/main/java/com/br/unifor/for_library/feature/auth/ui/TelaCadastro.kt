@@ -138,14 +138,21 @@ fun TelaCadastro(
 
             // ✅ Erro 1 — email já em uso (era duplicado com mensagem errada)
             if (emailJaEmUso) {
-                MensagemErro("Email já em uso")
+                MensagemErro("Email já esta em uso")
             }
             // ✅ Erro 2 — email não institucional
             if (emailInvalido) {
                 MensagemErro("Utilize um email institucional")
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                text = "Utilize um email institucional",
+                fontSize = 14.sp,
+                color = Color(0xFF757575),
+                modifier = Modifier.padding(top = 6.dp, bottom = 24.dp)
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
 
             // Senha
             OutlinedTextField(

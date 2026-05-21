@@ -34,12 +34,11 @@ fun TelaSplashScreen(onSplashFinished: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Falta colocar uma logo oficial
+        // Logo ForLibrary atualizada
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            painter = painterResource(id = R.drawable.logo_for_library),
             contentDescription = "Logo ForLibrary",
-            modifier = Modifier.size(120.dp),
-            colorFilter = ColorFilter.tint(Color.White)
+            modifier = Modifier.size(120.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))

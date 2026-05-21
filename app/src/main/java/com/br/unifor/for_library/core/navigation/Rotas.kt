@@ -45,6 +45,7 @@ sealed class Rota(val path: String) {
     object Estante   : Rota("estante")
     object Eventos   : Rota("eventos")
     object EventosAdmin  : Rota("eventos_admin")
+    object AdicionarEvento : Rota("adicionar_evento")
     object Perfil    : Rota("perfil")
 
     object DetalhesLivro : Rota("detalhes_livro/{livroId}") {

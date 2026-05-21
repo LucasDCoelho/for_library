@@ -162,34 +162,6 @@ fun TelaMeusPontos(
                         }
                     }
                 }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            // Como ganhar pontos
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                Text("Como ganhar pontos?", fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold, color = Color(0xFF212121),
-                    modifier = Modifier.padding(bottom = 10.dp))
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD))
-                ) {
-                    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
-                        Icon(Icons.Default.Info, contentDescription = null,
-                            tint = AzulPrimario, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(10.dp))
-                        Column {
-                            Text("Transforme sua leitura em recompensas",
-                                fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1A237E))
-                            Spacer(Modifier.height(4.dp))
-                            Text("Você acumula pontos lendo novos títulos, participando de discussões e avaliando suas leituras.",
-                                fontSize = 12.sp, color = Color(0xFF424242), lineHeight = 18.sp)
-                        }
-                    }
-                }
 
                 Spacer(Modifier.height(16.dp))
 

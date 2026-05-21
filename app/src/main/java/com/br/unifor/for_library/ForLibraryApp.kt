@@ -29,6 +29,7 @@ import com.br.unifor.for_library.feature.adm.moderacao.TelaAnaliseObra
 import com.br.unifor.for_library.feature.adm.moderacao.modresenha.TelaAnaliseResenha
 import com.br.unifor.for_library.feature.adm.moderacao.modresenha.TelaModeracaoResenhas
 import com.br.unifor.for_library.feature.aluno.acervo.ui.TelaAcervoDigital
+import com.br.unifor.for_library.feature.TelaAdicionarEvento
 import com.br.unifor.for_library.feature.aluno.eventos.ui.TelaEventos
 import com.br.unifor.for_library.feature.aluno.estante.ui.TelaEstante
 import com.br.unifor.for_library.feature.auth.ui.TelaLoginPlaceholder
@@ -273,7 +274,18 @@ fun ForLibraryApp() {
             }
 
             composable(Rota.EventosAdmin.path) {
-                TelaGestaoEventos (
+                TelaGestaoEventos(
+                    onNovoEventoClick = { navController.navigate(Rota.AdicionarEvento.path) }
+                )
+            }
+
+            composable(Rota.AdicionarEvento.path) {
+                TelaAdicionarEvento(
+                    onVoltar = { navController.popBackStack() },
+                    onPublicar = { 
+                        // Simulação de sucesso
+                        navController.popBackStack() 
+                    }
                 )
             }
 

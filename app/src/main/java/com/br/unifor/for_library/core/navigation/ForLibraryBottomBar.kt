@@ -48,7 +48,12 @@ fun ForLibraryBottomBar(navController: NavController) {
                 onClick = {
                     if (!selecionado) {
                         navController.navigate(item.rota.path) {
-                            popUpTo(Rota.HomeAluno.path) { saveState = true }
+                            // Limpa a pilha até a tela inicial da bottom bar para evitar acúmulo
+                            navController.graph.startDestinationRoute?.let { startRoute ->
+                                popUpTo(startRoute) {
+                                    saveState = true
+                                }
+                            }
                             launchSingleTop = true
                             restoreState = true
                         }

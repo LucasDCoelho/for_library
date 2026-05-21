@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -309,7 +310,7 @@ private fun CardLivroFavorito(
                 corFallback = corFallback
             )
 
-            // BotÃ£o bookmark (RF13.3)
+            // Botão de Favorito (Coração)
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -321,10 +322,10 @@ private fun CardLivroFavorito(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Bookmark,
-                    contentDescription = "Salvo",
-                    tint = AzulPrimario,
-                    modifier = Modifier.size(16.dp)
+                    imageVector = Icons.Filled.Favorite,
+                    contentDescription = "Favoritado",
+                    tint = Color.Red,
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }
