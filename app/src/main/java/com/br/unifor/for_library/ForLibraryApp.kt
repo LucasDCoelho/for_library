@@ -1,4 +1,4 @@
-package com.br.unifor.for_library;
+package com.br.unifor.for_library
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +23,9 @@ import com.br.unifor.for_library.feature.adm.acervo.TelaEditarObra
 import com.br.unifor.for_library.feature.adm.acervo.TelaGestaoAcervo
 import com.br.unifor.for_library.feature.adm.dashboard.TelaDashboardAdmin
 import com.br.unifor.for_library.feature.adm.moderacao.TelaGestaoUsuarios
+import com.br.unifor.for_library.feature.adm.moderacao.TelaListaModeracaoAdmin
+import com.br.unifor.for_library.feature.adm.moderacao.TelaModeracaoObras
+import com.br.unifor.for_library.feature.adm.moderacao.TelaAnaliseObra
 import com.br.unifor.for_library.feature.adm.moderacao.modresenha.TelaAnaliseResenha
 import com.br.unifor.for_library.feature.adm.moderacao.modresenha.TelaModeracaoResenhas
 import com.br.unifor.for_library.feature.aluno.acervo.ui.TelaAcervoDigital
@@ -44,6 +47,13 @@ import com.br.unifor.for_library.feature.aluno.perfil.ui.PopupLogout
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.br.unifor.for_library.feature.TelaGestaoEventos
+import com.br.unifor.for_library.feature.auth.ui.TelaCadastro
+import android.net.Uri
+import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaEnvioObra
+import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaMeusPontos
+import com.br.unifor.for_library.feature.aluno.estante.ui.TelaHistoricoLeitura
+import com.br.unifor.for_library.feature.aluno.eventos.ui.TelaDetalhesEvento
 
 
 private val rotasComPadding = setOf(
@@ -55,8 +65,16 @@ private val rotasComPadding = setOf(
     // Rotas admin com bottom bar
     Rota.DashboardAdmin.path,
     Rota.AcervoAdmin.path,
+    Rota.AdicionarLivro.path,
+    Rota.EditarObra.path,
+    Rota.ListaModeracao.path,
     Rota.GestaoUsuarios.path,
-    Rota.EditarObra.path
+    Rota.ModeracaoObras.path,
+    Rota.AnaliseObra.path,
+    Rota.ModeracaoResenhas.path,
+    Rota.AnaliseResenha.path,
+    Rota.EventosAdmin.path,
+    Rota.NotificacoesAdmin.path
 )
 
 @Composable
@@ -71,11 +89,11 @@ fun ForLibraryApp() {
     if (mostrarPopupSair) {
         PopupLogout(
             onDismiss = { mostrarPopupSair = false }, // RF25.3: Fecha ao cancelar
+    // ── Bug 1 corrigido: popUpTo(0) garante que toda a back stack é limpa ──
             onConfirm = {
                 mostrarPopupSair = false
-                // RF25.3: Vai para o Login limpando o histórico
                 navController.navigate(Rota.Login.path) {
-                    popUpTo(Rota.Splash.path) { inclusive = true }
+                    popUpTo(0) { inclusive = true }
                 }
             }
         )
@@ -84,8 +102,16 @@ fun ForLibraryApp() {
     val rotasAdmin = setOf(
         Rota.DashboardAdmin.path,
         Rota.AcervoAdmin.path,
+        Rota.AdicionarLivro.path,
+        Rota.EditarObra.path,
+        Rota.ListaModeracao.path,
         Rota.GestaoUsuarios.path,
-        Rota.EditarObra.path
+        Rota.ModeracaoObras.path,
+        Rota.AnaliseObra.path,
+        Rota.ModeracaoResenhas.path,
+        Rota.AnaliseResenha.path,
+        Rota.EventosAdmin.path,
+        Rota.NotificacoesAdmin.path  // Bug 3: notificações no contexto admin
     )
 
     // O Scaffold gerencia o layout da tela, incluindo a BottomBar
@@ -131,7 +157,7 @@ fun ForLibraryApp() {
                             popUpTo(Rota.Login.path) { inclusive = true }
                         }
                     },
-                    onIrParaCadastro     = {navController.navigate(Rota.ConfiguracoesSistema.path) },
+                    onIrParaCadastro     = { navController.navigate(Rota.Cadastro.path) },
                     onIrParaEsqueciSenha = { navController.navigate(Rota.RecuperarSenha.path) },
                     onAdm                = {
                         navController.navigate(Rota.DashboardAdmin.path) {
@@ -146,17 +172,26 @@ fun ForLibraryApp() {
             }
 
             composable(Rota.Cadastro.path) {
-                Text(text = "Tela de cadastro (em construção)")
+                TelaCadastro(
+                    onVoltar = { navController.popBackStack() },
+                    onCadastrarSucesso = {
+                        navController.navigate(Rota.HomeAluno.path) {
+                            popUpTo(Rota.Cadastro.path) { inclusive = true }
+                        }
+                    },
+                    onIrParaLogin = { navController.popBackStack() }
+                )
             }
 
             // ── Home ──────────────────────────────────────────────────────────
             composable(Rota.HomeAluno.path) {
                 TelaHomeAluno(
-                    onPontosClick        = { /* TODO: Rota.MeusPontos */ },
+                    onPontosClick        = { navController.navigate(Rota.MeusPontos.path) },
                     onSinoClick          = { navController.navigate(Rota.Notificacoes.path) },
                     onContinueLendoClick = { /* TODO: Rota.Leitor */ },
                     onVerTodosClick      = { navController.navigate(Rota.Acervo.path) },
-                    onLivroClick = { navController.navigate(Rota.DetalhesLivro.criarRota("livro_id_exemplo")) }                )
+                    onLivroClick = { navController.navigate(Rota.DetalhesLivro.criarRota("livro_id_exemplo")) }
+                )
             }
 
             composable(Rota.DetalhesLivro.path) { backStackEntry ->
@@ -167,8 +202,8 @@ fun ForLibraryApp() {
                     onVoltar = { navController.popBackStack() },
                     onNotificacoes = { /* TODO */ },
                     onLerAgora = {
-                        // Clicou no botão, navega para o Leitor passando o título!
-                        navController.navigate(Rota.LeitorDigital.criarRota(livroId, "O Horizonte de Eventos"))
+                        // Bug 2: Uri.encode evita crash com títulos com caracteres especiais
+                        navController.navigate(Rota.LeitorDigital.criarRota(livroId, Uri.encode("O Horizonte de Eventos")))
                     }
                 )
             }
@@ -192,6 +227,13 @@ fun ForLibraryApp() {
 
             // ── Notificações ──────────────────────────────────────────────────
             composable(Rota.Notificacoes.path) {
+                TelaNotificacoes(
+                    onVoltar = { navController.popBackStack() }
+                )
+            }
+
+            // ── Notificações Admin (Bug 3: contexto separado) ─────────────────
+            composable(Rota.NotificacoesAdmin.path) {
                 TelaNotificacoes(
                     onVoltar = { navController.popBackStack() }
                 )
@@ -225,25 +267,30 @@ fun ForLibraryApp() {
 
             composable(Rota.Estante.path) {
                 TelaEstante(
-                    onSearchClick = { /* TODO: busca */ }
+                    onSearchClick = { /* TODO: busca */ },
+                    onHistoricoClick = { navController.navigate(Rota.HistoricoLeitura.path) }
                 )
             }
+
+            composable(Rota.EventosAdmin.path) {
+                TelaGestaoEventos (
+                )
+            }
+
 
             composable(Rota.Eventos.path) {
                 TelaEventos(
                     onSinoClick   = { navController.navigate(Rota.Notificacoes.path) },
-                    onEventoClick = { /* TODO: Rota.DetalhesEvento */ }
+                    onEventoClick = { eventoId -> navController.navigate(Rota.DetalhesEvento.criarRota(eventoId)) }
                 )
             }
 
             composable(Rota.Perfil.path) {
                 TelaPerfil(
                     onEditarPerfilClick = { navController.navigate(Rota.EditarPerfil.path) },
-                    onEnvioObraClick = { /*TODO*/ },
+                    onEnvioObraClick = { navController.navigate(Rota.EnvioObra.path) },
                     onDuvidasClick = { navController.navigate(Rota.Duvida.path) },
                     onConfiguracoesClick = { navController.navigate(Rota.Configuracoes.path) },
-
-                    // ── MUDANÇA AQUI: Aciona o popup em vez de navegar direto ──
                     onSairClick = { mostrarPopupSair = true }
                 )
             }
@@ -276,7 +323,8 @@ fun ForLibraryApp() {
             // ── Dashboard Admin (RF26) ───────────────────────────────────────
             composable(Rota.DashboardAdmin.path) {
                 TelaDashboardAdmin(
-                    onSinoClick = { navController.navigate(Rota.Notificacoes.path) },
+                    onSinoClick = { navController.navigate(Rota.NotificacoesAdmin.path) }, // Bug 3: rota admin
+                    onConfiguracoesClick = { navController.navigate(Rota.ConfiguracoesSistema.path) }, // Bug 7
                     onVerTodasAtividades = { /* TODO */ }
                 )
             }
@@ -304,9 +352,39 @@ fun ForLibraryApp() {
                 )
             }
 
+            // ── Lista de Moderação ───────────────────────────────────────────
+            composable(Rota.ListaModeracao.path) {
+                TelaListaModeracaoAdmin(
+                    onModeracaoUsuarios = { navController.navigate(Rota.GestaoUsuarios.path) },
+                    onModeracaoObras    = { navController.navigate(Rota.ModeracaoObras.path) },
+                    onModeracaoResenhas = { navController.navigate(Rota.ModeracaoResenhas.path) }
+                )
+            }
+
             // ── Gestão de Usuários (RF38 mínima → trigger RF39) ──────────────
             composable(Rota.GestaoUsuarios.path) {
-                TelaGestaoUsuarios()
+                TelaGestaoUsuarios(onVoltar = { navController.popBackStack() })
+            }
+
+            // ── Moderação de Obras ────────────────────────────────────────────
+            composable(Rota.ModeracaoObras.path) {
+                TelaModeracaoObras(
+                    onVoltar = { navController.popBackStack() },
+                    onRevisarObra = { obraId ->
+                        navController.navigate(Rota.AnaliseObra.criarRota(obraId))
+                    }
+                )
+            }
+
+            // ── Análise de Obra ───────────────────────────────────────────────
+            composable(Rota.AnaliseObra.path) { backStackEntry ->
+                val obraId = backStackEntry.arguments?.getString("obraId") ?: ""
+                TelaAnaliseObra(
+                    obraId = obraId,
+                    onVoltar = { navController.popBackStack() },
+                    onAprovar = { navController.popBackStack() },
+                    onRejeitar = { _ -> navController.popBackStack() }
+                )
             }
 
             // Moderação de obras
@@ -346,6 +424,38 @@ fun ForLibraryApp() {
                 )
             }
 
+            // ── Novas telas Aluno ─────────────────────────────────────────────
+
+            composable(Rota.EnvioObra.path) {
+                TelaEnvioObra(
+                    onVoltar = { navController.popBackStack() },
+                    onObraEnviada = { navController.popBackStack() }
+                )
+            }
+
+            composable(Rota.MeusPontos.path) {
+                TelaMeusPontos(
+                    onVoltar = { navController.popBackStack() }
+                )
+            }
+
+            composable(Rota.HistoricoLeitura.path) {
+                TelaHistoricoLeitura(
+                    onVoltar = { navController.popBackStack() },
+                    onLivroClick = { livroId ->
+                        navController.navigate(Rota.DetalhesLivro.criarRota(livroId.toString()))
+                    }
+                )
+            }
+
+            composable(Rota.DetalhesEvento.path) { backStackEntry ->
+                val eventoId = backStackEntry.arguments?.getString("eventoId")?.toIntOrNull() ?: 1
+                TelaDetalhesEvento(
+                    eventoId = eventoId,
+                    onVoltar = { navController.popBackStack() },
+                    onAdicionarCalendario = { /* TODO: integrar calendário */ }
+                )
+            }
 
         }
     }

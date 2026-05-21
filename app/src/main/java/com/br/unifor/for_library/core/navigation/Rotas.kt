@@ -20,9 +20,16 @@ sealed class Rota(val path: String) {
         fun criarRota(livroId: String) = "editar_obra/$livroId"
     }
 
-    object PainelModeracao : Rota("painel_moderacao")
 
     object GestaoUsuarios : Rota("gestao_usuarios")
+
+    object ListaModeracao : Rota("lista_moderacao")
+
+    object ModeracaoObras : Rota("moderacao_obras")
+
+    object AnaliseObra : Rota("analise_obra/{obraId}") {
+        fun criarRota(obraId: String) = "analise_obra/$obraId"
+    }
 
     object ModeracaoResenhas : Rota("moderacao_resenhas")
 
@@ -37,6 +44,7 @@ sealed class Rota(val path: String) {
     object Acervo    : Rota("acervo")
     object Estante   : Rota("estante")
     object Eventos   : Rota("eventos")
+    object EventosAdmin  : Rota("eventos_admin")
     object Perfil    : Rota("perfil")
 
     object DetalhesLivro : Rota("detalhes_livro/{livroId}") {
@@ -48,4 +56,16 @@ sealed class Rota(val path: String) {
     }
 
     object AvalicaoLivro : Rota("avaliacao")
+
+    // Notificações Admin (contexto separado do aluno)
+    object NotificacoesAdmin : Rota("notificacoes_admin")
+
+    // Rotas Aluno — novas telas
+    object EnvioObra       : Rota("envio_obra")
+    object MeusPontos      : Rota("meus_pontos")
+    object HistoricoLeitura: Rota("historico_leitura")
+
+    object DetalhesEvento : Rota("detalhes_evento/{eventoId}") {
+        fun criarRota(eventoId: Int) = "detalhes_evento/$eventoId"
+    }
 }

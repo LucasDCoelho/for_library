@@ -36,9 +36,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +54,6 @@ import com.br.unifor.for_library.core.data.LivrosSalvosState
 import com.br.unifor.for_library.core.components.FiltroAvancadoBottomSheet
 import com.br.unifor.for_library.core.components.FiltroAvancadoState
 import com.br.unifor.for_library.core.designsystem.AzulPrimario
-import com.br.unifor.for_library.feature.aluno.acervo.ui.BuscaVaziaPlaceholder
 import com.br.unifor.for_library.core.components.CapaLivro
 import com.br.unifor.for_library.core.designsystem.CinzaTexto
 import com.br.unifor.for_library.core.designsystem.coresFallback
@@ -79,11 +80,23 @@ fun TelaAcervoDigital(
     onLivroClick: (Int) -> Unit = {},
     onSinoClick: () -> Unit = {}
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-    val categorias = listOf("Tudo", "FicÃ§Ã£o", "Tecnologia", "HistÃ³ria", "Design")
-    var categoriaSelecionada by remember { mutableStateOf("Tudo") }
+    // ✅ rememberSaveable: busca e categoria sobrevivem à rotação de tela
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    val categorias = listOf("Tudo", "Ficção", "Tecnologia", "História", "Design")
+    var categoriaSelecionada by rememberSaveable { mutableStateOf("Tudo") }
     var mostrarFiltro by remember { mutableStateOf(false) }
     var filtroState by remember { mutableStateOf(FiltroAvancadoState()) }
+
+    // ✅ derivedStateOf: re-filtra apenas quando busca ou categoria mudam
+    val destinosFiltrados by remember {
+        derivedStateOf {
+            mockDestaques.filter { livro ->
+                searchQuery.isBlank() ||
+                livro.titulo.contains(searchQuery, ignoreCase = true) ||
+                livro.autor.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
 
     FiltroAvancadoBottomSheet(
         visivel = mostrarFiltro,
@@ -180,7 +193,8 @@ fun TelaAcervoDigital(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(categorias) { categoria ->
+            // ✅ key estável nas categorias
+            items(categorias, key = { it }) { categoria ->
                 val isSelected = categoria == categoriaSelecionada
                 Box(
                     modifier = Modifier
@@ -201,12 +215,7 @@ fun TelaAcervoDigital(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // â”€â”€ Grid ou Placeholder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        val destinosFiltrados = mockDestaques.filter { livro ->
-            searchQuery.isBlank() ||
-                    livro.titulo.contains(searchQuery, ignoreCase = true) ||
-                    livro.autor.contains(searchQuery, ignoreCase = true)
-        }
+        // ── Grid ou Placeholder ───────────────────────────────────────────────────────────────────────
 
         if (destinosFiltrados.isEmpty()) {
             BuscaVaziaPlaceholder(
@@ -221,7 +230,8 @@ fun TelaAcervoDigital(
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                items(destinosFiltrados) { livro ->
+                // ✅ key estável: evita recomposições desnecessárias no grid
+                items(destinosFiltrados, key = { it.id }) { livro ->
                     val corFallback = coresFallback[livro.id % coresFallback.size]
                     Column(
                         modifier = Modifier.fillMaxWidth().clickable { onLivroClick(livro.id) },
