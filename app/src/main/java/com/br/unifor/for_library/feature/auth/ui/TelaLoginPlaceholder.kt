@@ -1,5 +1,6 @@
 package com.br.unifor.for_library.feature.auth.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -13,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -22,6 +24,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.br.unifor.for_library.R
 
 @Composable
 fun TelaLoginPlaceholder(
@@ -43,6 +46,15 @@ fun TelaLoginPlaceholder(
             .padding(24.dp)
     ) {
         Spacer(modifier = Modifier.height(48.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.logo_for_library),
+            contentDescription = "Logo ForLibrary",
+            modifier = Modifier.size(64.dp),
+            colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(MaterialTheme.colorScheme.primary)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // RF02.1 e RF02.2: Títulos alinhados à esquerda
         Text(

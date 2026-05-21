@@ -9,14 +9,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -324,34 +327,48 @@ fun TelaHomeAluno(
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            listOf(
-                Triple("", "LIVROS LIDOS", livrosLidos.toString()),
-                Triple("", "TEMPO TOTAL",  tempoTotal)
-            ).forEach { (icone, titulo, valor) ->
+            val stats = listOf(
+                Triple(Icons.AutoMirrored.Filled.MenuBook, "LIVROS LIDOS", livrosLidos.toString()),
+                Triple(Icons.Default.Timer, "TEMPO TOTAL", tempoTotal)
+            )
+            stats.forEachIndexed { index, (icone, titulo, valor) ->
+                val corIcone = if (index == 0) Color(0xFF2E7D32) else Color(0xFF1976D2)
                 Card(
                     modifier  = Modifier.weight(1f),
                     shape     = MaterialTheme.shapes.medium,
                     colors    = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
-                    Column(
+                    Row(
                         modifier            = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                            .padding(12.dp),
+                        verticalAlignment   = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(icone, style = MaterialTheme.typography.headlineSmall)
-                        Text(
-                            titulo,
-                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        Icon(
+                            imageVector = icone,
+                            contentDescription = null,
+                            tint = corIcone,
+                            modifier = Modifier.size(28.dp)
                         )
-                        Text(
-                            valor,
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(
+                                titulo,
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                    letterSpacing = androidx.compose.ui.unit.TextUnit.Unspecified
+                                ),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                valor,
+                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
                     }
                 }
             }

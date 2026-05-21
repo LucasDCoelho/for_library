@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.delay
 
 // ---------------------------------------------------------------------------
@@ -217,13 +218,7 @@ fun TelaAvaliacaoResenha(
         // â”€â”€ RF14.6: BotÃ£o "Enviar Resenha" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Button(
             onClick = {
-                mensagemSucesso = if (resenha.isNotEmpty()) {
-                    "ENVIADO PARA MODERAÃ‡ÃƒO!"
-                } else {
-                    "AVALIAÃ‡ÃƒO REGISTRADA!"
-                }
-                // O LaunchedEffect acima detecta a mudanÃ§a de mensagemSucesso
-                // e chama onClose() apÃ³s 2 segundos automaticamente.
+                mensagemSucesso = "Avaliação registrada"
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -258,34 +253,30 @@ fun TelaAvaliacaoResenha(
             Text("Cancelar", color = Color.Gray)
         }
 
-        // â”€â”€ Feedback de sucesso animado â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        AnimatedVisibility(visible = mensagemSucesso != null) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            ) {
+        // â”€â”€ Feedback de sucesso em Popup (Checkout Verde) ──────────────────────
+        if (mensagemSucesso != null) {
+            Dialog(onDismissRequest = { onClose() }) {
                 Surface(
-                    color = VerdeFundo,
-                    shape = CircleShape
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.White,
+                    tonalElevation = 8.dp
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier.padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
                             contentDescription = null,
                             tint = VerdeSucesso,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(64.dp)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = mensagemSucesso ?: "",
-                            color = VerdeSucesso,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
+                            text = "Avaliação registrada",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = Color.Black
                         )
                     }
                 }
