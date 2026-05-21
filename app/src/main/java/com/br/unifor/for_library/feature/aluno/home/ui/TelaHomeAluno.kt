@@ -68,6 +68,8 @@ fun TelaHomeAluno(
     onLivroClick: (Int) -> Unit = {},
 ) {
     val destaques = mockDestaques
+
+    Box(modifier = Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -358,4 +360,14 @@ fun TelaHomeAluno(
         }
         Spacer(Modifier.height(24.dp))
     }
+
+    ChatBotAluno(
+        modifier = Modifier
+            .align(Alignment.BottomEnd)
+            .padding(bottom = 16.dp, end = 16.dp)
+    )
+    } // Box
+}
+
+
 }
