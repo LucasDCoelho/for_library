@@ -322,9 +322,9 @@ private fun CardLivroFavorito(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Favorite,
+                    imageVector = Icons.Default.Bookmark,
                     contentDescription = "Favoritado",
-                    tint = Color.Red,
+                    tint = AzulPrimario,
                     modifier = Modifier.size(18.dp)
                 )
             }

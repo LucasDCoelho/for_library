@@ -39,7 +39,7 @@ enum class TipoEvento(val label: String) {
     TODOS("Todos"),
     WORKSHOP("Workshops"),
     PALESTRA("Palestras"),
-    LANCAMENTO("LanÃ§amentos")
+    LANCAMENTO("Lançamentos")
 }
 
 data class Evento(
@@ -151,7 +151,7 @@ fun TelaEventos(
             }
 
             Text(
-                text = "Eventos LiterÃ¡rios",
+                text = "Eventos Literários",
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1A1A2E)
@@ -164,7 +164,7 @@ fun TelaEventos(
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
-                    contentDescription = "NotificaÃ§Ãµes",
+                    contentDescription = "Notificações",
                     tint = Color(0xFF424242),
                     modifier = Modifier.size(22.dp)
                 )

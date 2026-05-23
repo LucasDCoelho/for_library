@@ -95,7 +95,7 @@ fun PopupFimLeitura(
                     modifier = Modifier.semantics(mergeDescendants = true) {}
                 ) {
                     Text(
-                        text = "ParabÃ©ns!",
+                        text = "Parabens!",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
@@ -103,7 +103,7 @@ fun PopupFimLeitura(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = buildAnnotatedString {
-                            append("VocÃª concluiu a leitura e ganhou ")
+                            append("Você concluiu a leitura e ganhou ")
                             withStyle(style = SpanStyle(color = AzulPrimario)) {
                                 append("$pontosGanhos pontos")
                             }

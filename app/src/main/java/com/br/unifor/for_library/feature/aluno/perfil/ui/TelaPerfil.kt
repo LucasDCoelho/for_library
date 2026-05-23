@@ -124,12 +124,12 @@ fun TelaPerfil(
             )
             ItemMenuPerfil(
                 icone = Icons.Default.HelpOutline,
-                texto = "DÃºvidas (FAQ)",
+                texto = "Duvidas (FAQ)",
                 onClick = onDuvidasClick
             )
             ItemMenuPerfil(
                 icone = Icons.Default.Settings,
-                texto = "ConfiguraÃ§Ãµes",
+                texto = "Configurações",
                 onClick = onConfiguracoesClick
             )
 

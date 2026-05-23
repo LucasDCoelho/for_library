@@ -88,7 +88,7 @@ fun TelaAvaliacaoResenha(
             Column {
                 // CORREÃ‡ÃƒO: fontSize aumentado de 10.sp para 12.sp (mÃ­nimo legÃ­vel)
                 Text(
-                    text = "AVALIAÃ‡ÃƒO",
+                    text = "AVALIAÇÃO",
                     fontSize = 12.sp,
                     color = Color.Gray,
                     fontWeight = FontWeight.Bold
@@ -197,7 +197,7 @@ fun TelaAvaliacaoResenha(
                 .padding(top = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("MÃ­nimo 20 caracteres", fontSize = 11.sp, color = Color.Gray)
+            Text("Minimo 20 caracteres", fontSize = 11.sp, color = Color.Gray)
             Text("${resenha.length} / $maxChars", fontSize = 11.sp, color = Color.Gray)
         }
 

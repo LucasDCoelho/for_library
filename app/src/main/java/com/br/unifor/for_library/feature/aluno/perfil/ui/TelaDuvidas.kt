@@ -51,7 +51,7 @@ fun TelaDuvidas(
             TopAppBar(
                 title = {
                     Text(
-                        text = "DÃºvidas Frequentes",
+                        text = "Duvidas Frequentes",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = Color(0xFF212121)

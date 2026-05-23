@@ -75,7 +75,7 @@ fun TelaNotificacoes(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("NotificaÃ§Ãµes", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text("Notificações", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 },
                 navigationIcon = {
                     IconButton(onClick = onVoltar) {

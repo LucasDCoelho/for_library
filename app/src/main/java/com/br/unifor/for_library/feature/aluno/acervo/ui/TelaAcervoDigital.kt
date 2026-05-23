@@ -69,7 +69,7 @@ private val mockDestaques = listOf(
     LivroDestaque(1, "O Design do Dia a Dia",    "Don Norman",               "9780465050659"),
     LivroDestaque(2, "Sapiens: Uma Breve HistÃ³ria","Yuval Noah Harari",      "9788543102146"),
     LivroDestaque(3, "Clean Code",               "Robert C. Martin",         "9780132350884"),
-    LivroDestaque(4, "O Pequeno PrÃ­ncipe",        "Antoine de Saint-ExupÃ©ry","9788522031412"),
+    LivroDestaque(4, "O Pequeno Principe",        "Antoine de Saint-Exuparry","9788522031412"),
     LivroDestaque(5, "Fundamentos da GestÃ£o",     "Peter Drucker",           "9788522102716"),
     LivroDestaque(6, "Atomic Habits",             "James Clear",             "9780735211292")
 )
@@ -143,7 +143,7 @@ fun TelaAcervoDigital(
             IconButton(onClick = onSinoClick) {
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
-                    contentDescription = "NotificaÃ§Ãµes",
+                    contentDescription = "Notificações",
                     tint = Color.DarkGray
                 )
             }
@@ -160,7 +160,7 @@ fun TelaAcervoDigital(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 modifier = Modifier.weight(1f).height(52.dp),
-                placeholder = { Text("Busque por tÃ­tulo ou autor", color = Color.Gray, fontSize = 14.sp) },
+                placeholder = { Text("Busque por título ou autor", color = Color.Gray, fontSize = 14.sp) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
                 singleLine = true,
                 shape = RoundedCornerShape(4.dp),

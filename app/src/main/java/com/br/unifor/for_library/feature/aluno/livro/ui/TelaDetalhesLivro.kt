@@ -10,9 +10,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.*
@@ -93,7 +93,7 @@ fun TelaDetalhesLivro(
                     fontSize = 18.sp
                 )
                 IconButton(onClick = onNotificacoes) {
-                    Icon(Icons.Outlined.Notifications, contentDescription = "NotificaÃ§Ãµes")
+                    Icon(Icons.Outlined.Notifications, contentDescription = "Notificações")
                 }
             }
         }
@@ -133,7 +133,7 @@ fun TelaDetalhesLivro(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "GÃŠNERO: FICÃ‡ÃƒO CIENTÃFICA",
+                        text = "GÊNERO: FICÇÃO CIENTIFICA",
                         color = AzulPrimario,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
@@ -214,11 +214,11 @@ fun TelaDetalhesLivro(
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
-                        imageVector = if (favoritado) Icons.Filled.Favorite
-                        else Icons.Outlined.FavoriteBorder,
+                        imageVector = if (favoritado) Icons.Filled.Bookmark
+                        else Icons.Outlined.BookmarkBorder,
                         contentDescription = if (favoritado) "Remover dos favoritos"
                         else "Adicionar aos favoritos",
-                        tint = if (favoritado) Color.Red else Color.Gray
+                        tint = if (favoritado) AzulPrimario else Color.Gray
                     )
                 }
             }
@@ -273,7 +273,7 @@ fun TelaDetalhesLivro(
         // â”€â”€ RF09.7: AvaliaÃ§Ãµes de UsuÃ¡rios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         item {
             Text(
-                text = "AvaliaÃ§Ãµes de UsuÃ¡rios",
+                text = "Avaliações de Usuários",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
