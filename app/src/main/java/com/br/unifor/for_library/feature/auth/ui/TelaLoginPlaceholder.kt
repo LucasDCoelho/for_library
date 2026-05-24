@@ -25,19 +25,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.br.unifor.for_library.R
+import com.br.unifor.for_library.feature.auth.buscarTipoUsuarioAtual
+import com.br.unifor.for_library.feature.auth.emailInstitucionalValido
+import com.br.unifor.for_library.feature.auth.isAdmin
+import com.br.unifor.for_library.supabase
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
+import kotlinx.coroutines.launch
 
 @Composable
 fun TelaLoginPlaceholder(
     onLoginSucesso: () -> Unit,
+    onLoginAdmin: () -> Unit = onLoginSucesso,
     onIrParaCadastro: () -> Unit,
     onIrParaEsqueciSenha: () -> Unit,
-    onEsqueceuSenha: () -> Unit = {},
-    onAdm: () -> Unit = {},
 ) {
     var email             by rememberSaveable { mutableStateOf("") }
     var password          by rememberSaveable { mutableStateOf("") }
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
-    var showError         by rememberSaveable { mutableStateOf(false) }
+    var isLoading         by rememberSaveable { mutableStateOf(false) }
+    var errorMessage      by rememberSaveable { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -73,25 +81,23 @@ fun TelaLoginPlaceholder(
         // RF02.3: Campo Matrícula/Email
         OutlinedTextField(
             value         = email,
-            onValueChange = { email = it; showError = false },
-            label         = { Text("Matrícula ou Email Institucional") },
+            onValueChange = { email = it; errorMessage = null },
+            label         = { Text("Matrícula ou e-mail institucional") },
+            placeholder   = { Text("Matrícula ou Email") },
             modifier      = Modifier.fillMaxWidth(),
             singleLine    = true,
-            isError       = showError
+            isError       = errorMessage != null
         )
         Spacer(Modifier.height(8.dp))
 
         // RF02.4: Campo Senha Oculto + Ícone de Olho
         OutlinedTextField(
             value         = password,
-            onValueChange = { password = it; showError = false },
+            onValueChange = { password = it; errorMessage = null },
             label         = { Text("Senha") },
             modifier      = Modifier.fillMaxWidth(),
             singleLine    = true,
-            isError       = showError,
-            supportingText = if (showError) {
-                { Text(text = "Credenciais inválidas", color = MaterialTheme.colorScheme.error) }
-            } else null,
+            isError       = errorMessage != null,
             visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 val image = if (isPasswordVisible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff
@@ -101,24 +107,66 @@ fun TelaLoginPlaceholder(
                 }
             }
         )
+        if (errorMessage != null) {
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = errorMessage ?: "",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
         Spacer(modifier = Modifier.height(24.dp))
 
-        // RF02.5: Botão Entrar (Apenas Navegação)
+        // RF02.5 + RF02.8: botão com loading e autenticação real
         Button(
-            onClick  = { onLoginSucesso() },
+            onClick  = {
+                if (!emailInstitucionalValido(email)) {
+                    errorMessage = "Utilize um e-mail institucional válido"
+                    return@Button
+                }
+                scope.launch {
+                    isLoading = true
+                    errorMessage = null
+                    try {
+                        supabase.auth.signInWith(Email) {
+                            this.email = email.trim()
+                            this.password = password
+                        }
+                        val tipoUsuario = buscarTipoUsuarioAtual()
+                        if (isAdmin(tipoUsuario)) {
+                            onLoginAdmin()
+                        } else {
+                            onLoginSucesso()
+                        }
+                    } catch (_: Exception) {
+                        errorMessage = "Credenciais inválidas"
+                    } finally {
+                        isLoading = false
+                    }
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1C64F2)),
-            shape  = MaterialTheme.shapes.small
+            shape  = MaterialTheme.shapes.small,
+            enabled = !isLoading
         ) {
-            Row(
-                modifier              = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment     = Alignment.CenterVertically
-            ) {
-                Text("Entrar", fontSize = 16.sp)
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Seta Entrar")
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = Color.White
+                )
+            } else {
+                Row(
+                    modifier              = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment     = Alignment.CenterVertically
+                ) {
+                    Text("Entrar", fontSize = 16.sp)
+                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Seta Entrar")
+                }
             }
         }
         Spacer(Modifier.height(8.dp))
@@ -134,24 +182,6 @@ fun TelaLoginPlaceholder(
             )
         }
 
-        // Botão ADM
-        Button(
-            onClick  = { onAdm() },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1264c2)),
-            shape  = MaterialTheme.shapes.small
-        ) {
-            Row(
-                modifier              = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment     = Alignment.CenterVertically
-            ) {
-                Text("Entrar ADM", fontSize = 16.sp)
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Seta Entrar")
-            }
-        }
 
         Spacer(modifier = Modifier.weight(1f))
         Spacer(modifier = Modifier.height(24.dp))
