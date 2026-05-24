@@ -176,8 +176,8 @@ fun TelaAcervoDigital(
                 CircularProgressIndicator(color = AzulPrimario)
             }
         } else if (state.livros.isEmpty()) {
-            AcervoEmptyState(
-                onLimparFiltrosClick = { viewModel.limparFiltros() },
+            BuscaVaziaPlaceholder(
+                onLimparFiltros = { viewModel.limparFiltros() },
                 modifier = Modifier.weight(1f)
             )
         } else {
@@ -209,7 +209,7 @@ fun TelaAcervoDigital(
                                     .clip(RoundedCornerShape(8.dp)),
                                 corFallback = corFallback
                             )
-                            
+
                             // Label "NOVO" (Requisito RF06 - Livros recentes)
                             if (livro.isNovo) {
                                 Surface(
@@ -240,10 +240,10 @@ fun TelaAcervoDigital(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
-                                    imageVector = if (livro.isbn?.let { LivrosSalvosState.isSalvo(it) } == true) 
+                                    imageVector = if (livro.isbn?.let { LivrosSalvosState.isSalvo(it) } == true)
                                         Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                                     contentDescription = "Salvar livro",
-                                    tint = if (livro.isbn?.let { LivrosSalvosState.isSalvo(it) } == true) 
+                                    tint = if (livro.isbn?.let { LivrosSalvosState.isSalvo(it) } == true)
                                         AzulPrimario else Color(0xFF757575),
                                     modifier = Modifier.size(20.dp)
                                 )
