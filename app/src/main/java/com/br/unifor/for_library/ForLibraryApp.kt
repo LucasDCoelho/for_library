@@ -208,27 +208,30 @@ fun ForLibraryApp() {
                     livroId = livroId,
                     onVoltar = { navController.popBackStack() },
                     onNotificacoes = { /* TODO */ },
-                    onLerAgora = {
-                        // Bug 2: Uri.encode evita crash com títulos com caracteres especiais
-                        navController.navigate(Rota.LeitorDigital.criarRota(livroId, Uri.encode("O Horizonte de Eventos")))
+                    onLerAgora = { titulo ->
+                        navController.navigate(Rota.LeitorDigital.criarRota(livroId, Uri.encode(titulo)))
                     }
                 )
             }
 
             composable(route = Rota.LeitorDigital.path) { backStackEntry ->
-                val titulo = backStackEntry.arguments?.getString("titulo") ?: "Livro Desconhecido"
+                val livroId = backStackEntry.arguments?.getString("livroId") ?: ""
+                val titulo  = backStackEntry.arguments?.getString("titulo") ?: "Livro Desconhecido"
 
                 TelaLeitorDigital(
+                    livroId = livroId,
                     tituloLivro = titulo,
                     onVoltar = { navController.popBackStack() },
-                    onIrAvaliarLivro = { navController.navigate(Rota.AvalicaoLivro.path) }
+                    onIrAvaliarLivro = { navController.navigate(Rota.AvalicaoLivro.criarRota(livroId)) }
                 )
             }
 
-            composable(Rota.AvalicaoLivro.path) {
+            composable(Rota.AvalicaoLivro.path) { backStackEntry ->
+                val livroId = backStackEntry.arguments?.getString("livroId") ?: ""
                 TelaAvaliacaoResenha(
+                    livroId = livroId,
                     onClose = { navController.popBackStack() },
-                    onCancelar = { navController.popBackStack() },
+                    onCancelar = { navController.popBackStack() }
                 )
             }
 
@@ -274,7 +277,6 @@ fun ForLibraryApp() {
 
             composable(Rota.Estante.path) {
                 TelaEstante(
-                    onSearchClick = { /* TODO: busca */ },
                     onHistoricoClick = { navController.navigate(Rota.HistoricoLeitura.path) }
                 )
             }
@@ -446,8 +448,7 @@ fun ForLibraryApp() {
 
             composable(Rota.EnvioObra.path) {
                 TelaEnvioObra(
-                    onVoltar = { navController.popBackStack() },
-                    onObraEnviada = { navController.popBackStack() }
+                    onVoltar = { navController.popBackStack() }
                 )
             }
 
@@ -470,8 +471,7 @@ fun ForLibraryApp() {
                 val eventoId = backStackEntry.arguments?.getString("eventoId")?.toIntOrNull() ?: 1
                 TelaDetalhesEvento(
                     eventoId = eventoId,
-                    onVoltar = { navController.popBackStack() },
-                    onAdicionarCalendario = { /* TODO: integrar calendário */ }
+                    onVoltar = { navController.popBackStack() }
                 )
             }
 

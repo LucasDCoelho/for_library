@@ -1,4 +1,4 @@
-﻿package com.br.unifor.for_library.feature.aluno.livro.ui
+package com.br.unifor.for_library.feature.aluno.livro.ui
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -23,59 +23,40 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.br.unifor.for_library.core.components.CapaLivro
+import com.br.unifor.for_library.core.designsystem.coresFallback
+import com.br.unifor.for_library.feature.aluno.livro.viewmodel.DetalhesLivroViewModel
+import com.br.unifor.for_library.feature.aluno.livro.viewmodel.ResenhaUi
 
-// ---------------------------------------------------------------------------
-// Cores centralizadas â€” futuramente migrar para MaterialTheme.colorScheme
-// ---------------------------------------------------------------------------
 private val AzulPrimario   = Color(0xFF1565C0)
 private val AmareloEstrela = Color(0xFFFFC107)
 
-// ---------------------------------------------------------------------------
-// Modelo de dados simulado para as avaliaÃ§Ãµes (Mock)
-// TODO: mover para DetalhesLivroViewModel + UiState quando a camada de dados
-//       estiver pronta.
-// ---------------------------------------------------------------------------
-data class Avaliacao(val nome: String, val tempo: String, val nota: Int, val texto: String)
-
 @Composable
 fun TelaDetalhesLivro(
-    livroId: String,          // Recebemos o ID para no futuro buscar no banco de dados
+    livroId: String,
     onVoltar: () -> Unit,
     onNotificacoes: () -> Unit,
-    onLerAgora: () -> Unit
+    onLerAgora: (titulo: String) -> Unit,
+    viewModel: DetalhesLivroViewModel = viewModel()
 ) {
-    // Estado para o "Ler mais" da Sinopse (RF09.6)
+    val state by viewModel.state.collectAsState()
+    val livroIdInt = remember(livroId) { livroId.toIntOrNull() ?: 0 }
+
+    LaunchedEffect(livroIdInt) {
+        if (livroIdInt > 0) viewModel.carregarDetalhes(livroIdInt)
+    }
+
     var sinopseExpandida by remember { mutableStateOf(false) }
-
-    // CORREÃ‡ÃƒO RF09.5 â€” estado de favorito controla Ã­cone E cor
-    var favoritado by remember { mutableStateOf(false) }
-
-    // Dados simulados
-    // TODO: substituir por viewModel.uiState.collectAsStateWithLifecycle()
-    val notaMedia    = 4.2f
-    val totalAvaliacoes = 1_240
-
-    val avaliacoes = listOf(
-        Avaliacao("Mariana Silva",  "HÃ¡ 2 dias", 5, "Absolutamente fascinante. A construÃ§Ã£o de mundo Ã© impecÃ¡vel e o final me deixou sem palavras..."),
-        Avaliacao("Carlos Eduardo", "HÃ¡ 5 dias", 4, "Ã“timo livro, leitura muito fluÃ­da, mas o meio da histÃ³ria Ã© um pouco lento.")
-    )
-
-    val sinopseCompleta =
-        "Em um futuro onde as viagens interestelares tornaram-se rotina, o capitÃ£o Elias Thorne " +
-                "descobre uma anomalia nos confins da galÃ¡xia de AndrÃ´meda que desafia todas as leis " +
-                "conhecidas da fÃ­sica. Enquanto a tripulaÃ§Ã£o da nave 'Vanguard' luta pela sobrevivÃªncia, " +
-                "segredos ancestrais sobre a origem da humanidade comeÃ§am a emergir das sombras do espaÃ§o profundo."
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-
-        // â”€â”€ RF09.1: CabeÃ§alho â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── RF09.1: Cabeçalho ────────────────────────────────────────────────
         item {
             Row(
                 modifier = Modifier
@@ -87,45 +68,66 @@ fun TelaDetalhesLivro(
                 IconButton(onClick = onVoltar) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
                 }
-                Text(
-                    text = "Detalhes do livro",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
+                Text("Detalhes do livro", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 IconButton(onClick = onNotificacoes) {
                     Icon(Icons.Outlined.Notifications, contentDescription = "Notificações")
                 }
             }
         }
 
-        // â”€â”€ RF09.2: Capa do Livro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Loading / Error ───────────────────────────────────────────────────
+        if (state.isLoading) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(300.dp),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator(color = AzulPrimario) }
+            }
+            return@LazyColumn
+        }
+
+        if (state.error != null) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(300.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        "Não foi possível carregar o livro.",
+                        color = Color(0xFF616161),
+                        fontSize = 14.sp
+                    )
+                }
+            }
+            return@LazyColumn
+        }
+
+        val livro = state.livro ?: return@LazyColumn
+        val corFallback = coresFallback[livro.id % coresFallback.size]
+
+        // ── RF09.2: Capa ──────────────────────────────────────────────────────
         item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(280.dp)
-                    .padding(horizontal = 16.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    // TODO: substituir por AsyncImage (Coil) quando a URL da capa
-                    //       estiver disponÃ­vel no UiState:
-                    //       AsyncImage(model = state.capaUrl, contentDescription = "Capa")
-                    .background(Color(0xFFE3EEF9)),
+                    .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        Icons.Outlined.MenuBook,
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                        tint = AzulPrimario
-                    )
-                    Text("Capa do Livro", color = AzulPrimario, fontWeight = FontWeight.Bold)
-                }
+                CapaLivro(
+                    isbn = livro.isbn ?: "",
+                    tituloFallback = livro.titulo,
+                    modifier = Modifier
+                        .width(180.dp)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(8.dp)),
+                    corFallback = corFallback
+                )
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // â”€â”€ RF09.2: Metadados (GÃªnero, Ano, TÃ­tulo, Autor) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── RF09.2: Metadados ─────────────────────────────────────────────────
         item {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Row(
@@ -133,49 +135,40 @@ fun TelaDetalhesLivro(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "GÊNERO: FICÇÃO CIENTIFICA",
+                        text = "GÊNERO: ${livro.genero.uppercase()}",
                         color = AzulPrimario,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(text = "Ano: 2023", color = Color.Gray, fontSize = 12.sp)
+                    livro.ano_publicacao?.let {
+                        Text(text = "Ano: $it", color = Color.Gray, fontSize = 12.sp)
+                    }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "O Horizonte de Eventos",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                )
-                Text(
-                    text = "Autor: Jonathan K. Sterling",
-                    color = Color.DarkGray,
-                    fontSize = 14.sp
-                )
+                Text(text = livro.titulo, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                Text(text = "Autor: ${livro.autor}", color = Color.DarkGray, fontSize = 14.sp)
             }
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // â”€â”€ RF09.3: Nota MÃ©dia â€” CORRIGIDO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        // Antes: repeat(5) sempre renderizava 5 estrelas cheias.
-        // Agora: estrelas preenchidas atÃ© o inteiro da nota, restantes em cinza.
+        // ── RF09.3: Nota Média ────────────────────────────────────────────────
         item {
             Row(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val notaInt = notaMedia.toInt() // 4.2 â†’ 4
+                val notaInt = livro.nota_media.toInt()
                 repeat(5) { index ->
-                    val tint = if (index < notaInt) AmareloEstrela else Color.LightGray
                     Icon(
                         imageVector = Icons.Filled.Star,
                         contentDescription = null,
-                        tint = tint,
+                        tint = if (index < notaInt) AmareloEstrela else Color.LightGray,
                         modifier = Modifier.size(20.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "$notaMedia ($totalAvaliacoes avaliaÃ§Ãµes)",
+                    text = "${"%.1f".format(livro.nota_media)} (${livro.qtd_avaliacoes} avaliações)",
                     fontSize = 14.sp,
                     color = Color.DarkGray
                 )
@@ -183,9 +176,7 @@ fun TelaDetalhesLivro(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // â”€â”€ RF09.4 e RF09.5: BotÃµes de AÃ§Ã£o â€” CORRIGIDO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        // Antes: Ã­cone de favorito era sempre FavoriteBorder independente do estado.
-        // Agora: alterna entre Favorite (preenchido) e FavoriteBorder (contorno).
+        // ── RF09.4 + RF09.5: Botões de Ação ──────────────────────────────────
         item {
             Row(
                 modifier = Modifier
@@ -194,31 +185,27 @@ fun TelaDetalhesLivro(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = onLerAgora,
+                    onClick = { onLerAgora(livro.titulo) },
                     colors = ButtonDefaults.buttonColors(containerColor = AzulPrimario),
                     shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp)
+                    modifier = Modifier.weight(1f).height(48.dp)
                 ) {
                     Icon(Icons.Outlined.MenuBook, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Ler Agora", fontSize = 16.sp)
                 }
                 Spacer(modifier = Modifier.width(16.dp))
-
-                // CORREÃ‡ÃƒO RF09.5 â€” Ã­cone preenchido quando favoritado
                 OutlinedIconButton(
-                    onClick = { favoritado = !favoritado },
+                    onClick = { viewModel.toggleFavorito(livroIdInt) },
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
-                        imageVector = if (favoritado) Icons.Filled.Bookmark
-                        else Icons.Outlined.BookmarkBorder,
-                        contentDescription = if (favoritado) "Remover dos favoritos"
-                        else "Adicionar aos favoritos",
-                        tint = if (favoritado) AzulPrimario else Color.Gray
+                        imageVector = if (state.favoritado) Icons.Filled.Bookmark
+                                      else Icons.Outlined.BookmarkBorder,
+                        contentDescription = if (state.favoritado) "Remover dos favoritos"
+                                             else "Adicionar aos favoritos",
+                        tint = if (state.favoritado) AzulPrimario else Color.Gray
                     )
                 }
             }
@@ -231,7 +218,7 @@ fun TelaDetalhesLivro(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // â”€â”€ RF09.6: Sinopse com "Ler Mais" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── RF09.6: Sinopse expansível ────────────────────────────────────────
         item {
             Column(
                 modifier = Modifier
@@ -246,20 +233,23 @@ fun TelaDetalhesLivro(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = sinopseCompleta,
+                    text = livro.sinopse ?: "Sem sinopse disponível.",
                     fontSize = 14.sp,
                     color = Color.DarkGray,
+                    modifier = Modifier.fillMaxWidth(),
                     maxLines = if (sinopseExpandida) Int.MAX_VALUE else 4,
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = if (sinopseExpandida) "Ler menos" else "Ler mais",
-                    color = AzulPrimario,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { sinopseExpandida = !sinopseExpandida }
-                )
+                if (!livro.sinopse.isNullOrBlank()) {
+                    Text(
+                        text = if (sinopseExpandida) "Ler menos" else "Ler mais",
+                        color = AzulPrimario,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable { sinopseExpandida = !sinopseExpandida }
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(24.dp))
             HorizontalDivider(
@@ -270,7 +260,7 @@ fun TelaDetalhesLivro(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // â”€â”€ RF09.7: AvaliaÃ§Ãµes de UsuÃ¡rios â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── RF09.7: Avaliações ────────────────────────────────────────────────
         item {
             Text(
                 text = "Avaliações de Usuários",
@@ -280,60 +270,18 @@ fun TelaDetalhesLivro(
             )
         }
 
-        items(avaliacoes) { avaliacao ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .background(Color(0xFFF5F5F5), shape = RoundedCornerShape(8.dp))
-                    .padding(12.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        // Avatar circular simulado â€” inicial do nome
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(Color.DarkGray),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                avaliacao.nome.first().toString(),
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column {
-                            Text(
-                                text = avaliacao.nome,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
-                            )
-                            // Estrelas da avaliaÃ§Ã£o individual
-                            Row {
-                                repeat(5) { index ->
-                                    val tint = if (index < avaliacao.nota) AmareloEstrela
-                                    else Color.LightGray
-                                    Icon(
-                                        Icons.Filled.Star,
-                                        contentDescription = null,
-                                        tint = tint,
-                                        modifier = Modifier.size(12.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    Text(text = avaliacao.tempo, color = Color.Gray, fontSize = 12.sp)
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = avaliacao.texto, fontSize = 14.sp, color = Color.DarkGray)
+        if (state.resenhas.isEmpty()) {
+            item {
+                Text(
+                    text = "Nenhuma avaliação ainda.",
+                    color = Color.Gray,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+        } else {
+            items(state.resenhas, key = { it.id }) { resenha ->
+                ResenhaCard(resenha)
             }
         }
 
@@ -341,14 +289,60 @@ fun TelaDetalhesLivro(
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun TelaDetalhesLivroPreview() {
-    TelaDetalhesLivro(
-        livroId = "123",
-        onVoltar = {},
-        onNotificacoes = {},
-        onLerAgora = {}
-    )
+private fun ResenhaCard(resenha: ResenhaUi) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .background(Color(0xFFF5F5F5), shape = RoundedCornerShape(8.dp))
+            .padding(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF424242)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        resenha.autorNome.firstOrNull()?.toString() ?: "?",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Column {
+                    Text(resenha.autorNome, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Row {
+                        repeat(5) { index ->
+                            Icon(
+                                Icons.Filled.Star,
+                                contentDescription = null,
+                                tint = if (index < resenha.nota) AmareloEstrela else Color.LightGray,
+                                modifier = Modifier.size(12.dp)
+                            )
+                        }
+                    }
+                }
+            }
+            Text(resenha.tempoRelativo, color = Color.Gray, fontSize = 12.sp)
+        }
+        if (resenha.texto.isNotBlank()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = resenha.texto,
+                fontSize = 14.sp,
+                color = Color.DarkGray,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
 }
-
