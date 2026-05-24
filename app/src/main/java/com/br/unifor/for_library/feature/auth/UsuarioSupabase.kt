@@ -12,7 +12,7 @@ const val TIPO_ALUNO = "ALUNO"
 const val TIPO_ADMIN = "ADMIN"
 
 @Serializable
-private data class UsuarioPublicoPayload(
+data class UsuarioPublicoPayload(
     @SerialName("auth_user_id")
     val authUserId: String,
     val nome: String,
@@ -38,16 +38,14 @@ fun tipoAlunoPadrao(): String = TIPO_ALUNO
 fun isAdmin(tipo: String?): Boolean = normalizarTipoUsuario(tipo) == TIPO_ADMIN
 
 suspend fun inserirUsuarioPublico(
+    authUserId: String,
     nome: String,
     matricula: String,
     email: String,
     tipo: String = tipoAlunoPadrao()
 ) {
-    val usuarioAutenticado = supabase.auth.currentUserOrNull()
-        ?: throw IllegalStateException("Sessao invalida para criar usuario publico")
-
     val payload = UsuarioPublicoPayload(
-        authUserId = usuarioAutenticado.id,
+        authUserId = authUserId,
         nome = nome.trim(),
         matricula = matricula.trim(),
         email = email.trim().lowercase(),

@@ -288,9 +288,9 @@ fun ForLibraryApp() {
             composable(Rota.AdicionarEvento.path) {
                 TelaAdicionarEvento(
                     onVoltar = { navController.popBackStack() },
-                    onPublicar = { 
+                    onPublicar = {
                         // Simulação de sucesso
-                        navController.popBackStack() 
+                        navController.popBackStack()
                     }
                 )
             }

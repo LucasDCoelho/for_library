@@ -279,7 +279,7 @@ fun TelaCadastro(
                         isLoading = true
                         errorMessage = null
                         try {
-                            supabase.auth.signUpWith(Email) {
+                            val response = supabase.auth.signUpWith(Email) {
                                 this.email = email.trim()
                                 this.password = senha
                                 data = buildJsonObject {
@@ -288,7 +288,13 @@ fun TelaCadastro(
                                     put("tipo", tipoAlunoPadrao())
                                 }
                             }
+                            
+                            val userId = response?.id 
+                                ?: supabase.auth.currentUserOrNull()?.id
+                                ?: throw IllegalStateException("Não foi possível obter o ID do usuário após o cadastro")
+
                             inserirUsuarioPublico(
+                                authUserId = userId,
                                 nome = nomeCompleto,
                                 matricula = matricula,
                                 email = email,
@@ -296,7 +302,7 @@ fun TelaCadastro(
                             )
                             isSuccess = true
                         } catch (e: Exception) {
-                            errorMessage = e.message ?: "Email ja em uso"
+                            errorMessage = e.message ?: "Erro ao realizar cadastro"
                         } finally {
                             isLoading = false
                         }

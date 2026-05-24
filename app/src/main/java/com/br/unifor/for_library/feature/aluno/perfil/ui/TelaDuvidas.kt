@@ -35,7 +35,7 @@ fun TelaDuvidas(
     val listaDuvidas = listOf(
         Duvida(
             pergunta = "Como renovar um livro?",
-            resposta = "Para renovar uma obra, acesse a aba \"EmprÃ©stimos\", selecione o livro desejado e clique no botÃ£o \"Renovar\". Certifique-se de que nÃ£o hÃ¡ reservas pendentes para este tÃ­tulo."
+            resposta = "Para renovar uma obra, acesse a aba \"Emprestimos\", selecione o livro desejado e clique no botÃ£o \"Renovar\". Certifique-se de que nÃ£o hÃ¡ reservas pendentes para este tÃ­tulo."
         ),
         // As demais com texto vazio conforme solicitado
         Duvida("Como funciona o sistema de pontos?", "tem rep ainda naum kk 1"),
