@@ -2,52 +2,57 @@ package com.br.unifor.for_library.feature.auth.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.br.unifor.for_library.R
+import com.br.unifor.for_library.core.designsystem.AzulChip
+import com.br.unifor.for_library.feature.auth.buscarTipoUsuarioAtual
+import com.br.unifor.for_library.feature.auth.isAdmin
+import com.br.unifor.for_library.supabase
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.delay
 
 private const val SPLASH_DELAY_MS = 3000L
 
 @Composable
-fun TelaSplashScreen(onSplashFinished: () -> Unit) {
+fun TelaSplashScreen(
+    onNavigateToLogin: () -> Unit,
+    onNavigateToHomeAluno: () -> Unit,
+    onNavigateToHomeAdmin: () -> Unit
+) {
     LaunchedEffect(Unit) {
         delay(SPLASH_DELAY_MS)
-        onSplashFinished()
+        val user = supabase.auth.currentUserOrNull()
+        when {
+            user == null -> onNavigateToLogin()
+            else -> {
+                val tipoUsuario = buscarTipoUsuarioAtual()
+                if (isAdmin(tipoUsuario)) {
+                    onNavigateToHomeAdmin()
+                } else {
+                    onNavigateToHomeAluno()
+                }
+            }
+        }
     }
-    //Colocar em res? nao sei
-    val azulForLibrary = Color(0xFF1B65F6)
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(azulForLibrary),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(AzulChip),
+        contentAlignment = Alignment.Center
     ) {
-        // Logo ForLibrary atualizada
         Image(
             painter = painterResource(id = R.drawable.logo_for_library),
             contentDescription = "Logo ForLibrary",
             modifier = Modifier.size(120.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "ForLibrary",
-            color = Color.White,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold
         )
     }
 }

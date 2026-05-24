@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -49,6 +50,13 @@ dependencies {
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.compose.material3)
+
+    // Supabase
+    implementation(libs.supabase.kt)
+    implementation(libs.auth.kt)
+    implementation(libs.postgrest.kt)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.ktor.client.okhttp)
 
     // As duas bibliotecas essenciais para a sua arquitetura base funcionarem:
     implementation(libs.androidx.navigation.compose)

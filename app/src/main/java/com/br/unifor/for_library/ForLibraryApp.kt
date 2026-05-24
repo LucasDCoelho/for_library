@@ -142,8 +142,18 @@ fun ForLibraryApp() {
             // ── Splash ────────────────────────────────────────────────────────
             composable(Rota.Splash.path) {
                 TelaSplashScreen(
-                    onSplashFinished = {
+                    onNavigateToLogin = {
                         navController.navigate(Rota.Login.path) {
+                            popUpTo(Rota.Splash.path) { inclusive = true }
+                        }
+                    },
+                    onNavigateToHomeAluno = {
+                        navController.navigate(Rota.HomeAluno.path) {
+                            popUpTo(Rota.Splash.path) { inclusive = true }
+                        }
+                    },
+                    onNavigateToHomeAdmin = {
+                        navController.navigate(Rota.DashboardAdmin.path) {
                             popUpTo(Rota.Splash.path) { inclusive = true }
                         }
                     }
@@ -158,13 +168,13 @@ fun ForLibraryApp() {
                             popUpTo(Rota.Login.path) { inclusive = true }
                         }
                     },
-                    onIrParaCadastro     = { navController.navigate(Rota.Cadastro.path) },
-                    onIrParaEsqueciSenha = { navController.navigate(Rota.RecuperarSenha.path) },
-                    onAdm                = {
+                    onLoginAdmin = {
                         navController.navigate(Rota.DashboardAdmin.path) {
                             popUpTo(Rota.Login.path) { inclusive = true }
                         }
-                    }
+                    },
+                    onIrParaCadastro     = { navController.navigate(Rota.Cadastro.path) },
+                    onIrParaEsqueciSenha = { navController.navigate(Rota.RecuperarSenha.path) },
                 )
             }
 
@@ -175,11 +185,7 @@ fun ForLibraryApp() {
             composable(Rota.Cadastro.path) {
                 TelaCadastro(
                     onVoltar = { navController.popBackStack() },
-                    onCadastrarSucesso = {
-                        navController.navigate(Rota.HomeAluno.path) {
-                            popUpTo(Rota.Cadastro.path) { inclusive = true }
-                        }
-                    },
+                    onCadastrarSucesso = { navController.popBackStack() },
                     onIrParaLogin = { navController.popBackStack() }
                 )
             }
