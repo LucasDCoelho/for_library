@@ -20,17 +20,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.br.unifor.for_library.core.designsystem.AzulPrimario
 
+import com.br.unifor.for_library.core.components.PopupLogout
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaConfiguracoesSistema(
     onVoltar: () -> Unit,
-    onSairClick: () -> Unit
+    onSairConfirm: () -> Unit
 ) {
 
     var pontosResenha by remember { mutableStateOf("15") }
+    var mostrarPopupSair by remember { mutableStateOf(false) }
 
     val corVermelha = Color(0xFFD32F2F)
     val fundoVermelhoClaro = Color(0xFFFFF5F5)
+
+    if (mostrarPopupSair) {
+        PopupLogout(
+            onDismiss = { mostrarPopupSair = false },
+            onConfirm = {
+                mostrarPopupSair = false
+                onSairConfirm()
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -133,7 +146,7 @@ fun TelaConfiguracoesSistema(
 
                     // Botão Sair
                     OutlinedButton(
-                        onClick = onSairClick,
+                        onClick = { mostrarPopupSair = true },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(48.dp),

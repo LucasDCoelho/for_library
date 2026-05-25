@@ -59,7 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.br.unifor.for_library.feature.auth.emailInstitucionalValido
 import com.br.unifor.for_library.feature.auth.inserirUsuarioPublico
-import com.br.unifor.for_library.feature.auth.tipoAlunoPadrao
+import com.br.unifor.for_library.feature.auth.obterTipoPorEmail
 import com.br.unifor.for_library.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -279,13 +279,14 @@ fun TelaCadastro(
                         isLoading = true
                         errorMessage = null
                         try {
+                            val tipoIdentificado = obterTipoPorEmail(email)
                             val response = supabase.auth.signUpWith(Email) {
                                 this.email = email.trim()
                                 this.password = senha
                                 data = buildJsonObject {
                                     put("nome", nomeCompleto.trim())
                                     put("matricula", matricula.trim())
-                                    put("tipo", tipoAlunoPadrao())
+                                    put("tipo", tipoIdentificado)
                                 }
                             }
                             
@@ -298,7 +299,7 @@ fun TelaCadastro(
                                 nome = nomeCompleto,
                                 matricula = matricula,
                                 email = email,
-                                tipo = tipoAlunoPadrao()
+                                tipo = tipoIdentificado
                             )
                             isSuccess = true
                         } catch (e: Exception) {
