@@ -7,6 +7,7 @@ sealed class Rota(val path: String) {
     object Cadastro       : Rota("cadastro")
     object RecuperarSenha : Rota("recuperar_senha")
     object Notificacoes   : Rota("notificacoes")
+
     object EditarPerfil   : Rota("editar_perfil")
     object Duvida         : Rota("duvida")
     object Configuracoes  : Rota("configuracoes")
@@ -56,7 +57,9 @@ sealed class Rota(val path: String) {
         fun criarRota(livroId: String, titulo: String) = "leitor/$livroId/$titulo"
     }
 
-    object AvalicaoLivro : Rota("avaliacao")
+    object AvalicaoLivro : Rota("avaliacao/{livroId}") {
+        fun criarRota(livroId: String) = "avaliacao/$livroId"
+    }
 
     // Notificações Admin (contexto separado do aluno)
     object NotificacoesAdmin : Rota("notificacoes_admin")

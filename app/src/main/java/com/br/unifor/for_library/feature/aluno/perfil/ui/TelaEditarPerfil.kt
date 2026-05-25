@@ -127,7 +127,7 @@ fun TelaEditarPerfil(
 
             // Label da SeÃ§Ã£o
             Text(
-                text = "CONFIGURAÃ‡ÃƒO DE PERFIL",
+                text = "CONFIGURAÇÃO DE PERFIL",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray,
@@ -140,7 +140,7 @@ fun TelaEditarPerfil(
 
             // 1. Nome de ExibiÃ§Ã£o
             InputPerfil(
-                label = "Nome de ExibiÃ§Ã£o",
+                label = "Nome de Exibição",
                 value = nomeExibicao,
                 onValueChange = { nomeExibicao = it }
             )
@@ -159,7 +159,7 @@ fun TelaEditarPerfil(
 
             // 3. MatrÃ­cula (Simulando bloqueada com Ã­cone de cadeado)
             InputPerfil(
-                label = "MatrÃ­cula",
+                label = "Matrícula",
                 value = matricula,
                 onValueChange = { /* Bloqueado */ },
                 trailingIcon = Icons.Default.Lock,
@@ -185,7 +185,7 @@ fun TelaEditarPerfil(
                     // Dispara o pop-up de sucesso usando uma corrotina
                     scope.launch {
                         snackbarHostState.showSnackbar(
-                            message = "ALTERAÃ‡Ã•ES SALVAS!", // Texto do pop-up
+                            message = "ALTERAÇÕES SALVAS!", // Texto do pop-up
                             duration = SnackbarDuration.Short
                         )
                     }
@@ -197,7 +197,7 @@ fun TelaEditarPerfil(
                 shape = RoundedCornerShape(6.dp) // Shape quadrado como na imagem
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Salvar AlteraÃ§Ãµes", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = "Salvar Alterações", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(imageVector = Icons.Default.Verified, contentDescription = null, modifier = Modifier.size(18.dp))
                 }

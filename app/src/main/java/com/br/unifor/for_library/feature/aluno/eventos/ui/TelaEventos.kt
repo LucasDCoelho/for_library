@@ -1,4 +1,4 @@
-﻿package com.br.unifor.for_library.feature.aluno.eventos.ui
+package com.br.unifor.for_library.feature.aluno.eventos.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Notifications
@@ -26,98 +27,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.br.unifor.for_library.feature.aluno.eventos.viewmodel.Evento
+import com.br.unifor.for_library.feature.aluno.eventos.viewmodel.EventosViewModel
+import com.br.unifor.for_library.feature.aluno.eventos.viewmodel.TipoEvento
 
-// â”€â”€ Cores â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 private val AzulPrimario = Color(0xFF1565C0)
 private val FundoTela    = Color(0xFFF5F7FA)
 private val CinzaTexto   = Color(0xFF616161)
 
-// â”€â”€ Modelos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-enum class TipoEvento(val label: String) {
-    TODOS("Todos"),
-    WORKSHOP("Workshops"),
-    PALESTRA("Palestras"),
-    LANCAMENTO("LanÃ§amentos")
-}
-
-data class Evento(
-    val id: Int,
-    val titulo: String,
-    val local: String,
-    val descricao: String,
-    val mes: String,
-    val dia: String,
-    val tipo: TipoEvento,
-    val bannerUrl: String = ""
-)
-
-// â”€â”€ Mock â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-private val mockEventos = listOf(
-    Evento(
-        id = 1,
-        titulo = "Workshop de Escrita Criativa",
-        local = "AuditÃ³rio Central",
-        descricao = "Desenvolva suas habilidades narrativas com tÃ©cnicas prÃ¡ticas de estruturaÃ§Ã£o de personagens.",
-        mes = "MAI",
-        dia = "15",
-        tipo = TipoEvento.WORKSHOP,
-        bannerUrl = "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600"
-    ),
-    Evento(
-        id = 2,
-        titulo = "Noite de Poesia ContemporÃ¢nea",
-        local = "Sala de Leitura 04",
-        descricao = "Um encontro dedicado a explorar as novas vozes da poesia nacional com leitura aberta ao pÃºblico.",
-        mes = "MAI",
-        dia = "22",
-        tipo = TipoEvento.PALESTRA,
-        bannerUrl = "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600"
-    ),
-    Evento(
-        id = 3,
-        titulo = "LanÃ§amento: O Eco do SilÃªncio",
-        local = "Foyer Principal",
-        descricao = "SessÃ£o de autÃ³grafos e bate-papo com a autora premiada Marina Silva sobre seu novo romance.",
-        mes = "JUN",
-        dia = "05",
-        tipo = TipoEvento.LANCAMENTO,
-        bannerUrl = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600"
-    ),
-    Evento(
-        id = 4,
-        titulo = "Palestra: O Futuro da Literatura Digital",
-        local = "AuditÃ³rio B",
-        descricao = "Como as novas tecnologias estÃ£o transformando a forma de escrever e consumir literatura.",
-        mes = "JUN",
-        dia = "18",
-        tipo = TipoEvento.PALESTRA,
-        bannerUrl = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600"
-    ),
-    Evento(
-        id = 5,
-        titulo = "Workshop: RevisÃ£o e EdiÃ§Ã£o de Textos",
-        local = "Sala de Leitura 02",
-        descricao = "Aprenda tÃ©cnicas profissionais de revisÃ£o para aprimorar seus textos antes da publicaÃ§Ã£o.",
-        mes = "JUL",
-        dia = "03",
-        tipo = TipoEvento.WORKSHOP,
-        bannerUrl = "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?w=600"
-    )
-)
-
-// â”€â”€ Tela principal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @Composable
 fun TelaEventos(
     onSinoClick: () -> Unit = {},
-    onEventoClick: (Int) -> Unit = {}
+    onEventoClick: (Int) -> Unit = {},
+    viewModel: EventosViewModel = viewModel()
 ) {
+    val state by viewModel.state.collectAsState()
     var filtroSelecionado by remember { mutableStateOf(TipoEvento.TODOS) }
 
-    val eventosFiltrados = remember(filtroSelecionado) {
-        if (filtroSelecionado == TipoEvento.TODOS) mockEventos
-        else mockEventos.filter { it.tipo == filtroSelecionado }
+    val eventosFiltrados = remember(filtroSelecionado, state.eventos) {
+        if (filtroSelecionado == TipoEvento.TODOS) state.eventos
+        else state.eventos.filter { it.tipo == filtroSelecionado }
     }
 
     Column(
@@ -125,7 +57,7 @@ fun TelaEventos(
             .fillMaxSize()
             .background(FundoTela)
     ) {
-        // â”€â”€ Header (RF16.1) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Header (RF16.1)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -134,7 +66,6 @@ fun TelaEventos(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Avatar
             Box(
                 modifier = Modifier
                     .size(38.dp)
@@ -151,27 +82,26 @@ fun TelaEventos(
             }
 
             Text(
-                text = "Eventos LiterÃ¡rios",
+                text = "Eventos Literários",
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1A1A2E)
             )
 
-            // Sino (RF16.1)
             IconButton(
                 onClick = onSinoClick,
                 modifier = Modifier.size(38.dp)
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Notifications,
-                    contentDescription = "NotificaÃ§Ãµes",
+                    contentDescription = "Notificações",
                     tint = Color(0xFF424242),
                     modifier = Modifier.size(22.dp)
                 )
             }
         }
 
-        // â”€â”€ Filtros (RF16.2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Filtros (RF16.2)
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -201,9 +131,56 @@ fun TelaEventos(
 
         HorizontalDivider(thickness = 0.5.dp, color = Color(0xFFE0E0E0))
 
+        if (state.isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = AzulPrimario)
+            }
+            return@Column
+        }
+
+        if (state.error != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = "Não foi possível carregar os eventos.",
+                    color = CinzaTexto,
+                    fontSize = 14.sp
+                )
+            }
+            return@Column
+        }
+
+        if (eventosFiltrados.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Event,
+                        contentDescription = null,
+                        tint = Color(0xFFBDBDBD),
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Text(
+                        text = "Nenhum evento encontrado",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF424242)
+                    )
+                    Text(
+                        text = "Tente outro filtro ou volte mais tarde.",
+                        fontSize = 13.sp,
+                        color = CinzaTexto
+                    )
+                }
+            }
+            return@Column
+        }
+
         Spacer(modifier = Modifier.height(12.dp))
 
-        // â”€â”€ Lista de cards (RF16.3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Lista de cards (RF16.3)
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -220,7 +197,8 @@ fun TelaEventos(
     }
 }
 
-// â”€â”€ Card de Evento (RF16.4 + RF16.5) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Card de Evento (RF16.4 + RF16.5) ─────────────────────────────────────────
+
 @Composable
 private fun CardEvento(
     evento: Evento,
@@ -239,7 +217,6 @@ private fun CardEvento(
                     .fillMaxWidth()
                     .height(175.dp)
             ) {
-                // Imagem do banner
                 SubcomposeAsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(evento.bannerUrl)
@@ -268,7 +245,6 @@ private fun CardEvento(
                     }
                 )
 
-                // Gradiente sutil na base da imagem para legibilidade
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -281,7 +257,7 @@ private fun CardEvento(
                         )
                 )
 
-                // Badge de data (RF16.4)
+                // Badge de data (RF16.4) — topo esquerdo, fundo azul
                 Column(
                     modifier = Modifier
                         .padding(10.dp)
@@ -308,11 +284,9 @@ private fun CardEvento(
                 }
             }
 
-            // ConteÃºdo do card
             Column(
                 modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 10.dp)
             ) {
-                // TÃ­tulo
                 Text(
                     text = evento.titulo,
                     fontSize = 15.sp,
@@ -324,7 +298,6 @@ private fun CardEvento(
 
                 Spacer(modifier = Modifier.height(5.dp))
 
-                // Local
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(3.dp)
@@ -344,7 +317,6 @@ private fun CardEvento(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // DescriÃ§Ã£o
                 Text(
                     text = evento.descricao,
                     fontSize = 13.sp,
@@ -356,7 +328,7 @@ private fun CardEvento(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // BotÃ£o seta (RF16.5)
+                // Botão seta (RF16.5)
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.CenterEnd
@@ -381,4 +353,3 @@ private fun CardEvento(
         }
     }
 }
-

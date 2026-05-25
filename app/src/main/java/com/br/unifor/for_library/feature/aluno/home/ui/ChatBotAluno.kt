@@ -22,23 +22,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.br.unifor.for_library.core.designsystem.AzulPrimario
-
-private data class MensagemChat(val texto: String, val isBot: Boolean)
+import com.br.unifor.for_library.feature.aluno.home.viewmodel.ChatBotViewModel
+import com.br.unifor.for_library.feature.aluno.home.viewmodel.MensagemChat
 
 @Composable
-fun ChatBotAluno(modifier: Modifier = Modifier) {
+fun ChatBotAluno(
+    modifier: Modifier = Modifier,
+    viewModel: ChatBotViewModel = viewModel()
+) {
+    val state by viewModel.state.collectAsState()
     var aberto by remember { mutableStateOf(false) }
     var textoUsuario by remember { mutableStateOf("") }
-    val mensagens = remember {
-        mutableStateListOf(
-            MensagemChat("Olá! 👋 Sou o assistente da ForLibrary. Como posso te ajudar hoje?", isBot = true)
-        )
-    }
     val listaState = rememberLazyListState()
 
-    LaunchedEffect(mensagens.size) {
-        if (mensagens.isNotEmpty()) listaState.animateScrollToItem(mensagens.size - 1)
+    LaunchedEffect(state.mensagens.size) {
+        if (state.mensagens.isNotEmpty()) {
+            listaState.animateScrollToItem(state.mensagens.size - 1)
+        }
     }
 
     Column(
@@ -52,15 +54,15 @@ fun ChatBotAluno(modifier: Modifier = Modifier) {
         ) {
             Card(
                 modifier = Modifier
-                    .width(280.dp)
-                    .height(400.dp),
+                    .width(300.dp)
+                    .height(450.dp),
                 shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 4.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(8.dp)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
 
-                    // ── Header ──────────────────────────────────────────────────
+                    // ── Header (RF41.1) ──────────────────────────────────────────
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -92,20 +94,34 @@ fun ChatBotAluno(modifier: Modifier = Modifier) {
                         }
                     }
 
-                    // ── Mensagens ────────────────────────────────────────────────
+                    // ── Mensagens (RF41.5 / RF41.8 / RF41.9) ──────────────────────
                     LazyColumn(
                         state = listaState,
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 10.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(mensagens) { msg -> BolhaMensagem(msg) }
+                        items(state.mensagens) { msg -> BolhaMensagem(msg) }
+                        
+                        if (state.isDigitando) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(start = 4.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(Color(0xFFE3EBF6))
+                                        .padding(8.dp)
+                                ) {
+                                    Text("Digitando...", fontSize = 11.sp, color = Color.Gray)
+                                }
+                            }
+                        }
                     }
 
                     HorizontalDivider(color = Color(0xFFEEEEEE))
 
-                    // ── Input ────────────────────────────────────────────────────
+                    // ── Input (RF41.6 / RF41.7) ──────────────────────────────────
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -118,18 +134,25 @@ fun ChatBotAluno(modifier: Modifier = Modifier) {
                             modifier = Modifier.weight(1f),
                             placeholder = { Text("Digite sua dúvida...", fontSize = 12.sp) },
                             maxLines = 2,
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(20.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = AzulPrimario,
+                                unfocusedBorderColor = Color(0xFFEEEEEE)
+                            )
                         )
                         Spacer(Modifier.width(6.dp))
                         Box(
                             modifier = Modifier
-                                .size(36.dp)
+                                .size(40.dp)
                                 .clip(CircleShape)
-                                .background(AzulPrimario)
-                                .clickable { /* envio real em breve */ },
+                                .background(if (textoUsuario.isNotBlank()) AzulPrimario else Color.Gray)
+                                .clickable(enabled = textoUsuario.isNotBlank()) {
+                                    viewModel.enviarMensagem(textoUsuario)
+                                    textoUsuario = ""
+                                },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("➤", fontSize = 14.sp, color = Color.White)
+                            Text("➤", fontSize = 16.sp, color = Color.White)
                         }
                     }
                 }

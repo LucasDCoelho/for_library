@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.supabase.kt)
     implementation(libs.auth.kt)
     implementation(libs.postgrest.kt)
+    implementation(libs.storage.kt)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.okhttp)
 

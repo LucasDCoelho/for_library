@@ -1,4 +1,4 @@
-﻿package com.br.unifor.for_library.feature.aluno.perfil.ui
+package com.br.unifor.for_library.feature.aluno.perfil.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,36 +13,44 @@ import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.br.unifor.for_library.feature.aluno.perfil.viewmodel.PerfilViewModel
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun TelaPerfil(
-    // â”€â”€ Callbacks de clique prontos para uso â”€â”€
     onEditarPerfilClick: () -> Unit,
     onEnvioObraClick: () -> Unit,
     onDuvidasClick: () -> Unit,
     onConfiguracoesClick: () -> Unit,
-    onSairClick: () -> Unit
+    onSairClick: () -> Unit,
+    viewModel: PerfilViewModel = viewModel()
 ) {
     val azulPrimario = Color(0xFF1E88E5)
     val cinzaTexto = Color(0xFF757575)
-    val corSair = Color(0xFFD32F2F) // Vermelho para o botÃ£o sair
+    val corSair = Color(0xFFD32F2F)
     val corDivisoria = Color(0xFFEEEEEE)
+
+    val state by viewModel.state.collectAsState()
+    val formatadorPontos = NumberFormat.getNumberInstance(Locale("pt", "BR"))
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // â”€â”€ CabeÃ§alho Simples â”€â”€
         Text(
             text = "Perfil do Aluno",
             fontSize = 18.sp,
@@ -53,64 +61,106 @@ fun TelaPerfil(
 
         HorizontalDivider(color = corDivisoria)
 
-        // â”€â”€ InformaÃ§Ãµes do UsuÃ¡rio (Foto, Nome, MatrÃ­cula) â”€â”€
+        // Cabeçalho: foto, nome, matrícula
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Foto de Perfil Default
-            Box(
-                modifier = Modifier
-                    .size(90.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF212121)), // Fundo escuro igual imagem
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Foto de perfil padrÃ£o",
-                    tint = Color.LightGray,
-                    modifier = Modifier.size(50.dp)
+            if (state.isLoading) {
+                CircularProgressIndicator(
+                    color = azulPrimario,
+                    modifier = Modifier.size(40.dp)
+                )
+                Spacer(modifier = Modifier.height(56.dp))
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(90.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF212121)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (state.fotoPerfil != null) {
+                        AsyncImage(
+                            model = state.fotoPerfil,
+                            contentDescription = "Foto de perfil",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Foto de perfil padrão",
+                            tint = Color.LightGray,
+                            modifier = Modifier.size(50.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = state.nome,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF212121)
+                )
+
+                Text(
+                    text = state.matricula,
+                    fontSize = 12.sp,
+                    color = cinzaTexto
                 )
             }
+        }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
+        if (state.error != null) {
             Text(
-                text = "Ricardo Ferreira",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF212121)
-            )
-
-            Text(
-                text = "2613903-9",
+                text = "Não foi possível carregar os dados.",
                 fontSize = 12.sp,
-                color = cinzaTexto
+                color = corSair,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 8.dp)
             )
         }
 
         HorizontalDivider(color = corDivisoria)
 
-        // â”€â”€ EstatÃ­sticas (Livros, Resenhas, Pontos) â”€â”€
+        // Estatísticas
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            EstatisticaItem(valor = "24", titulo = "LIVROS LIDOS", azulPrimario, Modifier.weight(1f))
+            EstatisticaItem(
+                valor = state.livrosLidos.toString(),
+                titulo = "LIVROS LIDOS",
+                corValor = azulPrimario,
+                modifier = Modifier.weight(1f)
+            )
             EstatisticaDivisoria()
-            EstatisticaItem(valor = "18", titulo = "RESENHAS APROVADAS", azulPrimario, Modifier.weight(1f))
+            EstatisticaItem(
+                valor = state.resenhasAprovadas.toString(),
+                titulo = "RESENHAS APROVADAS",
+                corValor = azulPrimario,
+                modifier = Modifier.weight(1f)
+            )
             EstatisticaDivisoria()
-            EstatisticaItem(valor = "1.250", titulo = "PONTOS", azulPrimario, Modifier.weight(1f))
+            EstatisticaItem(
+                valor = formatadorPontos.format(state.pontos),
+                titulo = "PONTOS",
+                corValor = azulPrimario,
+                modifier = Modifier.weight(1f)
+            )
         }
 
-        HorizontalDivider(color = corDivisoria, thickness = 4.dp) // DivisÃ£o um pouco mais grossa
+        HorizontalDivider(color = corDivisoria, thickness = 4.dp)
 
-        // â”€â”€ Menu de AÃ§Ãµes (5 BotÃµes) â”€â”€
+        // Menu de ações
         Column(modifier = Modifier.fillMaxWidth()) {
             ItemMenuPerfil(
                 icone = Icons.Default.Edit,
@@ -124,16 +174,14 @@ fun TelaPerfil(
             )
             ItemMenuPerfil(
                 icone = Icons.Default.HelpOutline,
-                texto = "DÃºvidas (FAQ)",
+                texto = "Dúvidas (FAQ)",
                 onClick = onDuvidasClick
             )
             ItemMenuPerfil(
                 icone = Icons.Default.Settings,
-                texto = "ConfiguraÃ§Ãµes",
+                texto = "Configurações",
                 onClick = onConfiguracoesClick
             )
-
-            // BotÃ£o Sair (Vermelho)
             ItemMenuPerfil(
                 icone = Icons.AutoMirrored.Filled.ExitToApp,
                 texto = "Sair",
@@ -145,10 +193,15 @@ fun TelaPerfil(
     }
 }
 
-// â”€â”€ Componentes ReutilizÃ¡veis Internos â”€â”€
+// ── Componentes reutilizáveis ──────────────────────────────────────────────────
 
 @Composable
-private fun EstatisticaItem(valor: String, titulo: String, corValor: Color, modifier: Modifier = Modifier) {
+private fun EstatisticaItem(
+    valor: String,
+    titulo: String,
+    corValor: Color,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally

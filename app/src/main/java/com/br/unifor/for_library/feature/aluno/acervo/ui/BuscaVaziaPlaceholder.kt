@@ -109,7 +109,7 @@ fun BuscaVaziaPlaceholder(
 
         // TÃ­tulo (RF08.4)
         Text(
-            text = "Ops! SilÃªncio na biblioteca",
+            text = "Ops! Silêncio na biblioteca",
             fontSize = 17.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF1A1A2E),
