@@ -28,16 +28,6 @@ data class Evento(
     val bannerUrl: String = ""
 )
 
-@Serializable
-private data class EventoDb(
-    val id: Int,
-    val titulo: String,
-    val tipo: String,
-    val descricao: String = "",
-    val banner_url: String? = null,
-    val data_inicio: String? = null,
-    val endereco: String? = null
-)
 
 data class EventosState(
     val isLoading: Boolean = true,
@@ -77,7 +67,7 @@ class EventosViewModel : ViewModel() {
             id = id,
             titulo = titulo,
             local = endereco ?: "",
-            descricao = descricao,
+            descricao = descricao ?: "",
             mes = mes,
             dia = dia,
             tipo = mapTipo(tipo),

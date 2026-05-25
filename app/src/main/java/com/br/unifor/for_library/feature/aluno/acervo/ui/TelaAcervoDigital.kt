@@ -35,7 +35,7 @@ import com.br.unifor.for_library.core.designsystem.AzulPrimario
 import com.br.unifor.for_library.core.designsystem.CinzaTexto
 import com.br.unifor.for_library.core.designsystem.coresFallback
 import com.br.unifor.for_library.feature.aluno.acervo.viewmodel.AcervoViewModel
-import com.br.unifor.for_library.feature.aluno.components.AcervoEmptyState
+import com.br.unifor.for_library.feature.aluno.acervo.ui.BuscaVaziaPlaceholder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -176,8 +176,8 @@ fun TelaAcervoDigital(
                 CircularProgressIndicator(color = AzulPrimario)
             }
         } else if (state.livros.isEmpty()) {
-            AcervoEmptyState(
-                onLimparFiltrosClick = { viewModel.limparFiltros() },
+            BuscaVaziaPlaceholder(
+                onLimparFiltros = { viewModel.limparFiltros() },
                 modifier = Modifier.weight(1f)
             )
         } else {

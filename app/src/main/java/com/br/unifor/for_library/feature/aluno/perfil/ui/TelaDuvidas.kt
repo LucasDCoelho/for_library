@@ -20,8 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// â”€â”€ Modelo de Dados â”€â”€
-data class Duvida(
+// RF23.3 - Modelo de Dados FAQ
+data class FAQItem(
     val pergunta: String,
     val resposta: String
 )
@@ -31,29 +31,39 @@ data class Duvida(
 fun TelaDuvidas(
     onVoltar: () -> Unit
 ) {
+    // RF23.3 - Conteúdo dinâmico e real
+    val listaDuvidas = remember {
+        listOf(
+            FAQItem(
+                pergunta = "Como renovar um livro?",
+                resposta = "Para renovar uma obra, acesse a aba \"Empréstimos\", selecione o livro desejado e clique no botão \"Renovar\". Certifique-se de que não há reservas pendentes para este título."
+            ),
+            FAQItem(
+                pergunta = "Como funciona o sistema de pontos?",
+                resposta = "Você ganha pontos ao concluir a leitura de livros (50 pts) e ao ter suas resenhas aprovadas (15 pts). Seus pontos definem seu nível na plataforma, variando de 1 a 5."
+            ),
+            FAQItem(
+                pergunta = "Posso sugerir um novo livro?",
+                resposta = "Sim! No seu perfil, utilize a opção 'Adicionar Obra' para enviar os dados de um livro que você gostaria de ver em nosso acervo. Nossa equipe analisará a sugestão."
+            ),
+            FAQItem(
+                pergunta = "Como reportar um erro na obra?",
+                resposta = "Caso encontre algum erro de formatação ou conteúdo, você pode utilizar o botão de suporte no menu de configurações ou enviar um e-mail para suporte@forlibrary.com."
+            )
+        )
+    }
 
-    val listaDuvidas = listOf(
-        Duvida(
-            pergunta = "Como renovar um livro?",
-            resposta = "Para renovar uma obra, acesse a aba \"Emprestimos\", selecione o livro desejado e clique no botÃ£o \"Renovar\". Certifique-se de que nÃ£o hÃ¡ reservas pendentes para este tÃ­tulo."
-        ),
-        // As demais com texto vazio conforme solicitado
-        Duvida("Como funciona o sistema de pontos?", "tem rep ainda naum kk 1"),
-        Duvida("Posso sugerir um novo livro?", "tem rep ainda naum kk 2"),
-        Duvida("Como reportar um erro na obra?", "tem rep ainda naum kk 3")
-    )
-
-    // Controla qual item estÃ¡ expandido (comeÃ§a com o Ã­ndice 0 expandido)
-    var expandedIndex by remember { mutableStateOf<Int?>(0) }
+    // Controla qual item está expandido
+    var expandedIndex by remember { mutableStateOf<Int?>(null) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Duvidas Frequentes",
+                        text = "Dúvidas Frequentes", // RF23.1 - Correção do título
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
+                        fontSize = 17.sp,
                         color = Color(0xFF212121)
                     )
                 },
@@ -76,9 +86,9 @@ fun TelaDuvidas(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // â”€â”€ CabeÃ§alho da Tela â”€â”€
+            // RF23.2 - Cabeçalho da Tela
             item {
-                Column(modifier = Modifier.padding(20.dp)) {
+                Column(modifier = Modifier.padding(24.dp)) {
                     Text(
                         text = "Como podemos ajudar?",
                         fontSize = 22.sp,
@@ -87,20 +97,20 @@ fun TelaDuvidas(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Encontre respostas para as dÃºvidas mais comuns sobre o uso da ForLibrary.",
+                        text = "Encontre respostas para as dúvidas mais comuns sobre o uso da ForLibrary.",
                         fontSize = 14.sp,
                         color = Color(0xFF757575),
-                        lineHeight = 20.sp
+                        lineHeight = 22.sp
                     )
                 }
                 HorizontalDivider(color = Color(0xFFEEEEEE), thickness = 1.dp)
             }
 
-            // â”€â”€ Lista de Perguntas (Accordion) â”€â”€
+            // RF23.3 - Lista de Perguntas (Accordion)
             itemsIndexed(listaDuvidas) { index, duvida ->
                 val isExpanded = expandedIndex == index
 
-                // AnimaÃ§Ã£o de rotaÃ§Ã£o da setinha
+                // Animação de rotação da seta
                 val rotationAngle by animateFloatAsState(
                     targetValue = if (isExpanded) 180f else 0f,
                     label = "SetaAnimacao"
@@ -111,51 +121,54 @@ fun TelaDuvidas(
                         .fillMaxWidth()
                         .background(Color.White)
                 ) {
-                    // Linha clicÃ¡vel da pergunta
+                    // Linha da pergunta (Clickable)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                // Se clicar no que jÃ¡ estÃ¡ aberto, ele fecha. Se nÃ£o, abre o clicado.
                                 expandedIndex = if (isExpanded) null else index
                             }
-                            .padding(20.dp),
+                            .padding(horizontal = 24.dp, vertical = 20.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
                             text = duvida.pergunta,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF424242),
                             modifier = Modifier.weight(1f)
                         )
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Expandir",
+                            contentDescription = if (isExpanded) "Recolher" else "Expandir",
                             tint = Color(0xFF9E9E9E),
                             modifier = Modifier.rotate(rotationAngle)
                         )
                     }
 
-                    // ConteÃºdo expansÃ­vel (Resposta)
+                    // Conteúdo expansível (Resposta)
                     AnimatedVisibility(visible = isExpanded) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 20.dp, vertical = 8.dp)
-                                .padding(bottom = 12.dp)
+                                .padding(horizontal = 24.dp)
+                                .padding(bottom = 20.dp)
                         ) {
                             Text(
                                 text = duvida.resposta,
-                                fontSize = 13.sp,
-                                color = Color(0xFF757575),
-                                lineHeight = 20.sp
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFF616161),
+                                lineHeight = 22.sp
                             )
                         }
                     }
 
-                    HorizontalDivider(color = Color(0xFFEEEEEE), thickness = 1.dp)
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        color = Color(0xFFF5F5F5), 
+                        thickness = 1.dp
+                    )
                 }
             }
         }

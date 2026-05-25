@@ -12,20 +12,6 @@ import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-@Serializable
-private data class EventoDb(
-    val id: Int,
-    val titulo: String,
-    val tipo: String = "",
-    val descricao: String? = null,
-    val sobre: String? = null,
-    val banner_url: String? = null,
-    val data_inicio: String,
-    val data_fim: String? = null,
-    val fuso_horario: String = "GMT-3",
-    val endereco: String? = null,
-    val complemento: String? = null
-)
 
 data class EventoDetalhesUi(
     val id: Int,

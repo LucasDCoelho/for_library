@@ -41,10 +41,10 @@ import com.br.unifor.for_library.feature.aluno.livro.ui.TelaAvaliacaoResenha
 import com.br.unifor.for_library.feature.aluno.home.ui.TelaHomeAluno
 import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaPerfil
 import com.br.unifor.for_library.feature.aluno.notificacao.ui.TelaNotificacoes
-import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaConfiguracoes
+import com.br.unifor.for_library.feature.aluno.presentation.configuracoes.TelaConfiguracoes
 import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaEditarPerfil
 import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaDuvidas
-import com.br.unifor.for_library.feature.aluno.perfil.ui.PopupLogout
+import com.br.unifor.for_library.core.components.PopupLogout
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,9 +52,11 @@ import com.br.unifor.for_library.feature.TelaGestaoEventos
 import com.br.unifor.for_library.feature.auth.ui.TelaCadastro
 import android.net.Uri
 import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaEnvioObra
-import com.br.unifor.for_library.feature.aluno.perfil.ui.TelaMeusPontos
-import com.br.unifor.for_library.feature.aluno.estante.ui.TelaHistoricoLeitura
+import com.br.unifor.for_library.feature.aluno.presentation.gamificacao.TelaGamificacao
+import com.br.unifor.for_library.feature.aluno.presentation.historico.TelaHistoricoLeitura
 import com.br.unifor.for_library.feature.aluno.eventos.ui.TelaDetalhesEvento
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.launch
 
 
 private val rotasComPadding = setOf(
@@ -87,14 +89,22 @@ fun ForLibraryApp() {
 
     var mostrarPopupSair by remember { mutableStateOf(false) }
 
+    val scope = rememberCoroutineScope()
+
     if (mostrarPopupSair) {
         PopupLogout(
             onDismiss = { mostrarPopupSair = false }, // RF25.3: Fecha ao cancelar
-    // ── Bug 1 corrigido: popUpTo(0) garante que toda a back stack é limpa ──
             onConfirm = {
-                mostrarPopupSair = false
-                navController.navigate(Rota.Login.path) {
-                    popUpTo(0) { inclusive = true }
+                scope.launch {
+                    try {
+                        supabase.auth.signOut()
+                    } catch (e: Exception) {
+                        // Log erro se necessário
+                    }
+                    mostrarPopupSair = false
+                    navController.navigate(Rota.Login.path) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             }
         )
@@ -330,10 +340,14 @@ fun ForLibraryApp() {
             composable(Rota.ConfiguracoesSistema.path) {
                 TelaConfiguracoesSistema(
                     onVoltar = { navController.popBackStack() },
-
-                    onSairClick = {
-                        navController.navigate(Rota.Login.path) {
-                            popUpTo(0) { inclusive = true } // Limpa todo o histórico
+                    onSairConfirm = {
+                        scope.launch {
+                            try {
+                                supabase.auth.signOut()
+                            } catch (e: Exception) {}
+                            navController.navigate(Rota.Login.path) {
+                                popUpTo(0) { inclusive = true }
+                            }
                         }
                     }
                 )
@@ -453,7 +467,7 @@ fun ForLibraryApp() {
             }
 
             composable(Rota.MeusPontos.path) {
-                TelaMeusPontos(
+                TelaGamificacao(
                     onVoltar = { navController.popBackStack() }
                 )
             }
