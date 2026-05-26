@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.br.unifor.for_library.feature.auth.emailInstitucionalValido
+import com.br.unifor.for_library.feature.auth.traduzirErroAuth
 import com.br.unifor.for_library.supabase
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.delay
@@ -172,17 +173,21 @@ fun TelaRecuperarSenha(
             Button(
                 onClick = {
                     scope.launch {
+                        if (email.isBlank()) {
+                            errorMessage = "Informe seu e-mail institucional"
+                            return@launch
+                        }
                         if (!emailInstitucionalValido(email)) {
-                            errorMessage = "Utilize um email institucional valido"
+                            errorMessage = "Utilize um e-mail @unifor.br ou @edu.unifor.br"
                             return@launch
                         }
                         isLoading = true
                         errorMessage = null
                         try {
-                            supabase.auth.resetPasswordForEmail(email)
+                            supabase.auth.resetPasswordForEmail(email.trim())
                             isSuccess = true
                         } catch (e: Exception) {
-                            errorMessage = e.message ?: "Nao foi possivel enviar o link"
+                            errorMessage = traduzirErroAuth(e)
                         } finally {
                             isLoading = false
                         }
