@@ -13,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.br.unifor.for_library.R
 import com.br.unifor.for_library.core.designsystem.AzulChip
+import com.br.unifor.for_library.feature.auth.UsuarioBloqueadoException
 import com.br.unifor.for_library.feature.auth.buscarTipoUsuarioAtual
 import com.br.unifor.for_library.feature.auth.isAdmin
 import com.br.unifor.for_library.supabase
@@ -66,6 +67,10 @@ fun TelaSplashScreen(
                 Log.d("Splash", "Nenhum usuário encontrado, indo para login.")
                 onNavigateToLogin()
             }
+        } catch (e: UsuarioBloqueadoException) {
+            Log.w("Splash", "Usuário bloqueado na restauração de sessão, redirecionando para login")
+            try { supabase.auth.signOut() } catch (_: Exception) {}
+            onNavigateToLogin()
         } catch (e: Exception) {
             Log.e("Splash", "Erro no splash", e)
             onNavigateToLogin()

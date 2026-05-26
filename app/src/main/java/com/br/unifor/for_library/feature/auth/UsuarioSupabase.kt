@@ -23,7 +23,8 @@ data class UsuarioPublicoPayload(
 
 @Serializable
 private data class UsuarioTipoResponse(
-    val tipo: String? = null
+    val tipo: String? = null,
+    val status: String? = null
 )
 
 fun normalizarTipoUsuario(tipo: String?): String {
@@ -80,10 +81,15 @@ suspend fun buscarTipoUsuarioAtual(): String {
                 }
                 .decodeList<UsuarioTipoResponse>()
 
-            val tipo = resultado.firstOrNull()?.tipo
-            if (tipo != null) {
-                return normalizarTipoUsuario(tipo)
+            val usuario = resultado.firstOrNull()
+            if (usuario != null) {
+                if (usuario.status?.lowercase() == "bloqueado") {
+                    throw UsuarioBloqueadoException()
+                }
+                return normalizarTipoUsuario(usuario.tipo)
             }
+        } catch (e: UsuarioBloqueadoException) {
+            throw e
         } catch (_: Exception) {
             // tenta a proxima convencao de nome de tabela
         }

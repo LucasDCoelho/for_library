@@ -25,9 +25,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.br.unifor.for_library.R
+import com.br.unifor.for_library.feature.auth.UsuarioBloqueadoException
 import com.br.unifor.for_library.feature.auth.buscarTipoUsuarioAtual
 import com.br.unifor.for_library.feature.auth.emailInstitucionalValido
 import com.br.unifor.for_library.feature.auth.isAdmin
+import com.br.unifor.for_library.feature.auth.traduzirErroAuth
 import com.br.unifor.for_library.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -120,8 +122,16 @@ fun TelaLoginPlaceholder(
         // RF02.5 + RF02.8: botão com loading e autenticação real
         Button(
             onClick  = {
+                if (email.isBlank()) {
+                    errorMessage = "Informe seu e-mail institucional"
+                    return@Button
+                }
                 if (!emailInstitucionalValido(email)) {
-                    errorMessage = "Utilize um e-mail institucional válido"
+                    errorMessage = "Utilize um e-mail @unifor.br ou @edu.unifor.br"
+                    return@Button
+                }
+                if (password.isBlank()) {
+                    errorMessage = "Informe sua senha"
                     return@Button
                 }
                 scope.launch {
@@ -138,8 +148,11 @@ fun TelaLoginPlaceholder(
                         } else {
                             onLoginSucesso()
                         }
-                    } catch (_: Exception) {
-                        errorMessage = "Credenciais inválidas"
+                    } catch (e: UsuarioBloqueadoException) {
+                        try { supabase.auth.signOut() } catch (_: Exception) {}
+                        errorMessage = traduzirErroAuth(e)
+                    } catch (e: Exception) {
+                        errorMessage = traduzirErroAuth(e)
                     } finally {
                         isLoading = false
                     }
