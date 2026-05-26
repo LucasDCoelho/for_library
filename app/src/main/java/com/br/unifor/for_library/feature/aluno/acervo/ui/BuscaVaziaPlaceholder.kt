@@ -13,7 +13,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+    import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 private val AzulPrimario = Color(0xFF1565C0)

@@ -1,4 +1,4 @@
-﻿package com.br.unifor.for_library.feature.aluno.estante.ui
+package com.br.unifor.for_library.feature.aluno.estante.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,10 +12,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -27,56 +26,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.br.unifor.for_library.core.data.LivrosSalvosState
-import com.br.unifor.for_library.core.data.catalogoGlobal
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.br.unifor.for_library.core.components.CapaLivro
 import com.br.unifor.for_library.core.designsystem.coresFallback
+import com.br.unifor.for_library.feature.aluno.estante.viewmodel.EstanteViewModel
+import com.br.unifor.for_library.feature.aluno.estante.viewmodel.FavoritoEstante
+import com.br.unifor.for_library.feature.aluno.estante.viewmodel.ProgressoEstante
 
-// â”€â”€ Cores â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-private val AzulPrimario  = Color(0xFF1565C0)
-private val CinzaTexto    = Color(0xFF616161)
-private val FundoTela     = Color(0xFFF5F7FA)
+private val AzulPrimario = Color(0xFF1565C0)
+private val CinzaTexto   = Color(0xFF616161)
+private val FundoTela    = Color(0xFFF5F7FA)
 
-// â”€â”€ Modelos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-data class LivroLendo(
-    val id: Int,
-    val titulo: String,
-    val autor: String,
-    val isbn: String,
-    val paginaAtual: Int,
-    val totalPaginas: Int,
-    val progressoPct: Float = paginaAtual.toFloat() / totalPaginas.toFloat()
-)
-
-
-
-// â”€â”€ Mock â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-private val mockLendo = listOf(
-    LivroLendo(1, "O Design do Dia a Dia",          "Don Norman",       "9780465050659", 248, 390),
-    LivroLendo(2, "Sistemas Ãgeis no Enterprise",   "Kent Beck",        "9780321125217",  45, 952),
-    LivroLendo(3, "Arquitetura de Software Moderno","Martin Fowler",    "9780134494166", 412, 448),
-    LivroLendo(4, "Psicologia da CogniÃ§Ã£o",         "Daniel Kahneman",  "9788535921311", 130, 418),
-)
-
-
-
-// â”€â”€ Tela principal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaEstante(
-    onSearchClick: () -> Unit = {},
-    onHistoricoClick: () -> Unit = {}
+    onHistoricoClick: () -> Unit = {},
+    viewModel: EstanteViewModel = viewModel()
 ) {
+    val state by viewModel.state.collectAsState()
     var tabSelecionada by remember { mutableIntStateOf(0) }
-
-    val abas = listOf("Lendo", "Favoritos")
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(FundoTela)
     ) {
-        // â”€â”€ Header (RF12.1 / RF13.1) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Header (RF12.1 / RF13.1 — lupa suprimida conforme spec)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -85,51 +60,23 @@ fun TelaEstante(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(CircleShape)
-                        .background(AzulPrimario),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                Text(
-                    text = "Minha Estante",
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1A1A2E)
-                )
-            }
-
+            Text(
+                text = "Minha Estante",
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1A1A2E)
+            )
             IconButton(onClick = onHistoricoClick) {
                 Icon(
                     imageVector = Icons.Default.History,
-                    contentDescription = "Histórico",
-                    tint = Color(0xFF424242),
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-            IconButton(onClick = onSearchClick) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Pesquisar",
+                    contentDescription = "Histórico de leitura",
                     tint = Color(0xFF424242),
                     modifier = Modifier.size(22.dp)
                 )
             }
         }
 
-        // â”€â”€ Tabs (RF12.2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Tabs (RF12.2)
         TabRow(
             selectedTabIndex = tabSelecionada,
             containerColor = Color.White,
@@ -141,7 +88,7 @@ fun TelaEstante(
                 )
             }
         ) {
-            abas.forEachIndexed { index, titulo ->
+            listOf("Lendo", "Favoritos").forEachIndexed { index, titulo ->
                 Tab(
                     selected = tabSelecionada == index,
                     onClick = { tabSelecionada = index },
@@ -156,34 +103,60 @@ fun TelaEstante(
             }
         }
 
-        // â”€â”€ ConteÃºdo das abas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        if (state.isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = AzulPrimario)
+            }
+            return@Column
+        }
+
+        if (state.error != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = "Não foi possível carregar a estante.",
+                    color = CinzaTexto,
+                    fontSize = 14.sp
+                )
+            }
+            return@Column
+        }
+
         when (tabSelecionada) {
-            0 -> AbaLendo()
+            0 -> AbaLendo(livros = state.livrosLendo)
             1 -> AbaFavoritos(
-                onToggleFavorito = { isbn ->
-                    LivrosSalvosState.toggleSalvo(isbn)
-                }
+                favoritos = state.livrosFavoritos,
+                onRemoverFavorito = { favoritoId -> viewModel.removerFavorito(favoritoId) }
             )
         }
     }
 }
 
-// â”€â”€ Aba Lendo (RF12.3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Aba Lendo (RF12.3) ───────────────────────────────────────────────────────
+
 @Composable
-private fun AbaLendo() {
+private fun AbaLendo(livros: List<ProgressoEstante>) {
+    if (livros.isEmpty()) {
+        EstanteVazia(
+            mensagem = "Você não está lendo nenhum livro",
+            submensagem = "Acesse o acervo e comece uma leitura!"
+        )
+        return
+    }
+
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxSize()
     ) {
-        items(mockLendo, key = { it.id }) { livro ->
-            CardLivroLendo(livro = livro)
+        items(livros, key = { it.id }) { progresso ->
+            CardLivroLendo(progresso = progresso)
         }
     }
 }
 
 @Composable
-private fun CardLivroLendo(livro: LivroLendo) {
+private fun CardLivroLendo(progresso: ProgressoEstante) {
+    val livro = progresso.livros
     val corFallback = coresFallback[livro.id % coresFallback.size]
 
     Card(
@@ -197,9 +170,8 @@ private fun CardLivroLendo(livro: LivroLendo) {
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Capa
             CapaLivro(
-                isbn = livro.isbn,
+                isbn = livro.isbn ?: "",
                 tituloFallback = livro.titulo,
                 modifier = Modifier
                     .width(60.dp)
@@ -225,21 +197,15 @@ private fun CardLivroLendo(livro: LivroLendo) {
                 )
                 Spacer(Modifier.height(10.dp))
 
-                // Progresso
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text(
-                        text = "${(livro.progressoPct * 100).toInt()}% concluÃ­do",
-                        fontSize = 11.sp,
-                        color = AzulPrimario,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+                Text(
+                    text = "${(progresso.progressoPct * 100).toInt()}% concluído",
+                    fontSize = 11.sp,
+                    color = AzulPrimario,
+                    fontWeight = FontWeight.SemiBold
+                )
                 Spacer(Modifier.height(4.dp))
                 LinearProgressIndicator(
-                    progress = { livro.progressoPct },
+                    progress = { progresso.progressoPct.coerceIn(0f, 1f) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(5.dp)
@@ -249,7 +215,7 @@ private fun CardLivroLendo(livro: LivroLendo) {
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "${livro.paginaAtual} de ${livro.totalPaginas} pÃ¡ginas",
+                    text = "${progresso.pagina_atual} / ${livro.total_paginas} págs",
                     fontSize = 11.sp,
                     color = CinzaTexto
                 )
@@ -258,12 +224,20 @@ private fun CardLivroLendo(livro: LivroLendo) {
     }
 }
 
-// â”€â”€ Aba Favoritos (RF13.2 / RF13.3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Aba Favoritos (RF13.2 / RF13.3) ─────────────────────────────────────────
+
 @Composable
 private fun AbaFavoritos(
-    onToggleFavorito: (String) -> Unit
+    favoritos: List<FavoritoEstante>,
+    onRemoverFavorito: (Int) -> Unit
 ) {
-    val favoritos = catalogoGlobal.filter { LivrosSalvosState.isSalvo(it.isbn) }
+    if (favoritos.isEmpty()) {
+        EstanteVazia(
+            mensagem = "Nenhum livro favorito ainda",
+            submensagem = "Marque livros como favoritos para encontrá-los aqui."
+        )
+        return
+    }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -272,12 +246,10 @@ private fun AbaFavoritos(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.fillMaxSize()
     ) {
-        items(favoritos, key = { it.isbn }) { livro ->
+        items(favoritos, key = { it.id }) { favorito ->
             CardLivroFavorito(
-                titulo = livro.titulo,
-                autor = livro.autor,
-                isbn = livro.isbn,
-                onToggleFavorito = { onToggleFavorito(livro.isbn) }
+                favorito = favorito,
+                onRemover = { onRemoverFavorito(favorito.id) }
             )
         }
     }
@@ -285,12 +257,11 @@ private fun AbaFavoritos(
 
 @Composable
 private fun CardLivroFavorito(
-    titulo: String,
-    autor: String,
-    isbn: String,
-    onToggleFavorito: () -> Unit
+    favorito: FavoritoEstante,
+    onRemover: () -> Unit
 ) {
-    val corFallback = coresFallback[isbn.hashCode().and(0x7FFFFFFF) % coresFallback.size]
+    val livro = favorito.livros
+    val corFallback = coresFallback[livro.id % coresFallback.size]
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -302,15 +273,15 @@ private fun CardLivroFavorito(
                 .aspectRatio(0.68f)
         ) {
             CapaLivro(
-                isbn = isbn,
-                tituloFallback = titulo,
+                isbn = livro.isbn ?: "",
+                tituloFallback = livro.titulo,
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(10.dp)),
                 corFallback = corFallback
             )
 
-            // Botão de Favorito (Coração)
+            // Botão Bookmark — validação do spec: coração é reprovação imediata
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -318,12 +289,12 @@ private fun CardLivroFavorito(
                     .size(30.dp)
                     .clip(CircleShape)
                     .background(Color.White.copy(alpha = 0.9f))
-                    .clickable { onToggleFavorito() },
+                    .clickable { onRemover() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Bookmark,
-                    contentDescription = "Favoritado",
+                    contentDescription = "Remover dos favoritos",
                     tint = AzulPrimario,
                     modifier = Modifier.size(18.dp)
                 )
@@ -332,7 +303,7 @@ private fun CardLivroFavorito(
 
         Spacer(Modifier.height(6.dp))
         Text(
-            text = titulo,
+            text = livro.titulo,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color(0xFF1A1A2E),
@@ -341,7 +312,7 @@ private fun CardLivroFavorito(
             lineHeight = 16.sp
         )
         Text(
-            text = autor,
+            text = livro.autor,
             fontSize = 11.sp,
             color = CinzaTexto,
             maxLines = 1,
@@ -350,3 +321,33 @@ private fun CardLivroFavorito(
     }
 }
 
+// ── Estado vazio ─────────────────────────────────────────────────────────────
+
+@Composable
+private fun EstanteVazia(mensagem: String, submensagem: String) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.MenuBook,
+                contentDescription = null,
+                tint = Color(0xFFBDBDBD),
+                modifier = Modifier.size(64.dp)
+            )
+            Text(
+                text = mensagem,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF424242)
+            )
+            Text(
+                text = submensagem,
+                fontSize = 13.sp,
+                color = CinzaTexto
+            )
+        }
+    }
+}

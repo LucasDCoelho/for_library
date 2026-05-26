@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.supabase.kt)
     implementation(libs.auth.kt)
     implementation(libs.postgrest.kt)
+    implementation(libs.storage.kt)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.client.okhttp)
 
@@ -64,6 +65,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.ui.text)
+    implementation(libs.androidx.datastore.preferences)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
