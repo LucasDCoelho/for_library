@@ -1,5 +1,6 @@
 package com.br.unifor.for_library.feature.adm.moderacao
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -24,40 +25,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-data class ObraDetalhe(
-    val id: String,
-    val titulo: String,
-    val genero: String,
-    val autor: String,
-    val sinopse: String,
-    val urlCapa: String = "",
-    val urlPdf: String = ""
-)
-
-private val mockObrasDetalhe = mapOf(
-    "1" to ObraDetalhe(
-        id = "1",
-        titulo = "A Jornada Digital",
-        genero = "Tecnologia",
-        autor = "Ricardo Lima",
-        sinopse = "Uma exploração profunda sobre como as tecnologias emergentes estão moldando o comportamento humano e as estruturas sociais no século XXI. Um guia essencial para entender o amanhã."
-    ),
-    "2" to ObraDetalhe(
-        id = "2",
-        titulo = "O Eco das Sombras",
-        genero = "Suspense",
-        autor = "Beatriz Soares",
-        sinopse = "Em uma cidade onde os segredos nunca dormem, uma investigadora descobre que o passado pode ser mais perigoso do que qualquer ameaça presente."
-    ),
-    "3" to ObraDetalhe(
-        id = "3",
-        titulo = "Raízes do Amanhã",
-        genero = "Ficção Científica",
-        autor = "Marcos Vinicius",
-        sinopse = "Uma saga épica sobre humanidade, sobrevivência e esperança em um planeta à beira do colapso. A natureza encontra a tecnologia em uma narrativa inesquecível."
-    )
-)
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.br.unifor.for_library.core.designsystem.AzulPrimario
+import com.br.unifor.for_library.core.designsystem.VerdeSucesso
+import com.br.unifor.for_library.core.designsystem.VermelhoErro
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,8 +39,25 @@ fun TelaAnaliseObra(
     onAprovar: () -> Unit = {},
     onRejeitar: (String) -> Unit = {}
 ) {
-    val obra = mockObrasDetalhe[obraId] ?: mockObrasDetalhe["1"]!!
+    val idInt = obraId.toIntOrNull() ?: 0
+    val viewModel: AnaliseObraViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T =
+                AnaliseObraViewModel(idInt) as T
+        }
+    )
+
+    val state by viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
     var motivoRejeicao by remember { mutableStateOf("") }
+
+    LaunchedEffect(state.erro) {
+        state.erro?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.consumirErro()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -76,40 +65,48 @@ fun TelaAnaliseObra(
                 title = { Text("Analisar Obra", fontWeight = FontWeight.SemiBold, fontSize = 18.sp) },
                 navigationIcon = {
                     IconButton(onClick = onVoltar) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar"
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.White
     ) { paddingValues ->
+
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = AzulPrimario)
+            }
+            return@Scaffold
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-
-            // ── Capa do livro ──────────────────────────────────────────────────
+            // ── Capa placeholder ──────────────────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(160.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color(0xFF2C2C2C)),
                 contentAlignment = Alignment.Center
             ) {
-                // Placeholder escuro estilo capa de livro
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("📖", fontSize = 40.sp)
+                    Text("📖", fontSize = 36.sp)
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = obra.titulo,
+                        text = state.titulo,
                         fontSize = 12.sp,
                         color = Color.White,
                         fontWeight = FontWeight.SemiBold
@@ -117,76 +114,61 @@ fun TelaAnaliseObra(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
-
-            // ── Título ─────────────────────────────────────────────────────────
+            // ── Metadados da obra ─────────────────────────────────────────────
             Label("TÍTULO")
-            Text(
-                text = obra.titulo,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF212121)
-            )
+            Text(state.titulo, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF212121))
 
-            Spacer(Modifier.height(10.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Label("GÊNERO")
+                    Text(state.genero, fontSize = 14.sp, color = Color(0xFF424242))
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Label("AUTOR")
+                    Text(state.nomeAutor, fontSize = 14.sp, color = Color(0xFF424242))
+                }
+            }
 
-            // ── Gênero ───────────────────────────────���─────────────────────────
-            Label("GÊNERO")
-            Text(obra.genero, fontSize = 14.sp, color = Color(0xFF424242))
+            if (state.matriculaAutor.isNotBlank() && state.matriculaAutor != "—") {
+                Label("MATRÍCULA")
+                Text(state.matriculaAutor, fontSize = 14.sp, color = Color(0xFF424242))
+            }
 
-            Spacer(Modifier.height(10.dp))
-
-            // ── Autor ──────────────────────────────────────────────────────────
-            Label("AUTOR")
-            Text(obra.autor, fontSize = 14.sp, color = Color(0xFF424242))
-
-            Spacer(Modifier.height(14.dp))
+            if (state.dataEnvio.isNotBlank()) {
+                Label("DATA DE ENVIO")
+                Text(state.dataEnvio, fontSize = 14.sp, color = Color(0xFF424242))
+            }
 
             HorizontalDivider(color = Color(0xFFE0E0E0))
 
-            Spacer(Modifier.height(14.dp))
-
-            // ── Sinopse ────────────────────────────────────────────────────────
-            Label("SINOPSE")
-            Text(
-                text = obra.sinopse,
-                fontSize = 13.sp,
-                color = Color(0xFF616161),
-                lineHeight = 20.sp
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            // ── Botão Baixar PDF ──────────���────────────────────────────────────
-            OutlinedButton(
-                onClick = { /* TODO: abrir PDF */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(44.dp),
-                shape = RoundedCornerShape(6.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF1565C0)),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF1565C0))
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Download,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+            // ── Sinopse ───────────────────────────────────────────────────────
+            if (state.sinopse.isNotBlank()) {
+                Label("SINOPSE")
+                Text(
+                    text = state.sinopse,
+                    fontSize = 13.sp,
+                    color = CinzaTextoLocal,
+                    lineHeight = 20.sp
                 )
-                Spacer(Modifier.width(8.dp))
-                Text("Baixar PDF para Análise", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             }
 
-            Spacer(Modifier.height(24.dp))
+            // ── Botão baixar PDF ──────────────────────────────────────────────
+            if (state.pdfUrl.isNotBlank()) {
+                OutlinedButton(
+                    onClick = { /* TODO: abrir PDF via Intent */ },
+                    modifier = Modifier.fillMaxWidth().height(44.dp),
+                    shape = RoundedCornerShape(6.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AzulPrimario),
+                    border = BorderStroke(1.dp, AzulPrimario)
+                ) {
+                    Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Baixar PDF para Análise", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
 
-            // ── Motivo da Rejeição ──────────────────────────────���──────────────
-            Text(
-                text = "MOTIVO DA REJEIÇÃO (OPCIONAL)",
-                fontSize = 10.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF9E9E9E),
-                letterSpacing = 0.5.sp
-            )
-            Spacer(Modifier.height(6.dp))
+            // ── Motivo da rejeição ────────────────────────────────────────────
+            Label("MOTIVO DA REJEIÇÃO (OPCIONAL)")
             OutlinedTextField(
                 value = motivoRejeicao,
                 onValueChange = { motivoRejeicao = it },
@@ -197,19 +179,15 @@ fun TelaAnaliseObra(
                         color = Color(0xFFBDBDBD)
                     )
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(110.dp),
+                modifier = Modifier.fillMaxWidth().height(110.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = Color(0xFFE0E0E0),
-                    focusedBorderColor = Color(0xFF1565C0)
+                    focusedBorderColor = AzulPrimario
                 )
             )
 
-            Spacer(Modifier.height(14.dp))
-
-            // ── Aviso Diretrizes ───────────────────────────────────────────────
+            // ── Aviso de diretrizes ───────────────────────────────────────────
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -218,9 +196,9 @@ fun TelaAnaliseObra(
                 verticalAlignment = Alignment.Top
             ) {
                 Icon(
-                    imageVector = Icons.Default.Info,
+                    Icons.Default.Info,
                     contentDescription = null,
-                    tint = Color(0xFF1565C0),
+                    tint = AzulPrimario,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(Modifier.width(8.dp))
@@ -229,13 +207,11 @@ fun TelaAnaliseObra(
                         append("Certifique-se de que a obra está de acordo com as ")
                         withStyle(
                             SpanStyle(
-                                color = Color(0xFF1565C0),
+                                color = AzulPrimario,
                                 textDecoration = TextDecoration.Underline,
                                 fontWeight = FontWeight.SemiBold
                             )
-                        ) {
-                            append("Diretrizes Editoriais")
-                        }
+                        ) { append("Diretrizes Editoriais") }
                         append(" antes de prosseguir com a aprovação.")
                     },
                     fontSize = 12.sp,
@@ -244,48 +220,42 @@ fun TelaAnaliseObra(
                 )
             }
 
-            Spacer(Modifier.height(20.dp))
-
-            // ── Botão Aprovar ──────────────────────────────────────────────────
+            // ── Botão Aprovar ─────────────────────────────────────────────────
             Button(
-                onClick = onAprovar,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
+                onClick = { viewModel.aprovar(onSucesso = onAprovar) },
+                enabled = !state.processando,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
+                colors = ButtonDefaults.buttonColors(containerColor = VerdeSucesso)
             ) {
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text("Aprovar Obra", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                if (state.processando) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Aprovar Obra", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                }
             }
 
-            Spacer(Modifier.height(10.dp))
-
-            // ── Botão Rejeitar ─────────────────────────────────────────────────
+            // ── Botão Rejeitar ────────────────────────────────────────────────
             OutlinedButton(
-                onClick = { onRejeitar(motivoRejeicao) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
+                onClick = { viewModel.rejeitar(motivoRejeicao) { onRejeitar(motivoRejeicao) } },
+                enabled = !state.processando,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFD32F2F)),
-                border = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFFD32F2F))
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = VermelhoErro),
+                border = BorderStroke(1.5.dp, VermelhoErro)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Cancel,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
+                Icon(Icons.Default.Cancel, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text("Rejeitar Obra", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -302,5 +272,4 @@ private fun Label(text: String) {
     Spacer(Modifier.height(2.dp))
 }
 
-
-
+private val CinzaTextoLocal = Color(0xFF616161)

@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,42 +20,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.br.unifor.for_library.core.designsystem.AzulPrimario
 import com.br.unifor.for_library.core.designsystem.CinzaTexto
-
-data class UsuarioMock(
-    val id: String,
-    val nome: String,
-    val matricula: String,
-    val email: String,
-    val ativo: Boolean,
-    val resenhasInadequadas: Int
-)
-
-private val mockUsuarios = listOf(
-    UsuarioMock("1", "João Silva",     "2023001", "joao.silva@unifor.edu.br",     true,  0),
-    UsuarioMock("2", "Ana Oliveira",   "2023045", "ana.oliveira@unifor.edu.br",   false, 3),
-    UsuarioMock("3", "Ricardo Mendes", "2022112", "ricardo.mendes@unifor.edu.br", true,  1),
-    UsuarioMock("4", "Maria Santos",   "2023089", "maria.santos@unifor.edu.br",   true,  0),
-    UsuarioMock("5", "Pedro Costa",    "2021504", "pedro.costa@unifor.edu.br",    false, 3),
-    UsuarioMock("6", "Juliana Lima",   "2023156", "juliana.lima@unifor.edu.br",   true,  0),
-)
+import com.br.unifor.for_library.core.designsystem.VermelhoErro
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TelaGestaoUsuarios(onVoltar: () -> Unit = {}) {
-    // ✅ rememberSaveable: busca sobrevive à rotação de tela
-    var busca by rememberSaveable { mutableStateOf("") }
-    var usuarioSelecionado by remember { mutableStateOf<UsuarioMock?>(null) }
+fun TelaGestaoUsuarios(
+    onVoltar: () -> Unit = {},
+    viewModel: GestaoUsuariosViewModel = viewModel()
+) {
+    val state by viewModel.state.collectAsState()
+    val busca by viewModel.busca.collectAsState()
+    val usuariosFiltrados by viewModel.usuariosFiltrados.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    // ✅ derivedStateOf: re-filtra apenas quando busca ou lista mudam
-    val usuariosFiltrados by remember {
-        derivedStateOf {
-            mockUsuarios.filter {
-                busca.isBlank() ||
-                it.nome.contains(busca, ignoreCase = true) ||
-                it.matricula.contains(busca, ignoreCase = true)
-            }
+    var usuarioSelecionado by remember { mutableStateOf<UsuarioAdminItem?>(null) }
+
+    LaunchedEffect(state.erro) {
+        state.erro?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.consumirErro()
         }
     }
 
@@ -73,17 +58,26 @@ fun TelaGestaoUsuarios(onVoltar: () -> Unit = {}) {
                 },
                 navigationIcon = {
                     IconButton(onClick = onVoltar) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar"
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.White
     ) { paddingValues ->
+
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = AzulPrimario)
+            }
+            return@Scaffold
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -92,11 +86,20 @@ fun TelaGestaoUsuarios(onVoltar: () -> Unit = {}) {
         ) {
             Spacer(Modifier.height(8.dp))
 
+            // RF38.2: SearchBar
             OutlinedTextField(
                 value = busca,
-                onValueChange = { busca = it },
-                placeholder = { Text("Buscar por matrícula ou nome", fontSize = 13.sp, color = Color.LightGray) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
+                onValueChange = viewModel::onBuscaChange,
+                placeholder = {
+                    Text(
+                        "Buscar por matrícula ou nome",
+                        fontSize = 13.sp,
+                        color = Color.LightGray
+                    )
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray)
+                },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(6.dp),
@@ -108,8 +111,9 @@ fun TelaGestaoUsuarios(onVoltar: () -> Unit = {}) {
 
             Spacer(Modifier.height(8.dp))
 
+            // RF38.3: Contador (Gate 2: atualiza com a busca)
             Text(
-                "${usuariosFiltrados.size} USUÁRIOS ENCONTRADOS",
+                text = "${usuariosFiltrados.size} USUÁRIO${if (usuariosFiltrados.size != 1) "S" else ""} ENCONTRADO${if (usuariosFiltrados.size != 1) "S" else ""}",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = CinzaTexto,
@@ -118,33 +122,52 @@ fun TelaGestaoUsuarios(onVoltar: () -> Unit = {}) {
 
             Spacer(Modifier.height(8.dp))
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
-                // ✅ key estável: evita recomposições desnecessárias ao filtrar
-                items(usuariosFiltrados, key = { it.id }) { usuario ->
-                    ItemUsuario(
-                        usuario = usuario,
-                        onClick = { usuarioSelecionado = usuario }
+            if (usuariosFiltrados.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (busca.isBlank()) "Nenhum usuário cadastrado."
+                               else "Nenhum resultado para \"$busca\".",
+                        color = Color(0xFF9E9E9E),
+                        fontSize = 14.sp
                     )
+                }
+            } else {
+                // RF38.4: Listagem
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp)
+                ) {
+                    items(usuariosFiltrados, key = { it.id }) { usuario ->
+                        ItemUsuario(
+                            usuario = usuario,
+                            onClick = { usuarioSelecionado = usuario }
+                        )
+                    }
                 }
             }
         }
     }
 
-    // RF39: Popup acionado ao clicar em um aluno
+    // RF38.5: Popup de detalhes (RF39)
     usuarioSelecionado?.let { usuario ->
         PopupDetalhesUsuario(
             usuario = usuario,
-            onFechar = { usuarioSelecionado = null }
+            onFechar = { usuarioSelecionado = null },
+            onAlterarStatus = { bloqueado ->
+                viewModel.alterarStatus(usuario.id, bloqueado)
+                // Reflete mudança imediata no item selecionado sem fechar o popup
+                usuarioSelecionado = usuario.copy(bloqueado = bloqueado)
+            }
         )
     }
 }
 
 @Composable
 private fun ItemUsuario(
-    usuario: UsuarioMock,
+    usuario: UsuarioAdminItem,
     onClick: () -> Unit
 ) {
     Card(
@@ -161,26 +184,43 @@ private fun ItemUsuario(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // RF38.4: Avatar (foto_perfil ou placeholder)
             Box(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFE0E0E0)),
+                    .background(Color(0xFFE3EEF9)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Person, contentDescription = null, tint = Color(0xFF757575), modifier = Modifier.size(20.dp))
-            }
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(usuario.nome, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, color = Color(0xFF212121))
-                Text("Matrícula: ${usuario.matricula}", fontSize = 11.sp, color = CinzaTexto)
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = null,
+                    tint = AzulPrimario,
+                    modifier = Modifier.size(20.dp)
+                )
             }
 
-            // Status badge
-            val (corFundo, corTexto, label) = if (usuario.ativo) {
+            Spacer(Modifier.width(12.dp))
+
+            Column(Modifier.weight(1f)) {
+                Text(
+                    usuario.nome,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 13.sp,
+                    color = Color(0xFF212121)
+                )
+                Text(
+                    "Matrícula: ${usuario.matricula}",
+                    fontSize = 11.sp,
+                    color = CinzaTexto
+                )
+            }
+
+            // Gate 1: status bloqueado em vermelho, ativo em verde
+            val (corFundo, corTexto, label) = if (!usuario.bloqueado) {
                 Triple(Color(0xFFE6F4EA), Color(0xFF1B873B), "ATIVO")
             } else {
-                Triple(Color(0xFFFDEAEA), Color(0xFFD32F2F), "BLOQUEADO")
+                Triple(Color(0xFFFDEAEA), VermelhoErro, "BLOQUEADO")
             }
             Box(
                 modifier = Modifier
