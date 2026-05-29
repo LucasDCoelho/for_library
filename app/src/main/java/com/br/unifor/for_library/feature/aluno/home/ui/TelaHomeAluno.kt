@@ -259,6 +259,7 @@ fun TelaHomeAluno(
                             CapaLivro(
                                 isbn = livro.isbn ?: "",
                                 tituloFallback = livro.titulo,
+                                capaUrl = livro.capa_url,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .clip(MaterialTheme.shapes.small),
