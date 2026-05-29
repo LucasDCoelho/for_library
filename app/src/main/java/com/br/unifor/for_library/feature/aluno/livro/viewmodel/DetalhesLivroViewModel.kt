@@ -24,8 +24,7 @@ data class LivroDetalhes(
     val ano_publicacao: Int? = null,
     val sinopse: String? = null,
     val isbn: String? = null,
-    val nota_media: Double = 0.0,
-    val qtd_avaliacoes: Int = 0
+    val capa_url: String? = null
 )
 
 @Serializable
@@ -52,7 +51,9 @@ data class DetalhesLivroState(
     val isLoading: Boolean = true,
     val livro: LivroDetalhes? = null,
     val resenhas: List<ResenhaUi> = emptyList(),
-    val favoritado: Boolean = false,
+    val notaMedia: Double = 0.0,
+    val qtdAvaliacoes: Int = 0,
+    val salvo: Boolean = false,
     val error: String? = null
 )
 
@@ -66,20 +67,23 @@ class DetalhesLivroViewModel : ViewModel() {
         if (_state.value.livro?.id == livroId) return
         viewModelScope.launch {
             _state.value = DetalhesLivroState(isLoading = true)
-            try {
-                val userAuth = supabase.auth.currentUserOrNull()
-                    ?: throw Exception("Não autenticado")
 
-                val usuario = supabase.from("usuarios")
-                    .select { filter { eq("auth_user_id", userAuth.id) } }
-                    .decodeSingle<UsuarioIdModel>()
-                usuarioId = usuario.id
-
-                val livro = supabase.from("livros")
+            // Única query crítica — sem ela nada faz sentido
+            val livro = try {
+                supabase.from("livros")
                     .select { filter { eq("id", livroId) } }
-                    .decodeSingle<LivroDetalhes>()
+                    .decodeList<LivroDetalhes>()
+                    .firstOrNull()
+            } catch (e: Exception) { null }
 
-                val resenhas = supabase.from("resenhas")
+            if (livro == null) {
+                _state.value = DetalhesLivroState(isLoading = false, error = "Livro não encontrado")
+                return@launch
+            }
+
+            // Queries secundárias: falhas são silenciosas
+            val resenhas = try {
+                supabase.from("resenhas")
                     .select(Columns.raw("id, nota, texto, data_publicacao, usuarios(nome)")) {
                         filter {
                             eq("livro_id", livroId)
@@ -89,33 +93,45 @@ class DetalhesLivroViewModel : ViewModel() {
                     }
                     .decodeList<ResenhaDb>()
                     .map { it.toUi() }
+            } catch (e: Exception) { emptyList() }
 
-                val favoritoCount = supabase.from("favoritos")
-                    .select { filter { eq("usuario_id", usuario.id); eq("livro_id", livroId) } }
-                    .decodeList<FavoritoId>()
+            val notaMedia = if (resenhas.isEmpty()) 0.0 else resenhas.map { it.nota }.average()
 
-                _state.value = DetalhesLivroState(
-                    isLoading = false,
-                    livro = livro,
-                    resenhas = resenhas,
-                    favoritado = favoritoCount.isNotEmpty()
-                )
-            } catch (e: Exception) {
-                _state.value = DetalhesLivroState(
-                    isLoading = false,
-                    error = e.message ?: "Erro ao carregar livro"
-                )
-            }
+            val salvo = try {
+                val userAuth = supabase.auth.currentUserOrNull()
+                if (userAuth != null) {
+                    val uid = supabase.from("usuarios")
+                        .select { filter { eq("auth_user_id", userAuth.id) } }
+                        .decodeList<UsuarioIdModel>()
+                        .firstOrNull()
+                    if (uid != null) {
+                        usuarioId = uid.id
+                        supabase.from("favoritos")
+                            .select { filter { eq("usuario_id", uid.id); eq("livro_id", livroId) } }
+                            .decodeList<FavoritoId>()
+                            .isNotEmpty()
+                    } else false
+                } else false
+            } catch (e: Exception) { false }
+
+            _state.value = DetalhesLivroState(
+                isLoading = false,
+                livro = livro,
+                resenhas = resenhas,
+                notaMedia = notaMedia,
+                qtdAvaliacoes = resenhas.size,
+                salvo = salvo
+            )
         }
     }
 
-    fun toggleFavorito(livroId: Int) {
+    fun toggleSalvo(livroId: Int) {
         val uid = usuarioId ?: return
-        val eraFavoritado = _state.value.favoritado
-        _state.value = _state.value.copy(favoritado = !eraFavoritado)
+        val eraSalvo = _state.value.salvo
+        _state.value = _state.value.copy(salvo = !eraSalvo)
         viewModelScope.launch {
             try {
-                if (eraFavoritado) {
+                if (eraSalvo) {
                     supabase.from("favoritos").delete {
                         filter { eq("usuario_id", uid); eq("livro_id", livroId) }
                     }
@@ -125,7 +141,7 @@ class DetalhesLivroViewModel : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
-                _state.value = _state.value.copy(favoritado = eraFavoritado)
+                _state.value = _state.value.copy(salvo = eraSalvo)
             }
         }
     }

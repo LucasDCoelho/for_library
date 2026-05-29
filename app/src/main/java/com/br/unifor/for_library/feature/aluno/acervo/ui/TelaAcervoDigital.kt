@@ -29,13 +29,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.br.unifor.for_library.core.components.CapaLivro
 import com.br.unifor.for_library.core.components.FiltroAvancadoBottomSheet
-import com.br.unifor.for_library.core.components.FiltroAvancadoState
 import com.br.unifor.for_library.core.data.LivrosSalvosState
 import com.br.unifor.for_library.core.designsystem.AzulPrimario
 import com.br.unifor.for_library.core.designsystem.CinzaTexto
 import com.br.unifor.for_library.core.designsystem.coresFallback
 import com.br.unifor.for_library.feature.aluno.acervo.viewmodel.AcervoViewModel
-import com.br.unifor.for_library.feature.aluno.acervo.ui.BuscaVaziaPlaceholder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -204,6 +202,7 @@ fun TelaAcervoDigital(
                             CapaLivro(
                                 isbn = livro.isbn ?: "",
                                 tituloFallback = livro.titulo,
+                                capaUrl = livro.capa_url,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .clip(RoundedCornerShape(8.dp)),

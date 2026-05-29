@@ -1,166 +1,96 @@
-# ForLibrary - Documentação de Especificações
+# ForLibrary — Índice de Especificações (`.specs/`)
 
-Bem-vindo à pasta de especificações (`/.specs`) do projeto **ForLibrary**. Aqui estão documentados todos os requisitos, arquitetura, design system, entidades e integrações do aplicativo.
-
----
-
-## 📋 Índice de Documentos
-
-### Backend & Infraestrutura
-
-- **`supabase_schema.md`** ⭐ **NOVO**
-  - Schema PostgreSQL completo do banco de dados Supabase
-  - 11 tabelas principais: `usuarios`, `livros`, `favoritos`, `progresso_leitura`, `resenhas`, `eventos`, `notificacoes`, `obras_autorais`, `historico_pontos`, `atividades_admin`, `configuracoes_sistema`
-  - Relacionamentos, constraints e políticas de Row Level Security (RLS)
-  - Índices recomendados para otimização
-
-- **`auth_supabase.md`**
-  - Integração de autenticação com Supabase (GoTrue)
-  - Fluxos de Sign Up, Sign In, Password Reset
-  - Configuração do SDK Kotlin/Android
-  - Segurança e sincronização com o banco
-
-- **`supabase_schema.md`**
-  - Documentação detalhada de todas as tabelas
-  - Tipos de dados, constraints, relacionamentos
-  - Exemplos de uso e sincronização
-
-### Análise e Requisitos
-
-- **`requirements.md`**
-  - Requisitos funcionais e não-funcionais do sistema
-
-- **`requisitos.md`**
-  - Descripção dos requisitos em português
-  
-- **`mapeamento_entidades.md`**
-  - Mapping entre entidades de negócio e tabelas do banco
-  - Relacionamentos de domínio
-
-### Design & UI
-
-- **`design_system.md`**
-  - Paleta de cores
-  - Tipografia
-  - Componentes reutilizáveis
-  - Tokens de design
-
-- **`design.md`**
-  - Wireframes e fluxos de UI
-  - Considerações de UX
-
-### Módulos e Features
-
-- **`modulo-01/`**
-  - `2026-05-23-splash/` - Splash screen e verificação de sessão
-  - `2026-05-23-login/` - Fluxo de login
-  - `2026-05-23-cadastro-aluno/` - Sign up de alunos
-  - `2026-05-23-recuperacao-senha/` - Password reset
+> Pasta de especificações do projeto **ForLibrary** — biblioteca digital universitária Android.  
+> Última auditoria/padronização: **2026-05-28**
 
 ---
 
-## 🔧 Stack Tecnológico
-
-### Backend
-- **Banco de Dados:** Supabase (PostgreSQL)
-- **Autenticação:** Supabase Auth (GoTrue)
-- **Segurança:** Row Level Security (RLS) em nível de banco
-- **Infraestrutura:** Backend as a Service (BaaS)
-
-### Aplicativo Android
-- **Linguagem:** Kotlin
-- **UI Framework:** Jetpack Compose
-- **Arquitetura:** MVVM + Clean Architecture
-- **Gradle:** Gradle Wrapper (JDK 17+)
-
----
-
-## 📊 Arquitetura do Banco
+## Estrutura
 
 ```
-Supabase PostgreSQL Server
-├── auth.users (Supabase Auth)
-│   └── Trigger → created_at_usuario()
-│       └── Insere automaticamente em usuarios
+.specs/
+├── project/                  ← Estado e visão do projeto
+│   ├── PROJECT.md            ← Contexto, objetivos, restrições, critérios de sucesso
+│   ├── ROADMAP.md            ← Milestones por módulo, status de cada feature, próximos passos
+│   └── STATE.md              ← Estado atual, branch ativo, bloqueios, ADRs, dívidas técnicas
 │
-└── public schema
-    ├── usuarios (núcleo de identidade)
-    ├── livros (catálogo)
-    ├── favoritos (N:M usuarios ↔ livros)
-    ├── progresso_leitura (leitura em andamento)
-    ├── resenhas (avaliações)
-    ├── eventos (comunidade)
-    ├── notificacoes (sistema)
-    ├── obras_autorais (user-generated content)
-    ├── historico_pontos (gamificação audit)
-    ├── atividades_admin (admin audit)
-    └── configuracoes_sistema (tuning)
+├── codebase/                 ← Documentação técnica do código existente (brownfield)
+│   ├── ARCHITECTURE.md       ← MVVM + Clean Architecture, estrutura de pacotes, fluxo de dados
+│   ├── STACK.md              ← Kotlin, Jetpack Compose, Supabase, dependências
+│   ├── CONVENTIONS.md        ← Nomenclatura, padrões de Compose, enums, tokens obrigatórios
+│   ├── DATA_MODEL.md         ← Data classes de domínio, tabelas Supabase, regras de negócio
+│   ├── INTEGRATIONS.md       ← Supabase (auth/DB/storage), OpenLibrary, ChatBot, Calendar
+│   ├── ROUTES.md             ← Todas as rotas de navegação e telas correspondentes
+│   └── COMPONENTS.md        ← Componentes compartilhados (CapaLivro, BottomBars, PopupLogout)
+│
+├── modulo-01/                ← Features: Autenticação (RF01–RF04)
+│   ├── 2026-05-23-splash/
+│   ├── 2026-05-23-login/
+│   ├── 2026-05-23-cadastro-aluno/
+│   └── 2026-05-23-recuperacao-senha/
+│
+├── modulo-02/                ← Features: Área do Aluno (RF05–RF25)
+│   ├── 2026-04-24-RF05-home-aluno/
+│   ├── 2026-04-24-RF06-acervo-digital/
+│   └── ... (21 features)
+│
+├── modulo-03/                ← Features: Área do Administrador (RF26–RF41)
+│   ├── 2026-05-24-RF26-Dashboard-Admin/
+│   ├── 2026-05-24-RF27-Gestao-Acervo/
+│   └── ... (16 features)
+│
+├── requirements.md           ← Tabela completa de RFs/RNFs com status de implementação
+├── requisitos.md             ← Dump original dos requisitos (formato bruto da equipe)
+├── auth_supabase.md          ← Detalhes de autenticação Supabase (GoTrue SDK)
+├── design.md                 ← Wireframes e fluxos de UI
+├── design_system.md          ← Tokens visuais, paleta real, tipografia, inconsistências
+├── mapeamento_entidades.md   ← Data classes Kotlin completas com anotações
+├── supabase_schema.md        ← Schema PostgreSQL completo (11 tabelas, RLS, índices)
+└── supabase_policies.md      ← Políticas RLS detalhadas por tabela
 ```
 
 ---
 
-## 🔐 Segurança
+## Como Usar Esta Pasta
 
-- **Row Level Security (RLS):** Habilitado em todas as tabelas que contêm dados pessoais
-- **Autenticação:** Supabase GoTrue com e-mail e senha
-- **Validação de E-mail:** Apenas domínios `@unifor.br` e `@edu.unifor.br`
-- **Token Management:** Persistência segura via `EncryptedSharedPreferences`
-- **Sincronização:** Dados críticos (pontos, status) sincronizados após login
+### Iniciando numa nova feature
 
----
+1. Leia `project/STATE.md` para saber o contexto atual e bloqueios
+2. Leia `project/ROADMAP.md` para identificar a próxima feature a implementar
+3. Consulte `codebase/ARCHITECTURE.md` para entender onde o código deve ser criado
+4. Abra o `plan.md` da feature correspondente em `modulo-0X/`
 
-## 📱 Fluxos Principais
+### Implementando uma feature
 
-### 1. **Autenticação**
-   - Splash Screen → verificação de sessão
-   - Login/SignUp com validação de domínio
-   - Home (Aluno ou Admin)
+Cada pasta de feature contém:
+- `plan.md` — arquitetura, entidades afetadas, passo a passo de implementação, ADRs locais
+- `validation.md` — checklist de critérios de aceitação vinculados aos RFs
 
-### 2. **Leitura**
-   - Acervo (catálogo) → Livro → Leitura com progresso
-   - Favoritos armazenados em `LivrosSalvosState` globalmente
+### Rastreabilidade de Requisitos
 
-### 3. **Comunidade**
-   - Resenhas (moderadas)
-   - Eventos (campanhas, palestras)
-   - Notificações
-
-### 4. **Gamificação**
-   - Pontos por ações (resenhas, conclusões, eventos)
-   - Histórico completo em `historico_pontos`
-   - Níveis baseados em `pontos_gamificacao`
+Todos os requisitos funcionais estão em `requirements.md` com status `✔️ / ❌ / ❓`.  
+Os `validation.md` de cada feature referenciam os RFs correspondentes com `[cite: requirements.md]`.
 
 ---
 
-## 🚀 Como Começar
+## Estado Rápido
 
-1. **Confira o Schema Supabase:** Leia `supabase_schema.md` para entender as tabelas
-2. **Entenda a Autenticação:** Veja `auth_supabase.md` para fluxos de login/signup
-3. **Revise Requisitos:** Consulte `requirements.md` para features esperadas
-4. **Design:** Visualize em `design_system.md` e `design.md`
-5. **Implementação:** Siga as convenções em `../../../copilot-instructions.md`
+| Módulo | Progresso |
+|---|---|
+| M1 — Autenticação (RF01–04) | ~85% |
+| M2 — Área Aluno (RF05–25) | ~60% |
+| M3 — Área Admin (RF26–41) | ~45% |
+| **Global** | **~60%** |
 
----
-
-## 📝 Convenções
-
-- **Rotas:** Portuguese labels + snake_case paths (ex: `rota_home_aluno`)
-- **Nomes de Telo:** Prefixo `Tela...` (ex: `TelaLogin`, `TelaAcervo`)
-- **Tabelas:** Plurais em snake_case (ex: `usuarios`, `livros`, `favoritos`)
-- **Colunas:** snake_case com prefixos para relação (ex: `usuario_id`, `livro_id`)
+**Sprint atual:** RF27/RF28/RF29 — ViewModels + persistência Supabase no acervo admin  
+**Branch:** `lucasdev`
 
 ---
 
-## 🔗 Documentação Externa
+## Links Rápidos
 
-- [Supabase Docs](https://supabase.com/docs)
-- [Supabase Auth](https://supabase.com/docs/guides/auth)
-- [PostgreSQL Docs](https://www.postgresql.org/docs/)
-- [Jetpack Compose](https://developer.android.com/jetpack/compose)
-
----
-
-**Última atualização:** 2026-05-24
-
-**Status:** Documentação ativa e em evolução 🚀
-
+- [Estado atual do projeto](project/STATE.md)
+- [Roadmap e próximos passos](project/ROADMAP.md)
+- [Requisitos completos](requirements.md)
+- [Design System](design_system.md)
+- [Schema do banco](supabase_schema.md)
