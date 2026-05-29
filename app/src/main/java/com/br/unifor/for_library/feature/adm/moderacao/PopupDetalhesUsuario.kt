@@ -3,71 +3,103 @@ package com.br.unifor.for_library.feature.adm.moderacao
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.br.unifor.for_library.core.designsystem.AzulPrimario
 import com.br.unifor.for_library.core.designsystem.CinzaTexto
+import com.br.unifor.for_library.core.designsystem.VermelhoErro
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PopupDetalhesUsuario(
-    usuario: UsuarioMock,
-    onFechar: () -> Unit
+    usuario: UsuarioAdminItem,
+    onFechar: () -> Unit,
+    onAlterarStatus: (bloqueado: Boolean) -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var bloqueado by remember { mutableStateOf(!usuario.ativo) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Estado local sincronizado com o item passado — atualiza quando o pai reflete a mudança
+    var bloqueado by remember(usuario.bloqueado) { mutableStateOf(usuario.bloqueado) }
+    var salvando by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
         onDismissRequest = onFechar,
         sheetState = sheetState,
         containerColor = Color.White
     ) {
+        // Gate 1: Snackbar de feedback de erro dentro do sheet
+        SnackbarHost(snackbarHostState, modifier = Modifier.padding(horizontal = 16.dp))
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
-                .padding(bottom = 24.dp)
+                .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            // RF39.2: Título
-            Text(
-                "Detalhes do Usuário",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF212121)
-            )
+            // ── RF39.1: Cabeçalho ──────────────────────────────────────────────
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFE3EEF9)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = null,
+                        tint = AzulPrimario,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                Spacer(Modifier.width(12.dp))
+                Column {
+                    Text(
+                        usuario.nome,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF212121)
+                    )
+                    Text(
+                        "Matrícula: ${usuario.matricula}",
+                        fontSize = 12.sp,
+                        color = CinzaTexto
+                    )
+                }
+            }
 
             Spacer(Modifier.height(16.dp))
+            HorizontalDivider(color = Color(0xFFEEEEEE))
+            Spacer(Modifier.height(16.dp))
 
-            // RF39.2: Dados Pessoais
-            Text(
-                "DADOS PESSOAIS",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = CinzaTexto,
-                letterSpacing = 0.6.sp
-            )
-
+            // ── Dados pessoais ────────────────────────────────────────────────
+            SectionLabel("DADOS PESSOAIS")
             Spacer(Modifier.height(10.dp))
-
             CampoDado(label = "Nome Completo", valor = usuario.nome)
             Spacer(Modifier.height(8.dp))
             CampoDado(label = "Matrícula", valor = usuario.matricula)
-            Spacer(Modifier.height(8.dp))
-            CampoDado(label = "E-mail Institucional", valor = usuario.email)
+            if (usuario.email.isNotBlank()) {
+                Spacer(Modifier.height(8.dp))
+                CampoDado(label = "E-mail Institucional", valor = usuario.email)
+            }
 
-            Spacer(Modifier.height(16.dp))
-
-            // RF39.5: Card de Alerta — Status de Moderação
+            // ── RF39.5: Card de alerta — resenhas inadequadas ─────────────────
             if (usuario.resenhasInadequadas > 0) {
+                Spacer(Modifier.height(16.dp))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(6.dp),
@@ -82,7 +114,7 @@ fun PopupDetalhesUsuario(
                         Icon(
                             Icons.Default.Warning,
                             contentDescription = null,
-                            tint = Color(0xFFD32F2F),
+                            tint = VermelhoErro,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(Modifier.width(8.dp))
@@ -99,6 +131,7 @@ fun PopupDetalhesUsuario(
                                 fontSize = 12.sp,
                                 color = Color(0xFF424242)
                             )
+                            // Aviso de limite automático quando >= 3
                             if (usuario.resenhasInadequadas >= 3) {
                                 Spacer(Modifier.height(4.dp))
                                 Text(
@@ -110,10 +143,11 @@ fun PopupDetalhesUsuario(
                         }
                     }
                 }
-                Spacer(Modifier.height(16.dp))
             }
 
-            // RF39.3: Toggle Bloquear Acesso
+            Spacer(Modifier.height(16.dp))
+
+            // ── RF39.3: Toggle bloquear/desbloquear ───────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -131,21 +165,34 @@ fun PopupDetalhesUsuario(
                         color = CinzaTexto
                     )
                 }
-                Switch(
-                    checked = bloqueado,
-                    onCheckedChange = { bloqueado = it },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = AzulPrimario,
-                        uncheckedThumbColor = Color.White,
-                        uncheckedTrackColor = Color(0xFFBDBDBD)
+                if (salvando) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = AzulPrimario,
+                        strokeWidth = 2.dp
                     )
-                )
+                } else {
+                    Switch(
+                        checked = bloqueado,
+                        onCheckedChange = { novo ->
+                            salvando = true
+                            bloqueado = novo
+                            onAlterarStatus(novo)
+                            salvando = false
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = VermelhoErro,
+                            uncheckedThumbColor = Color.White,
+                            uncheckedTrackColor = Color(0xFFBDBDBD)
+                        )
+                    )
+                }
             }
 
             Spacer(Modifier.height(20.dp))
 
-            // RF39.4: Botão Fechar
+            // ── RF39.4: Fechar ────────────────────────────────────────────────
             OutlinedButton(
                 onClick = onFechar,
                 modifier = Modifier
@@ -158,6 +205,17 @@ fun PopupDetalhesUsuario(
             }
         }
     }
+}
+
+@Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text = text,
+        fontSize = 11.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = CinzaTexto,
+        letterSpacing = 0.6.sp
+    )
 }
 
 @Composable

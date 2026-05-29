@@ -1,5 +1,3 @@
-// ── TelaGestaoEventos.kt (corrigido) ─────────────────────────────────────────
-//TO-DO -> COLOCAR A BOTTOM BAR DO ADM
 package com.br.unifor.for_library.feature
 
 import androidx.compose.foundation.background
@@ -12,7 +10,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,83 +17,65 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-enum class StatusEvento { EM_BREVE, ANTES }
-
-data class EventoAdmin(
-    val id: String,
-    val titulo: String,
-    val data: String,
-    val horario: String,
-    val status: StatusEvento
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.br.unifor.for_library.core.designsystem.AzulPrimario
+import com.br.unifor.for_library.feature.aluno.eventos.viewmodel.EventoDb
 
 @Composable
 fun TelaGestaoEventos(
     onEditarEventoClick: (String) -> Unit = {},
-    onNovoEventoClick: () -> Unit = {}
+    onNovoEventoClick: () -> Unit = {},
+    viewModel: GestaoEventosViewModel = viewModel()
 ) {
-    val listaEventos = remember {
-        listOf(
-            EventoAdmin("1", "Advanced Archival Techniques Workshop", "Oct 24, 2024", "10:00 AM", StatusEvento.EM_BREVE),
-            EventoAdmin("2", "Children's Storytelling Hour", "Oct 28, 2024", "02:30 PM", StatusEvento.EM_BREVE),
-            EventoAdmin("3", "Digital Preservation Summit", "Sept 12, 2024", "09:00 AM", StatusEvento.ANTES),
-            EventoAdmin("4", "Summer Book Fair", "Aug 30, 2024", "11:00 AM", StatusEvento.ANTES),
-            EventoAdmin("5", "Local Author Reading: Elena Vance", "July 15, 2024", "06:00 PM", StatusEvento.ANTES)
-        )
+    val state by viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var eventoParaExcluir by remember { mutableStateOf<EventoDb?>(null) }
+
+    LaunchedEffect(state.erro) {
+        state.erro?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.consumirErro()
+        }
     }
 
-    // ✅ Fix 1: separado para futura substituição por viewModel.totalEventos
-    val totalEventos = listaEventos.size // TODO: viewModel.totalEventos
-
-    var mostrarPopupExclusao by remember { mutableStateOf(false) }
-    var eventoSelecionadoParaExcluir by remember { mutableStateOf<EventoAdmin?>(null) }
-
-    // ✅ Fix 2: reutiliza PopupExclusaoObra com mensagem de eventos
-    if (mostrarPopupExclusao) {
+    if (eventoParaExcluir != null) {
         PopupExclusaoObra(
-            mensagem = "Atenção: A exclusão removerá o evento para todos " +
-                    "os alunos. Deseja continuar?",
-            onDismiss = {
-                mostrarPopupExclusao = false
-                eventoSelecionadoParaExcluir = null
-            },
+            mensagem = "Atenção: A exclusão removerá o evento para todos os alunos. Deseja continuar?",
+            onDismiss = { eventoParaExcluir = null },
             onConfirm = {
-                // TODO: apagar eventoSelecionadoParaExcluir do banco de dados
-                mostrarPopupExclusao = false
-                eventoSelecionadoParaExcluir = null
+                val id = eventoParaExcluir!!.id
+                eventoParaExcluir = null
+                viewModel.deletarEvento(id) {}
             }
         )
     }
 
     Scaffold(
         containerColor = Color(0xFFF9F9F9),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { onNovoEventoClick() },
-                containerColor = Color(0xFF1E54FA),
+                onClick = onNovoEventoClick,
+                containerColor = AzulPrimario,
                 shape = RoundedCornerShape(4.dp),
                 contentColor = Color.White
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Criar novo evento")
             }
         }
-        // ✅ Fix 3: bottomBar = { BottomBarAdmin(...) } — TODO: implementar
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // ── RF31.1: Cabeçalho ─────────────────────────────────────────────
+            // Header RF31.1
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    // ✅ Fix 5: protege contra sobreposição da status bar
                     .statusBarsPadding()
                     .padding(horizontal = 16.dp, vertical = 20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -115,9 +94,8 @@ fun TelaGestaoEventos(
                         .padding(horizontal = 12.dp, vertical = 4.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    // ✅ Fix 1: variável separada, pronta para ViewModel
                     Text(
-                        text = "TOTAL:\n$totalEventos",
+                        text = "TOTAL:\n${state.eventos.size}",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.DarkGray,
@@ -128,18 +106,41 @@ fun TelaGestaoEventos(
 
             HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
 
-            // ── RF31.2: Lista ─────────────────────────────────────────────────
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(listaEventos) { evento ->
-                    ItemEventoAdmin(
-                        evento = evento,
-                        onEditarClick = { onEditarEventoClick(evento.id) },
-                        onExcluirClick = {
-                            eventoSelecionadoParaExcluir = evento
-                            mostrarPopupExclusao = true
+            when {
+                state.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = AzulPrimario)
+                    }
+                }
+
+                state.eventos.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Nenhum evento cadastrado.",
+                            color = Color(0xFF9E9E9E),
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+
+                else -> {
+                    // Listagem RF31.2
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(state.eventos, key = { it.id }) { evento ->
+                            ItemEventoAdmin(
+                                evento = evento,
+                                onEditarClick = { onEditarEventoClick(evento.id.toString()) },
+                                onExcluirClick = { eventoParaExcluir = evento }
+                            )
+                            HorizontalDivider(color = Color(0xFFEBEBEB), thickness = 1.dp)
                         }
-                    )
-                    HorizontalDivider(color = Color(0xFFEBEBEB), thickness = 1.dp)
+                    }
                 }
             }
         }
@@ -148,13 +149,13 @@ fun TelaGestaoEventos(
 
 @Composable
 private fun ItemEventoAdmin(
-    evento: EventoAdmin,
+    evento: EventoDb,
     onEditarClick: () -> Unit,
     onExcluirClick: () -> Unit
 ) {
-    val isEmBreve = evento.status == StatusEvento.EM_BREVE
-    val corTextoPrincipal = if (isEmBreve) Color.Black else Color(0xFF888888)
-    val corTextoSecundario = if (isEmBreve) Color.DarkGray else Color(0xFFAAAAAA)
+    val (dataFormatada, horario) = remember(evento.data_inicio) {
+        parseDataHorario(evento.data_inicio)
+    }
 
     Row(
         modifier = Modifier
@@ -165,80 +166,88 @@ private fun ItemEventoAdmin(
     ) {
         Column(modifier = Modifier.weight(1f)) {
 
-            if (isEmBreve) {
-                Text(
-                    text = "EM BREVE",
-                    color = Color(0xFF1E54FA),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = 1.sp
-                )
-            } else {
+            // Tipo do evento
+            if (evento.tipo.isNotBlank()) {
                 Box(
                     modifier = Modifier
-                        .background(Color(0xFF999999), RoundedCornerShape(2.dp))
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                        .background(Color(0xFFE3EEF9), RoundedCornerShape(2.dp))
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "ANTES",
-                        color = Color.White,
+                        text = evento.tipo.uppercase(),
+                        color = AzulPrimario,
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
+                Spacer(modifier = Modifier.height(4.dp))
             }
-
-            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = evento.titulo,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
-                color = corTextoPrincipal
+                color = Color(0xFF212121)
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = if (isEmBreve) Icons.Default.DateRange else Icons.Default.History,
+                    imageVector = Icons.Default.DateRange,
                     contentDescription = null,
-                    tint = corTextoSecundario,
+                    tint = Color(0xFF757575),
                     modifier = Modifier.size(14.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "${evento.data} • ${evento.horario}",
+                    text = if (horario.isNotBlank()) "$dataFormatada • $horario"
+                           else dataFormatada,
                     fontSize = 12.sp,
-                    color = corTextoSecundario
+                    color = Color(0xFF757575)
                 )
             }
         }
 
-        // ✅ Fix 4: IconButton garante área mínima de toque de 48dp
         Row {
             IconButton(onClick = onEditarClick) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Editar evento",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(24.dp)
+                    tint = Color(0xFF616161),
+                    modifier = Modifier.size(22.dp)
                 )
             }
             IconButton(onClick = onExcluirClick) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Excluir evento",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(24.dp)
+                    tint = Color(0xFFD32F2F),
+                    modifier = Modifier.size(22.dp)
                 )
             }
         }
     }
 }
 
-@Preview
-@Composable
-fun TelaGestaoEventosPreview() {
-    TelaGestaoEventos()
+private fun parseDataHorario(dataInicio: String?): Pair<String, String> {
+    if (dataInicio == null) return Pair("Sem data", "")
+    return try {
+        val partes = dataInicio.split("T")
+        val dateParts = partes[0].split("-")
+        val meses = listOf("Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez")
+        val dia = dateParts[2].trimStart('0').ifEmpty { "0" }
+        val mes = meses[dateParts[1].toInt() - 1]
+        val ano = dateParts[0]
+        val data = "$dia $mes $ano"
+
+        val horario = if (partes.size > 1) {
+            val timeParts = partes[1].split(":")
+            "${timeParts[0]}:${timeParts[1]}"
+        } else ""
+
+        Pair(data, horario)
+    } catch (e: Exception) {
+        Pair(dataInicio, "")
+    }
 }

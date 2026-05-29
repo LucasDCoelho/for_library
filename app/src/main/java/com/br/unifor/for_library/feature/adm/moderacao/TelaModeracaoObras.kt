@@ -10,40 +10,39 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-data class ObraPendenteMock(
-    val id: String,
-    val titulo: String,
-    val genero: String,
-    val autor: String,
-    val matriculaAluno: String
-)
-
-private val mockObrasPendentes = listOf(
-    ObraPendenteMock("1", "A Jornada Digital",   "Tecnologia",       "Ricardo Lima",    "2190333-9"),
-    ObraPendenteMock("2", "O Eco das Sombras",   "Suspense",         "Beatriz Soares",  "2510887-5"),
-    ObraPendenteMock("3", "Raízes do Amanhã",    "Ficção Científica","Marcos Vinicius", "2370112-7"),
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.br.unifor.for_library.core.designsystem.AzulPrimario
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaModeracaoObras(
     onVoltar: () -> Unit = {},
-    onRevisarObra: (String) -> Unit = {}
+    onRevisarObra: (String) -> Unit = {},
+    viewModel: ModeracaoObrasViewModel = viewModel()
 ) {
+    val state by viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(state.erro) {
+        state.erro?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.consumirErro()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        "Moderação de Obras",
+                        text = "Moderação de Obras",
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
@@ -59,8 +58,22 @@ fun TelaModeracaoObras(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.White
     ) { paddingValues ->
+
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = AzulPrimario)
+            }
+            return@Scaffold
+        }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -68,98 +81,43 @@ fun TelaModeracaoObras(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ── Cabeçalho "Submissões Recentes" ──────────────────────────────
-            item {
-                Text(
-                    text = "Moderação de Obras",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF616161)
-                )
-                Spacer(Modifier.height(6.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Submissões ",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF212121)
-                    )
-                    Text(
-                        text = "Recentes",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF1565C0)
-                    )
-                }
-                Text(
-                    text = "AGUARDANDO REVISÃO EDITORIAL",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF9E9E9E),
-                    letterSpacing = 0.5.sp
-                )
-                Spacer(Modifier.height(8.dp))
-                HorizontalDivider(color = Color(0xFFE0E0E0))
-                Spacer(Modifier.height(4.dp))
-            }
-
             // ── Cards das obras ───────────────────────────────────────────────
-            // ✅ key estável: evita recomposição desnecessária nos itens
-            items(mockObrasPendentes, key = { it.id }) { obra ->
-                CardObraPendente(obra = obra, onRevisar = { onRevisarObra(obra.id) })
+            items(state.obras, key = { it.id }) { obra ->
+                CardObraPendente(
+                    obra = obra,
+                    onRevisar = { onRevisarObra(obra.id.toString()) }
+                )
             }
 
-            // ── Card de resumo total pendente ─────────────────────────────────
-            item {
-                Spacer(Modifier.height(4.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0)),
-                    elevation = CardDefaults.cardElevation(0.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically
+            // ── Estado vazio ──────────────────────────────────────────────────
+            if (state.obras.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 48.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.LibraryBooks,
-                                contentDescription = null,
-                                tint = Color(0xFF757575),
-                                modifier = Modifier.size(26.dp)
-                            )
-                        }
-                        Spacer(Modifier.width(16.dp))
-                        Column {
-                            Text(
-                                text = "${mockObrasPendentes.size}",
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF212121)
-                            )
-                            Text(
-                                text = "TOTAL PENDENTE",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF9E9E9E),
-                                letterSpacing = 0.5.sp
-                            )
-                        }
+                        Text(
+                            text = "Nenhuma obra pendente de revisão.",
+                            color = Color(0xFF9E9E9E),
+                            fontSize = 14.sp
+                        )
                     }
                 }
+            }
+
+            // ── Card TOTAL PENDENTE ───────────────────────────────────────────
+            item {
+                Spacer(Modifier.height(4.dp))
+                CardTotalPendente(total = state.obras.size)
             }
         }
     }
 }
 
 @Composable
-private fun CardObraPendente(obra: ObraPendenteMock, onRevisar: () -> Unit) {
+private fun CardObraPendente(obra: ObraAutoralItem, onRevisar: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
@@ -187,7 +145,7 @@ private fun CardObraPendente(obra: ObraPendenteMock, onRevisar: () -> Unit) {
                     )
                 }
                 Text(
-                    text = "Matrícula do aluno: ${obra.matriculaAluno}",
+                    text = "Matrícula: ${obra.matriculaAutor}",
                     fontSize = 10.sp,
                     color = Color(0xFF9E9E9E)
                 )
@@ -230,7 +188,7 @@ private fun CardObraPendente(obra: ObraPendenteMock, onRevisar: () -> Unit) {
                         letterSpacing = 0.4.sp
                     )
                     Text(
-                        text = obra.autor,
+                        text = obra.nomeAutor,
                         fontSize = 13.sp,
                         color = Color(0xFF424242)
                     )
@@ -246,7 +204,7 @@ private fun CardObraPendente(obra: ObraPendenteMock, onRevisar: () -> Unit) {
                     .fillMaxWidth()
                     .height(40.dp),
                 shape = RoundedCornerShape(6.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1565C0))
+                colors = ButtonDefaults.buttonColors(containerColor = AzulPrimario)
             ) {
                 Icon(
                     imageVector = Icons.Default.RemoveRedEye,
@@ -264,3 +222,47 @@ private fun CardObraPendente(obra: ObraPendenteMock, onRevisar: () -> Unit) {
     }
 }
 
+@Composable
+private fun CardTotalPendente(total: Int) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0)),
+        elevation = CardDefaults.cardElevation(0.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.LibraryBooks,
+                    contentDescription = null,
+                    tint = Color(0xFF757575),
+                    modifier = Modifier.size(26.dp)
+                )
+            }
+            Spacer(Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = "$total",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF212121)
+                )
+                Text(
+                    text = "TOTAL PENDENTE",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF9E9E9E),
+                    letterSpacing = 0.5.sp
+                )
+            }
+        }
+    }
+}
