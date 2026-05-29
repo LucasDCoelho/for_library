@@ -15,19 +15,21 @@ import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 
-private fun capaUrlIsbn(isbn: String): String =
+private fun capaUrlIsbn(isbn: String?): String =
     "https://covers.openlibrary.org/b/isbn/$isbn-M.jpg?default=false"
 
 @Composable
 fun CapaLivro(
-    isbn: String,
+    isbn: String?,
     tituloFallback: String,
     modifier: Modifier = Modifier,
-    corFallback: Color = Color(0xFF1565C0)
+    corFallback: Color = Color(0xFF1565C0),
+    capaUrl: String? = null
 ) {
+    val imageUrl = capaUrl?.takeIf { it.isNotBlank() } ?: capaUrlIsbn(isbn)
     SubcomposeAsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(capaUrlIsbn(isbn))
+            .data(imageUrl)
             .crossfade(true)
             .build(),
         contentDescription = "Capa de $tituloFallback",

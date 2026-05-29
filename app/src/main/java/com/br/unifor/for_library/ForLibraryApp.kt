@@ -207,7 +207,7 @@ fun ForLibraryApp() {
                     onSinoClick          = { navController.navigate(Rota.Notificacoes.path) },
                     onContinueLendoClick = { /* TODO: Rota.Leitor */ },
                     onVerTodosClick      = { navController.navigate(Rota.Acervo.path) },
-                    onLivroClick = { navController.navigate(Rota.DetalhesLivro.criarRota("livro_id_exemplo")) }
+                    onLivroClick = { livroId -> navController.navigate(Rota.DetalhesLivro.criarRota(livroId.toString())) }
                 )
             }
 
@@ -366,12 +366,10 @@ fun ForLibraryApp() {
             // ── Gestão de Acervo (RF27) ──────────────────────────────────────
             composable(Rota.AcervoAdmin.path) {
                 TelaGestaoAcervo(
-                    onVoltar = { navController.popBackStack() },
                     onAdicionarLivro = { navController.navigate(Rota.AdicionarLivro.path) },
                     onEditarLivro = { livroId ->
                         navController.navigate(Rota.EditarObra.criarRota(livroId))
-                    },
-                    onExcluirLivro = { /* TODO */ }
+                    }
                 )
             }
 
@@ -421,11 +419,15 @@ fun ForLibraryApp() {
                 )
             }
 
-            // Moderação de obras
-
+            // ── Cadastro de Livro (RF28) ─────────────────────────────────────
             composable(Rota.AdicionarLivro.path) {
                 TelaAdicionarObra(
-                    onVoltar = { navController.popBackStack() }
+                    onVoltar = { navController.popBackStack() },
+                    onSucesso = {
+                        navController.navigate(Rota.AcervoAdmin.path) {
+                            popUpTo(Rota.AdicionarLivro.path) { inclusive = true }
+                        }
+                    }
                 )
             }
 

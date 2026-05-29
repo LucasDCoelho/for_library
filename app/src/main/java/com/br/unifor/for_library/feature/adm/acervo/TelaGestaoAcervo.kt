@@ -1,78 +1,64 @@
 package com.br.unifor.for_library.feature.adm.acervo
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.br.unifor.for_library.core.components.CapaLivro
 import com.br.unifor.for_library.core.designsystem.AzulPrimario
 import com.br.unifor.for_library.core.designsystem.CinzaTexto
 import com.br.unifor.for_library.feature.PopupExclusaoObra
 
-data class LivroAdminMock(
-    val id: String,
-    val titulo: String,
-    val autor: String,
-    val isbn: String
-)
-
-private val mockLivrosAdmin = listOf(
-    LivroAdminMock("1", "Design System Essentials", "IBM Design Team",     "9780132350884"),
-    LivroAdminMock("2", "The Grid System",          "Josef Müller-Brockmann","9783721201451"),
-    LivroAdminMock("3", "Accessibility in UI",      "Sara Soueidan",        "9781492053217"),
-    LivroAdminMock("4", "TypeScript Patterns",      "Dan Vanderkam",        "9781491904008"),
-    LivroAdminMock("5", "Enterprise Architecture",  "Martin Fowler",        "9780321127426"),
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaGestaoAcervo(
-    onVoltar: () -> Unit,
     onAdicionarLivro: () -> Unit,
     onEditarLivro: (String) -> Unit,
-    onExcluirLivro: (String) -> Unit
+    viewModel: GestaoAcervoViewModel = viewModel()
 ) {
-    // ✅ rememberSaveable: busca sobrevive à rotação de tela
-    var busca by rememberSaveable { mutableStateOf("") }
+    val state by viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var livroParaExcluir by remember { mutableStateOf<LivroAdmin?>(null) }
 
-    // ✅ derivedStateOf: filtro aplicado corretamente (era ignorado antes)
-    val livrosFiltrados by remember {
-        derivedStateOf {
-            mockLivrosAdmin.filter { livro ->
-                busca.isBlank() ||
-                livro.titulo.contains(busca, ignoreCase = true) ||
-                livro.autor.contains(busca, ignoreCase = true)
-            }
+    LaunchedEffect(state.mensagemSucesso) {
+        state.mensagemSucesso?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.limparMensagem()
         }
     }
 
-    // Bug 6: estado do popup de exclusão
-    var livroParaExcluir by remember { mutableStateOf<LivroAdminMock?>(null) }
+    LaunchedEffect(state.erro) {
+        state.erro?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.limparMensagem()
+        }
+    }
 
-    // Exibe popup de confirmação quando há livro selecionado para exclusão
     livroParaExcluir?.let { livro ->
         PopupExclusaoObra(
             mensagem = "A obra \"${livro.titulo}\" será removida permanentemente do acervo e das estantes de todos os alunos. Deseja continuar?",
             onDismiss = { livroParaExcluir = null },
             onConfirm = {
-                onExcluirLivro(livro.id)
+                viewModel.deletarLivro(livro.id)
                 livroParaExcluir = null
             }
         )
@@ -81,12 +67,7 @@ fun TelaGestaoAcervo(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Gestão de Acervo", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
-                navigationIcon = {
-                    IconButton(onClick = onVoltar) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
-                    }
-                }
+                title = { Text("Gestão de Acervo", fontWeight = FontWeight.Bold, fontSize = 20.sp) }
             )
         },
         floatingActionButton = {
@@ -99,6 +80,7 @@ fun TelaGestaoAcervo(
                 Icon(Icons.Default.Add, contentDescription = "Adicionar livro")
             }
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.White
     ) { paddingValues ->
         Column(
@@ -107,10 +89,9 @@ fun TelaGestaoAcervo(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
-            // ── Search Bar (RF27.2) ────────────────────────────────────────────
             OutlinedTextField(
-                value = busca,
-                onValueChange = { busca = it },
+                value = state.query,
+                onValueChange = { viewModel.onQueryChange(it) },
                 placeholder = { Text("Busque por título ou autor", fontSize = 13.sp, color = Color.LightGray) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
                 modifier = Modifier
@@ -124,31 +105,37 @@ fun TelaGestaoAcervo(
                 )
             )
 
-            // Quantidade de livros (RF27.2)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp, bottom = 8.dp),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "${livrosFiltrados.size} livros",
-                    fontSize = 12.sp,
-                    color = CinzaTexto
-                )
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = AzulPrimario
+                    )
+                } else {
+                    Text(
+                        text = "${state.livros.size} livro${if (state.livros.size != 1) "s" else ""}",
+                        fontSize = 12.sp,
+                        color = CinzaTexto
+                    )
+                }
             }
 
-            // Lista de livros (RF27.3)
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 contentPadding = PaddingValues(bottom = 80.dp)
             ) {
-                // ✅ key estável: evita recomposições desnecessárias
-                items(livrosFiltrados, key = { it.id }) { livro ->
+                items(state.livros, key = { it.id }) { livro ->
                     ItemLivroAdmin(
                         livro = livro,
-                        onEditar = { onEditarLivro(livro.id) },
-                        onExcluir = { livroParaExcluir = livro } // Bug 6: abre popup
+                        onEditar = { onEditarLivro(livro.id.toString()) },
+                        onExcluir = { livroParaExcluir = livro }
                     )
                 }
             }
@@ -158,7 +145,7 @@ fun TelaGestaoAcervo(
 
 @Composable
 private fun ItemLivroAdmin(
-    livro: LivroAdminMock,
+    livro: LivroAdmin,
     onEditar: () -> Unit,
     onExcluir: () -> Unit
 ) {
@@ -166,7 +153,7 @@ private fun ItemLivroAdmin(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE0E0E0)),
+        border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
         elevation = CardDefaults.cardElevation(0.dp)
     ) {
         Row(
@@ -175,15 +162,27 @@ private fun ItemLivroAdmin(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CapaLivro(
-                isbn = livro.isbn,
-                tituloFallback = livro.titulo,
-                modifier = Modifier
-                    .width(48.dp)
-                    .height(64.dp)
-                    .clip(RoundedCornerShape(4.dp)),
-                corFallback = AzulPrimario
-            )
+            if (!livro.capa_url.isNullOrBlank()) {
+                AsyncImage(
+                    model = livro.capa_url,
+                    contentDescription = livro.titulo,
+                    modifier = Modifier
+                        .width(48.dp)
+                        .height(64.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                CapaLivro(
+                    isbn = livro.isbn,
+                    tituloFallback = livro.titulo,
+                    modifier = Modifier
+                        .width(48.dp)
+                        .height(64.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                    corFallback = AzulPrimario
+                )
+            }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(
@@ -203,8 +202,6 @@ private fun ItemLivroAdmin(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-
-            // Editar (RF27.4)
             IconButton(onClick = onEditar) {
                 Icon(
                     Icons.Default.Edit,
@@ -213,7 +210,6 @@ private fun ItemLivroAdmin(
                     modifier = Modifier.size(18.dp)
                 )
             }
-            // Excluir (RF27.3)
             IconButton(onClick = onExcluir) {
                 Icon(
                     Icons.Default.Delete,

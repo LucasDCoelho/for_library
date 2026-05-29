@@ -58,8 +58,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.br.unifor.for_library.feature.auth.emailInstitucionalValido
-import com.br.unifor.for_library.feature.auth.inserirUsuarioPublico
 import com.br.unifor.for_library.feature.auth.obterTipoPorEmail
+import com.br.unifor.for_library.feature.auth.traduzirErroAuth
 import com.br.unifor.for_library.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -268,11 +268,15 @@ fun TelaCadastro(
                         return@Button
                     }
                     if (!emailInstitucionalValido(email)) {
-                        errorMessage = "Utilize um email institucional valido"
+                        errorMessage = "Utilize um e-mail @unifor.br ou @edu.unifor.br"
+                        return@Button
+                    }
+                    if (senha.length < 6) {
+                        errorMessage = "A senha deve ter pelo menos 6 caracteres"
                         return@Button
                     }
                     if (senha != confirmarSenha) {
-                        errorMessage = "As senhas nao coincidem"
+                        errorMessage = "As senhas não coincidem"
                         return@Button
                     }
                     scope.launch {
@@ -280,7 +284,7 @@ fun TelaCadastro(
                         errorMessage = null
                         try {
                             val tipoIdentificado = obterTipoPorEmail(email)
-                            val response = supabase.auth.signUpWith(Email) {
+                            supabase.auth.signUpWith(Email) {
                                 this.email = email.trim()
                                 this.password = senha
                                 data = buildJsonObject {
@@ -289,21 +293,9 @@ fun TelaCadastro(
                                     put("tipo", tipoIdentificado)
                                 }
                             }
-                            
-                            val userId = response?.id 
-                                ?: supabase.auth.currentUserOrNull()?.id
-                                ?: throw IllegalStateException("Não foi possível obter o ID do usuário após o cadastro")
-
-                            inserirUsuarioPublico(
-                                authUserId = userId,
-                                nome = nomeCompleto,
-                                matricula = matricula,
-                                email = email,
-                                tipo = tipoIdentificado
-                            )
                             isSuccess = true
                         } catch (e: Exception) {
-                            errorMessage = e.message ?: "Erro ao realizar cadastro"
+                            errorMessage = traduzirErroAuth(e)
                         } finally {
                             isLoading = false
                         }

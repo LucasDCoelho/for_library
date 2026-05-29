@@ -54,7 +54,7 @@ fun TelaDetalhesLivro(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // ── RF09.1: Cabeçalho ────────────────────────────────────────────────
         item {
@@ -115,7 +115,8 @@ fun TelaDetalhesLivro(
                 contentAlignment = Alignment.Center
             ) {
                 CapaLivro(
-                    isbn = livro.isbn ?: "",
+                    isbn = livro.isbn,
+                    capaUrl = livro.capa_url,
                     tituloFallback = livro.titulo,
                     modifier = Modifier
                         .width(180.dp)
@@ -157,7 +158,7 @@ fun TelaDetalhesLivro(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val notaInt = livro.nota_media.toInt()
+                val notaInt = state.notaMedia.toInt()
                 repeat(5) { index ->
                     Icon(
                         imageVector = Icons.Filled.Star,
@@ -168,7 +169,7 @@ fun TelaDetalhesLivro(
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "${"%.1f".format(livro.nota_media)} (${livro.qtd_avaliacoes} avaliações)",
+                    text = "${"%.1f".format(state.notaMedia)} (${state.qtdAvaliacoes} avaliações)",
                     fontSize = 14.sp,
                     color = Color.DarkGray
                 )
@@ -196,16 +197,16 @@ fun TelaDetalhesLivro(
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 OutlinedIconButton(
-                    onClick = { viewModel.toggleFavorito(livroIdInt) },
+                    onClick = { viewModel.toggleSalvo(livroIdInt) },
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
-                        imageVector = if (state.favoritado) Icons.Filled.Bookmark
+                        imageVector = if (state.salvo) Icons.Filled.Bookmark
                                       else Icons.Outlined.BookmarkBorder,
-                        contentDescription = if (state.favoritado) "Remover dos favoritos"
-                                             else "Adicionar aos favoritos",
-                        tint = if (state.favoritado) AzulPrimario else Color.Gray
+                        contentDescription = if (state.salvo) "Remover da estante"
+                                             else "Salvar na estante",
+                        tint = if (state.salvo) AzulPrimario else Color.Gray
                     )
                 }
             }
