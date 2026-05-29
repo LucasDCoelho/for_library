@@ -1,67 +1,82 @@
 # ARCHITECTURE.md — Arquitetura do ForLibrary
 
+> Última sincronização com o código: 2026-05-29 (branch `lucasdev`).
+
 ## Padrão Arquitetural
 
-**MVVM + Clean Architecture (parcial)**
+**MVVM (sem Clean Architecture completa)** — Compose para a View, `ViewModel` + `StateFlow` para o estado, acesso **direto** ao cliente Supabase global. **Não há camada Repository** em nenhuma feature.
 
 ```
 app/
 └── src/main/java/com/br/unifor/for_library/
-    ├── core/                        # Código compartilhado entre features
-    │   ├── components/              # Composables reutilizáveis (CapaLivro, PopupLogout...)
-    │   ├── designsystem/            # Tema, cores, tipografia (Color.kt, Theme.kt)
-    │   ├── domain/model/            # Data classes de domínio (Livro, Usuario, Resenha...)
-    │   └── navigation/              # Rotas, BottomBars (Rota.kt, ForLibraryBottomBar.kt, AdminBottomBar.kt)
+    ├── MainActivity.kt             # Entry point + cliente global `supabase` (Auth/Postgrest/Storage)
+    ├── ForLibraryApp.kt            # NavHost raiz + Scaffold + troca de BottomBar + PopupLogout
+    │
+    ├── core/
+    │   ├── components/             # Composables compartilhados (CapaLivro, PopupLogout, FiltroAvancado)
+    │   ├── data/                   # LivrosSalvosState + catalogoGlobal (estado mock em memória)
+    │   ├── designsystem/           # Color.kt, Theme.kt
+    │   └── navigation/             # Rotas.kt (sealed class Rota), ForLibraryBottomBar, AdminBottomBar
     │
     ├── feature/
     │   ├── auth/
-    │   │   └── ui/                  # TelaLoginPlaceholder, TelaCadastro, TelaRecuperarSenha, TelaSplashScreen
+    │   │   ├── AuthUtils.kt        # Validação de domínio, tipo por e-mail, tradução de erros
+    │   │   ├── UsuarioSupabase.kt  # Constantes/DTO de usuário
+    │   │   └── ui/                 # TelaSplash, TelaLoginPlaceholder, TelaCadastro, RecuperarSenha
     │   │
     │   ├── aluno/
-    │   │   ├── acervo/ui/           # TelaAcervoDigital
-    │   │   ├── estante/ui/          # TelaEstante
-    │   │   ├── eventos/ui/          # TelaEventos, TelaDetalhesEvento
-    │   │   ├── home/ui/             # TelaHomeAluno
-    │   │   ├── livro/ui/            # TelaDetalhesLivro, TelaLeitorDigital, TelaAvaliacaoResenha
-    │   │   ├── notificacao/ui/      # TelaNotificacoes
-    │   │   ├── perfil/ui/           # TelaPerfil, TelaEditarPerfil, TelaDuvidas, TelaEnvioObra
-    │   │   └── presentation/        # TelaConfiguracoes, TelaGamificacao, TelaHistoricoLeitura
+    │   │   ├── acervo/   ui/ + viewmodel/   # TelaAcervoDigital, BuscaVaziaPlaceholder, AcervoViewModel
+    │   │   ├── estante/  ui/ + viewmodel/   # TelaEstante, EstanteViewModel
+    │   │   ├── eventos/  ui/ + viewmodel/   # TelaEventos, TelaDetalhesEvento, Eventos/DetalhesEventoViewModel, EventoDb
+    │   │   ├── home/     ui/ + viewmodel/   # TelaHomeAluno, ChatBotAluno, Home/ChatBotViewModel
+    │   │   ├── livro/    ui/ + viewmodel/   # TelaDetalhesLivro, TelaLeitorDigital, TelaAvaliacaoResenha, TelaFimLeitura
+    │   │   ├── notificacao/ ui/ + viewmodel/
+    │   │   ├── perfil/   ui/ + viewmodel/   # TelaPerfil, TelaEditarPerfil, TelaEnvioObra, TelaDuvidas, TelaConfiguracoes, TelaConfirmacaoLogout
+    │   │   └── presentation/                # configuracoes/, gamificacao/, historico/ (Tela + ViewModel)
     │   │
-    │   └── adm/
-    │       ├── acervo/              # TelaGestaoAcervo, TelaAdicionarObra, TelaEditarObra + ViewModels
-    │       ├── dashboard/           # TelaDashboardAdmin
-    │       ├── moderacao/           # TelaListaModeracaoAdmin, TelaGestaoUsuarios, TelaModeracaoObras...
-    │       │   └── modresenha/      # TelaModeracaoResenhas, TelaAnaliseResenha
-    │       └── TelaConfiguracoesSistema
-    │
-    └── ForLibraryApp.kt             # NavHost raiz + Scaffold + BottomBar switching
+    │   ├── adm/
+    │   │   ├── acervo/             # TelaGestaoAcervo, AdicionarLivro, TelaEditarObra + Gestao/Cadastro/EdicaoLivroViewModel
+    │   │   ├── dashboard/          # TelaDashboardAdmin + AdminDashboardViewModel
+    │   │   ├── moderacao/          # TelaListaModeracaoAdmin, TelaGestaoUsuarios, TelaModeracaoObras, TelaAnaliseObra, PopupDetalhesUsuario
+    │   │   │   └── modresenha/     # TelaModeracaoResenhas, TelaAnaliseResenha
+    │   │   └── TelaConfigAdm.kt    # fun TelaConfiguracoesSistema
+    │   │
+    │   └── (raiz do pacote feature/ — fora de adm, ver CONCERNS)
+    │       ├── TelaGestaoEventos.kt
+    │       ├── TelaAdicionarEvento.kt
+    │       └── TelaExclusaoObra.kt
 ```
 
 ## Fluxo de Dados
 
 ```
 UI (Composable)
-   ↕  observa StateFlow/State
-ViewModel
-   ↕  chama suspend functions
-Repository (incompleto — não existe em todas as features)
-   ↕  chama SDK
-SupabaseClient (auth, postgrest, storage)
+   ↕  observa state: StateFlow<XxxState> (collectAsState)
+ViewModel  (XxxViewModel : ViewModel)
+   ↕  monta DTOs @Serializable e chama o cliente diretamente
+supabase  (global em MainActivity.kt) → auth · postgrest (.from) · storage
 ```
 
-**Obs:** Features mais antigas (auth, eventos) ainda não têm camada Repository separada — o ViewModel acessa o `supabaseClient` diretamente.
+Padrão dominante por feature:
+- Um **DTO `@Serializable`** com campos em `snake_case` que casa com a tabela (ex: `LivroAcervo`, `NovoLivro`, `EventoDb`), frequentemente `private` dentro do próprio ViewModel.
+- Um **data class de UI state** (`XxxUiState`/`XxxState`) exposto via `MutableStateFlow(...).asStateFlow()`.
+- Leitura/escrita com `supabase.from("tabela").select{...}.decodeList<DTO>()` / `.insert(...)` e upload com `supabase.storage.from("bucket").upload(...)`.
+
+**Sem Repository:** features antigas e novas acessam `supabase` diretamente no ViewModel. Não existe `core/domain/model` no código — os modelos de domínio descritos em `DATA_MODEL.md` são parcialmente aspiracionais; a realidade são DTOs por feature.
 
 ## Injeção de Dependência
 
-Sem framework de DI (Hilt/Koin não configurado). O `supabaseClient` é passado manualmente ou acessado como singleton global definido em `ForLibraryApp.kt`.
+Sem framework de DI (Hilt/Koin não configurado). ViewModels são instanciados via `viewModel()` padrão do Compose e acessam o singleton global `supabase` por import direto.
 
 ## Navegação
 
-Baseada em **Jetpack Navigation Compose** com rotas tipadas via `sealed class Rota` em `core/navigation/Rota.kt`. O `NavHost` raiz está em `ForLibraryApp.kt` com um `Scaffold` que troca a BottomBar conforme a rota atual.
+**Jetpack Navigation Compose** com rotas tipadas em `core/navigation/Rotas.kt` (`sealed class Rota(val path)`). O `NavHost` raiz fica em `ForLibraryApp.kt` dentro de um `Scaffold`. Rotas com argumento expõem helper `criarRota(...)` (ex: `Rota.DetalhesLivro.criarRota(id)`). Ver `ROUTES.md`.
 
 ## Dois Contextos Visuais
 
-| Contexto | BottomBar | Rotas |
+| Contexto | BottomBar | Critério |
 |---|---|---|
-| Aluno | `ForLibraryBottomBar` | Home, Acervo, Estante, Eventos, Perfil |
-| Admin | `AdminBottomBar` | Dashboard, Acervo, Moderação, Eventos |
+| Aluno | `ForLibraryBottomBar` | rota **não** está em `rotasAdmin` |
+| Admin | `AdminBottomBar` | rota está no set `rotasAdmin` de `ForLibraryApp.kt` |
+
+O padding do conteúdo só é aplicado para rotas no set `rotasComPadding`; rotas de auth/detalhe ficam `fillMaxSize`.

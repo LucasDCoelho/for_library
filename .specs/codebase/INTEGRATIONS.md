@@ -1,5 +1,7 @@
 # INTEGRATIONS.md — Integrações Externas do ForLibrary
 
+> Última sincronização com o código: 2026-05-29 (branch `lucasdev`).
+
 ## 1. Supabase (BaaS Principal)
 
 ### Autenticação (GoTrue)
@@ -26,13 +28,17 @@ RLS garante isolamento: cada `auth.uid()` acessa apenas seus próprios dados (ex
 
 ### Storage
 
-**Status:** Não integrado ainda (BLOQ-01)
+**Status:** ✅ Integrado (BLOQ-01 resolvido). `install(Storage)` em `MainActivity.kt`.
 
-Buckets esperados:
-- `capas` — imagens JPG/PNG de livros
-- `arquivos` — PDFs/ePubs de livros
-- `fotos-perfil` — avatares de usuários
-- `obras-autorais` — PDFs submetidos por alunos
+Buckets em uso (nomes reais no código):
+| Bucket | Conteúdo | Usado em |
+|---|---|---|
+| `imagens_livros` | Capas (JPG) | `CadastroLivroViewModel`, `EdicaoLivroViewModel` |
+| `arquivos_livros` | PDFs de livros | `CadastroLivroViewModel`, `EdicaoLivroViewModel` |
+| `avatars` | Foto de perfil | `EdicaoPerfilViewModel` |
+| `obras` | PDFs de obras autorais | `EnvioObraViewModel` |
+
+Padrão de upload: ler bytes via `context.contentResolver.openInputStream(uri)` → `supabase.storage.from(bucket).upload(nome, bytes)` → `.publicUrl(nome)` salvo na coluna `capa_url`/`arquivo_url`/etc.
 
 ---
 
@@ -50,19 +56,15 @@ Buckets esperados:
 
 ---
 
-## 3. ChatBot (Pendente — BLOQ-02)
+## 3. ChatBot (RF41) — UI pronta, IA ainda não conectada (BLOQ-02 parcial)
 
-**RF41** requer integração com IA.
+**Implementado:** `feature/aluno/home/ui/ChatBotAluno.kt` + `home/viewmodel/ChatBotViewModel.kt`.
 
-Opções candidatas:
-- **Anthropic Claude API** — modelo `claude-haiku-4-5-20251001` (mais econômico para chat)
-- **OpenAI API** — alternativa
+Estado atual: **respostas locais por palavra-chave** (`quandoPergunta()` com `when` sobre termos como "livro", "ponto", "evento") + `delay(1500)` simulando digitação. Mensagem inicial hardcoded (RF41.4). **Não há chamada a nenhuma API de IA.**
 
-Arquitetura sugerida quando implementado:
-```
-TelaChat.kt → ChatViewModel → ChatRepository → Anthropic/OpenAI API
-```
-A mensagem inicial do assistente (`RF41.4`) pode ser hardcoded ou vir de um prompt de sistema.
+Para conectar IA de verdade:
+- **Anthropic Claude API** — modelo `claude-haiku-4-5-20251001` (econômico para chat)
+- Substituir `quandoPergunta()` por chamada de rede; a estrutura `MensagemChat`/`ChatBotState` já suporta histórico.
 
 ---
 
@@ -76,6 +78,6 @@ Status atual: não implementado — deve exibir Toast verde "Adicionado ao calen
 
 ## 5. Android File Picker (RF15.5, RF28.5, RF29.3/29.4)
 
-Intent nativo `Intent.ACTION_OPEN_DOCUMENT` para selecionar PDFs e imagens.
+Seleção de PDFs/imagens via `Uri` + `ActivityResult`, lidos com `contentResolver.openInputStream`.
 
-Status atual: não funcional em `TelaEnvioObra`, `TelaAdicionarObra`, `TelaEditarObra`.
+Status atual: ✅ **funcional** nos fluxos que fazem upload — `TelaAdicionarObra`/`CadastroLivroViewModel`, `TelaEditarObra`/`EdicaoLivroViewModel`, `TelaEnvioObra`/`EnvioObraViewModel`, `TelaEditarPerfil`/`EdicaoPerfilViewModel`.
