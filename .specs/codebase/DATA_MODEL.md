@@ -1,8 +1,10 @@
 # DATA_MODEL.md — Modelo de Dados do ForLibrary
 
-Fonte: `core/domain/model/` + `supabase_schema.md`
+> Última sincronização com o código: 2026-05-29 (branch `lucasdev`).
 
-## Entidades de Domínio
+> ⚠️ **Realidade vs. modelo abaixo:** **não existe** o pacote `core/domain/model/` no código. As `data class` de domínio desta seção são uma **referência aspiracional**. O que existe de fato são **DTOs `@Serializable` por feature** (campos em `snake_case`, casando com as colunas), em geral declarados dentro dos ViewModels. Ver tabela "DTOs reais" ao final.
+
+## Entidades de Domínio (referência aspiracional)
 
 ### Usuario
 ```kotlin
@@ -153,6 +155,17 @@ data class ConfiguracaoSistema(
 | `historico_pontos` | `HistoricoPontos` | RLS: append-only pelo sistema |
 | `atividades_admin` | `AtividadeAdmin` | Audit log admin |
 | `configuracoes_sistema` | `ConfiguracaoSistema` | Apenas admin lê/escreve |
+
+## DTOs reais no código (`@Serializable`)
+
+| DTO | Local | Tabela | Observações |
+|---|---|---|---|
+| `LivroAcervo` | `aluno/acervo/viewmodel/AcervoViewModel.kt` | `livros` | id `Int`, `capa_url`, `genero`, `data_cadastro`, `avaliacao`; campo derivado `isNovo` |
+| `UsuarioAcervo` | idem | `usuarios` | `nome`, `foto_perfil`; lido por `auth_user_id == auth.uid` |
+| `NovoLivro` | `adm/acervo/CadastroLivroViewModel.kt` (private) | `livros` | payload de insert: `total_paginas`, `ano_publicacao`, `capa_url`, `arquivo_url` |
+| `EventoDb` | `aluno/eventos/viewmodel/EventoDb.kt` | `eventos` | `banner_url`, `data_inicio/fim`, `fuso_horario`; convertido p/ `Evento` (UI) via `toEvento()` |
+
+> A coluna de vínculo de usuário usada nas queries é **`auth_user_id`** (= `auth.users.id`), não um `id` numérico próprio.
 
 ## Regras de Gamificação
 
