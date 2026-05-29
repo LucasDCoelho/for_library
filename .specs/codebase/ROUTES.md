@@ -1,64 +1,72 @@
 # ROUTES.md — Rotas de Navegação do ForLibrary
 
-Fonte: `core/navigation/Rota.kt` + `ForLibraryApp.kt`
+> Última sincronização com o código: 2026-05-29 (branch `lucasdev`).
+> Fonte: `core/navigation/Rotas.kt` + `ForLibraryApp.kt`.
 
-## Rotas Definidas (sealed class Rota)
+> ⚠️ Nomes de arquivo divergem da função/classe em vários casos (coluna "Arquivo → fun").
 
-### Fluxo de Autenticação
+## Rotas Definidas (`sealed class Rota`)
 
-| Rota | Tela | Arquivo |
+### Fluxo de Autenticação (sem BottomBar)
+
+| `Rota` | path | Arquivo → fun |
 |---|---|---|
-| `Rota.Splash` | TelaSplashScreen | `feature/auth/ui/TelaSplashScreen.kt` |
-| `Rota.Login` | TelaLoginPlaceholder | `feature/auth/ui/TelaLoginPlaceholder.kt` |
-| `Rota.Cadastro` | TelaCadastro | `feature/auth/ui/TelaCadastro.kt` |
-| `Rota.RecuperarSenha` | TelaRecuperarSenha | `feature/auth/ui/TelaRecuperarSenha.kt` |
+| `Splash` | `splash` | `auth/ui/TelaSplash.kt` → `TelaSplashScreen` |
+| `Login` | `login` | `auth/ui/TelaLoginPlaceholder.kt` → `TelaLoginPlaceholder` |
+| `Cadastro` | `cadastro` | `auth/ui/TelaCadastro.kt` → `TelaCadastro` |
+| `RecuperarSenha` | `recuperar_senha` | `auth/ui/RecuperarSenha.kt` → `TelaRecuperarSenha` |
 
-### Área Aluno (com ForLibraryBottomBar)
+`Splash` decide o destino: Login, `HomeAluno` ou `DashboardAdmin`.
 
-| Rota | Tela | Arquivo |
+### Área Aluno
+
+| `Rota` | path | Arquivo |
 |---|---|---|
-| `Rota.HomeAluno` | TelaHomeAluno | `feature/aluno/home/ui/TelaHomeAluno.kt` |
-| `Rota.Acervo` | TelaAcervoDigital | `feature/aluno/acervo/ui/TelaAcervoDigital.kt` |
-| `Rota.Estante` | TelaEstante | `feature/aluno/estante/ui/TelaEstante.kt` |
-| `Rota.Eventos` | TelaEventos | `feature/aluno/eventos/ui/TelaEventos.kt` |
-| `Rota.Perfil` | TelaPerfil | `feature/aluno/perfil/ui/TelaPerfil.kt` |
-| `Rota.DetalhesLivro` | TelaDetalhesLivro | `feature/aluno/livro/ui/TelaDetalhesLivro.kt` |
-| `Rota.LeitorDigital` | TelaLeitorDigital | `feature/aluno/livro/ui/TelaLeitorDigital.kt` |
-| `Rota.AvaliacaoResenha` | TelaAvaliacaoResenha | `feature/aluno/livro/ui/TelaAvaliacaoResenha.kt` |
-| `Rota.DetalhesEvento` | TelaDetalhesEvento | `feature/aluno/eventos/ui/TelaDetalhesEvento.kt` |
-| `Rota.Notificacoes` | TelaNotificacoes | `feature/aluno/notificacao/ui/TelaNotificacoes.kt` |
-| `Rota.EditarPerfil` | TelaEditarPerfil | `feature/aluno/perfil/ui/TelaEditarPerfil.kt` |
-| `Rota.EnvioObra` | TelaEnvioObra | `feature/aluno/perfil/ui/TelaEnvioObra.kt` |
-| `Rota.Duvidas` | TelaDuvidas | `feature/aluno/perfil/ui/TelaDuvidas.kt` |
-| `Rota.Configuracoes` | TelaConfiguracoes | `feature/aluno/presentation/configuracoes/TelaConfiguracoes.kt` |
-| `Rota.Gamificacao` | TelaGamificacao | `feature/aluno/presentation/gamificacao/TelaGamificacao.kt` |
-| `Rota.HistoricoLeitura` | TelaHistoricoLeitura | `feature/aluno/presentation/historico/TelaHistoricoLeitura.kt` |
+| `HomeAluno` | `home_aluno` | `aluno/home/ui/TelaHomeAluno.kt` |
+| `Acervo` | `acervo` | `aluno/acervo/ui/TelaAcervoDigital.kt` |
+| `Estante` | `estante` | `aluno/estante/ui/TelaEstante.kt` |
+| `Eventos` | `eventos` | `aluno/eventos/ui/TelaEventos.kt` |
+| `Perfil` | `perfil` | `aluno/perfil/ui/TelaPerfil.kt` |
+| `DetalhesLivro` | `detalhes_livro/{livroId}` | `aluno/livro/ui/TelaDetalhesLivro.kt` |
+| `LeitorDigital` | `leitor/{livroId}/{titulo}` | `aluno/livro/ui/TelaLeitorDigital.kt` |
+| `AvalicaoLivro` | `avaliacao/{livroId}` | `aluno/livro/ui/TelaAvaliacaoResenha.kt` |
+| `DetalhesEvento` | `detalhes_evento/{eventoId}` (Int) | `aluno/eventos/ui/TelaDetalhesEvento.kt` |
+| `Notificacoes` | `notificacoes` | `aluno/notificacao/ui/TelaNotificacoes.kt` |
+| `EditarPerfil` | `editar_perfil` | `aluno/perfil/ui/TelaEditarPerfil.kt` |
+| `EnvioObra` | `envio_obra` | `aluno/perfil/ui/TelaEnvioObra.kt` |
+| `Duvida` | `duvida` | `aluno/perfil/ui/TelaDuvidas.kt` |
+| `Configuracoes` | `configuracoes` | `aluno/presentation/configuracoes/TelaConfiguracoes.kt` |
+| `MeusPontos` | `meus_pontos` | `aluno/presentation/gamificacao/TelaGamificacao.kt` |
+| `HistoricoLeitura` | `historico_leitura` | `aluno/presentation/historico/TelaHistoricoLeitura.kt` |
 
-### Área Admin (com AdminBottomBar)
+> Notas: a rota de gamificação é `MeusPontos` (não `Gamificacao`); a de avaliação é `AvalicaoLivro` (grafia com typo no código). Existe um segundo `TelaConfiguracoes.kt` em `aluno/perfil/ui/` que **não** é referenciado pelo NavHost.
 
-| Rota | Tela | Arquivo |
+### Área Admin (com `AdminBottomBar`)
+
+| `Rota` | path | Arquivo → fun |
 |---|---|---|
-| `Rota.DashboardAdmin` | TelaDashboardAdmin | `feature/adm/dashboard/TelaDashboardAdmin.kt` |
-| `Rota.AcervoAdmin` | TelaGestaoAcervo | `feature/adm/acervo/TelaGestaoAcervo.kt` |
-| `Rota.AdicionarLivro` | TelaAdicionarObra | `feature/adm/acervo/AdicionarLivro.kt` |
-| `Rota.EditarObra` | TelaEditarObra | `feature/adm/acervo/TelaEditarObra.kt` |
-| `Rota.ListaModeracao` | TelaListaModeracaoAdmin | `feature/adm/moderacao/TelaListaModeracaoAdmin.kt` |
-| `Rota.GestaoUsuarios` | TelaGestaoUsuarios | `feature/adm/moderacao/TelaGestaoUsuarios.kt` |
-| `Rota.ModeracaoObras` | TelaModeracaoObras | `feature/adm/moderacao/TelaModeracaoObras.kt` |
-| `Rota.AnaliseObra` | TelaAnaliseObra | `feature/adm/moderacao/TelaAnaliseObra.kt` |
-| `Rota.ModeracaoResenhas` | TelaModeracaoResenhas | `feature/adm/moderacao/modresenha/TelaModeracaoResenhas.kt` |
-| `Rota.AnaliseResenha` | TelaAnaliseResenha | `feature/adm/moderacao/modresenha/TelaAnaliseResenha.kt` |
-| `Rota.EventosAdmin` | TelaGestaoEventos | `feature/TelaGestaoEventos.kt` |
-| `Rota.AdicionarEvento` | TelaAdicionarEvento | `feature/TelaAdicionarEvento.kt` |
-| `Rota.NotificacoesAdmin` | TelaNotificacoes | (compartilhado) |
-| `Rota.ConfiguracoesSistema` | TelaConfiguracoesSistema | `feature/adm/TelaConfiguracoesSistema.kt` |
+| `DashboardAdmin` | `dashboard_admin` | `adm/dashboard/TelaDashboardAdmin.kt` |
+| `AcervoAdmin` | `acervo_admin` | `adm/acervo/TelaGestaoAcervo.kt` |
+| `AdicionarLivro` | `adicionar_livro` | `adm/acervo/AdicionarLivro.kt` → `TelaAdicionarObra` |
+| `EditarObra` | `editar_obra/{livroId}` | `adm/acervo/TelaEditarObra.kt` |
+| `ListaModeracao` | `lista_moderacao` | `adm/moderacao/TelaListaModeracaoAdmin.kt` |
+| `GestaoUsuarios` | `gestao_usuarios` | `adm/moderacao/TelaGestaoUsuarios.kt` |
+| `ModeracaoObras` | `moderacao_obras` | `adm/moderacao/TelaModeracaoObras.kt` |
+| `AnaliseObra` | `analise_obra/{obraId}` | `adm/moderacao/TelaAnaliseObra.kt` |
+| `ModeracaoResenhas` | `moderacao_resenhas` | `adm/moderacao/modresenha/TelaModeracaoResenhas.kt` |
+| `AnaliseResenha` | `analise_resenha/{resenhaId}` | `adm/moderacao/modresenha/TelaAnaliseResenha.kt` |
+| `EventosAdmin` | `eventos_admin` | `feature/TelaGestaoEventos.kt` (fora de `adm/`) |
+| `AdicionarEvento` | `adicionar_evento` | `feature/TelaAdicionarEvento.kt` (fora de `adm/`) |
+| `NotificacoesAdmin` | `notificacoes_admin` | `aluno/notificacao/ui/TelaNotificacoes.kt` (compartilhado — "Bug 3") |
+| `ConfiguracoesSistema` | `configuracoes_sistema` | `adm/TelaConfigAdm.kt` → `TelaConfiguracoesSistema` |
 
-## BottomBar Switching
+Helpers de rota com argumento: `EditarObra.criarRota`, `AnaliseObra.criarRota`, `AnaliseResenha.criarRota`, `DetalhesLivro.criarRota`, `LeitorDigital.criarRota`, `AvalicaoLivro.criarRota`, `DetalhesEvento.criarRota`.
 
-Em `ForLibraryApp.kt`, a BottomBar exibida depende da rota atual:
-- Rotas do conjunto `rotasComPadding` com prefixo de aluno → `ForLibraryBottomBar`
-- Rotas do conjunto `rotasComPadding` com prefixo de admin → `AdminBottomBar`
-- Rotas sem BottomBar (auth, detalhes) → sem bottom bar
+## BottomBar / padding switching (`ForLibraryApp.kt`)
+
+- `rotaAtual in rotasAdmin` → `AdminBottomBar`; senão → `ForLibraryBottomBar`.
+- `rotaAtual in rotasComPadding` → aplica `padding`; senão `fillMaxSize` (auth/detalhe).
+- O logout dispara o Composable `PopupLogout` controlado por `mostrarPopupSair` no nível do app.
 
 ## Rota Inicial
 

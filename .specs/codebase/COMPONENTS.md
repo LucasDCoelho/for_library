@@ -1,6 +1,8 @@
 # COMPONENTS.md — Componentes Compartilhados do ForLibrary
 
-Fonte: `core/components/`
+> Última sincronização com o código: 2026-05-29 (branch `lucasdev`).
+
+Fonte: `core/components/` (compartilhados) + alguns Composables auxiliares por feature.
 
 ## CapaLivro
 
@@ -55,8 +57,10 @@ Bottom Sheet para filtros de busca do acervo (RF07).
 
 **Seções:**
 - Chips selecionáveis de gênero literário
-- Radio buttons de ordenação (A-Z, Z-A, Mais Recentes, Melhor Avaliados)
+- Radio buttons de ordenação via enum `OrdemFiltro` (`A_Z`, `Z_A`, `MAIS_RECENTES`, `MELHOR_AVALIADOS`)
 - Botões "Limpar" e "Aplicar Filtros"
+
+**Estado:** `FiltroAvancadoState(generosSelecionados, ordem)` — consumido pelo `AcervoViewModel` para montar a query no Supabase.
 
 **Forma do topo:** `RoundedCornerShape(topStart = 20dp, topEnd = 20dp)`
 
@@ -99,6 +103,16 @@ BottomBar do contexto Admin.
 - Label: `10sp`
 
 ---
+
+## Componentes auxiliares por feature (não em `core/`)
+
+| Componente | Arquivo | Função |
+|---|---|---|
+| `BuscaVaziaPlaceholder` | `aluno/acervo/ui/BuscaVaziaPlaceholder.kt` | Estado vazio da busca do acervo |
+| `ChatBotAluno` | `aluno/home/ui/ChatBotAluno.kt` | UI do chat (bolhas + indicador "digitando") — respostas locais, ver `INTEGRATIONS.md` |
+| `TelaFimLeitura` | `aluno/livro/ui/TelaFimLeitura.kt` | Tela/overlay de conclusão de leitura |
+| `TelaConfirmacaoLogout` | `aluno/perfil/ui/TelaConfirmacaoLogout.kt` | Variante de confirmação de logout (coexiste com `PopupLogout`) |
+| `PopupDetalhesUsuario` | `adm/moderacao/PopupDetalhesUsuario.kt` | Dialog de detalhes de usuário na gestão admin |
 
 ## Padrões de Header (não componentizado, mas recorrente)
 
