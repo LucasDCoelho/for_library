@@ -62,7 +62,7 @@ fun TelaAdicionarEvento(
                         return utcTimeMillis >= hoje
                     }
                 }
-            } else SelectableDates.AllDates
+            } else DatePickerDefaults.AllDates
         )
         DatePickerDialog(
             onDismissRequest = { mostrarDatePicker = false },

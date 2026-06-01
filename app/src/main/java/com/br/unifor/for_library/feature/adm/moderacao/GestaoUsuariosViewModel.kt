@@ -19,6 +19,9 @@ private data class UsuarioAdminDb(
     val resenhas_inadequadas: Int = 0
 )
 
+@Serializable
+private data class UsuarioStatusUpdate(val status: String)
+
 data class UsuarioAdminItem(
     val id: Int,
     val nome: String,
@@ -60,7 +63,15 @@ class GestaoUsuariosViewModel : ViewModel() {
             _state.value = _state.value.copy(isLoading = true, erro = null)
             try {
                 val usuarios = supabase.from("usuarios")
-                    .select()
+                    .select {
+                        filter {
+                            or {
+                                eq("tipo", "Aluno")
+                                eq("tipo", "ALUNO")
+                                eq("tipo", "aluno")
+                            }
+                        }
+                    }
                     .decodeList<UsuarioAdminDb>()
                     .map { it.toItem() }
 
@@ -82,7 +93,7 @@ class GestaoUsuariosViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val novoStatus = if (bloqueado) "Bloqueado" else "Ativo"
-                supabase.from("usuarios").update(mapOf("status" to novoStatus)) {
+                supabase.from("usuarios").update(UsuarioStatusUpdate(status = novoStatus)) {
                     filter { eq("id", userId) }
                 }
                 _state.value = _state.value.copy(

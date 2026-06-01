@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UsuarioObraDb(
+data class UsuarioObraItemDb(
     val nome: String = "",
     val matricula: String = ""
 )
@@ -25,7 +25,7 @@ data class ObraAutoralItem(
     val genero: String,
     val status: String = "Pendente",
     val data_envio: String? = null,
-    val usuarios: UsuarioObraDb? = null
+    val usuarios: UsuarioObraItemDb? = null
 ) {
     val nomeAutor: String get() = usuarios?.nome ?: "—"
     val matriculaAutor: String get() = usuarios?.matricula ?: "—"

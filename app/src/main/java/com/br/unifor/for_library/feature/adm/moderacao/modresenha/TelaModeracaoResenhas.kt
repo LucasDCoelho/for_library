@@ -13,6 +13,9 @@ import androidx.compose.material.icons.filled.AssignmentLate
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,28 +23,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.br.unifor.for_library.core.designsystem.AzulPrimario
-
-data class ResenhaMock(
-    val id: String,
-    val nome: String,
-    val livro: String,
-    val estrelas: Int,
-    val texto: String
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TelaModeracaoResenhas(
     onVoltar: () -> Unit,
-    onResenhaClick: (String) -> Unit
+    onResenhaClick: (String) -> Unit,
+    viewModel: ModeracaoResenhasViewModel = viewModel()
 ) {
-    val resenhasPendentes = listOf(
-        ResenhaMock("1", "Ana Silva", "The Great Gatsby", 5, "A resenha explora profundamente a decadência do sonho americano através dos olhos de Nick..."),
-        ResenhaMock("2", "Bruno Oliveira", "1984 - George Orwell", 4, "Impactante e ainda muito atual. A forma como o Big Brother controla a sociedade é assustadora...."),
-        ResenhaMock("3", "Carla Mendes", "Dom Casmurro", 5, "A dúvida de Bentinho continua sendo um dos maiores mistérios da literatura brasileira. Machad..."),
-        ResenhaMock("4", "Daniel Rocha", "O Hobbit", 3, "Uma aventura clássica que introduz o mundo de Tolkien de forma leve e divertida. A jornada de Bil...")
-    )
+    val state by viewModel.state.collectAsState()
+
+    // Atualiza a lista sempre que entrar na tela
+    LaunchedEffect(Unit) {
+        viewModel.carregarResenhas()
+    }
 
     Scaffold(
         topBar = {
@@ -59,7 +56,7 @@ fun TelaModeracaoResenhas(
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             
-            // ── SEÇÃO STATUS (Conforme a imagem) ──────────────────────────
+            // ── SEÇÃO STATUS ──────────────────────────────────────────
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 Text(
                     text = "STATUS",
@@ -77,7 +74,7 @@ fun TelaModeracaoResenhas(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "12 Pending Reviews",
+                        text = "${state.resenhas.size} Pending Reviews",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.DarkGray
@@ -87,35 +84,47 @@ fun TelaModeracaoResenhas(
 
             HorizontalDivider(color = Color(0xFFEEEEEE), thickness = 1.dp)
 
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(resenhasPendentes) { resenha ->
-                    ItemResenhaPendente(resenha = resenha, onClick = { onResenhaClick(resenha.id) })
+            if (state.isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = AzulPrimario)
                 }
-
-                // ── BOTÃO CARREGAR MAIS (Conforme a imagem) ──────────────────
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedButton(
-                        onClick = { /* Lógica para carregar mais */ },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(54.dp),
-                        shape = RoundedCornerShape(4.dp),
-                        border = BorderStroke(1.dp, AzulPrimario),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = AzulPrimario)
-                    ) {
-                        Text(
-                            text = "CARREGAR MAIS RESENHAS",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            letterSpacing = 1.sp
+            } else if (state.resenhas.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Nenhuma resenha pendente", color = Color.Gray)
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(state.resenhas) { resenha ->
+                        ItemResenhaPendente(
+                            resenha = resenha,
+                            onClick = { onResenhaClick(resenha.id.toString()) }
                         )
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedButton(
+                            onClick = { viewModel.carregarResenhas() },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp),
+                            shape = RoundedCornerShape(4.dp),
+                            border = BorderStroke(1.dp, AzulPrimario),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = AzulPrimario)
+                        ) {
+                            Text(
+                                text = "ATUALIZAR LISTA",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                letterSpacing = 1.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
         }
@@ -123,7 +132,7 @@ fun TelaModeracaoResenhas(
 }
 
 @Composable
-fun ItemResenhaPendente(resenha: ResenhaMock, onClick: () -> Unit) {
+fun ItemResenhaPendente(resenha: ResenhaModeracao, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F7F7)),
         shape = RoundedCornerShape(8.dp),
@@ -134,7 +143,11 @@ fun ItemResenhaPendente(resenha: ResenhaMock, onClick: () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = resenha.nome, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                Text(
+                    text = resenha.usuarios?.nome ?: "Usuário Desconhecido",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
+                )
                 Box(
                     modifier = Modifier
                         .background(Color(0xFFD0E4FF), RoundedCornerShape(4.dp))
@@ -148,21 +161,21 @@ fun ItemResenhaPendente(resenha: ResenhaMock, onClick: () -> Unit) {
                     )
                 }
             }
-            Text(text = resenha.livro, fontSize = 13.sp, color = Color.Gray)
+            Text(text = resenha.livros?.titulo ?: "Livro Desconhecido", fontSize = 13.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(8.dp))
             Row {
                 repeat(5) { index ->
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = null,
-                        tint = if (index < resenha.estrelas) AzulPrimario else Color.LightGray,
+                        tint = if (index < resenha.nota) AzulPrimario else Color.LightGray,
                         modifier = Modifier.size(16.dp)
                     )
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = resenha.texto,
+                text = resenha.texto ?: "Sem conteúdo",
                 fontSize = 14.sp,
                 color = Color.DarkGray,
                 maxLines = 2,

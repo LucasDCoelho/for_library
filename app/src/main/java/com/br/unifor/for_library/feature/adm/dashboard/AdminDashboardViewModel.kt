@@ -2,10 +2,10 @@ package com.br.unifor.for_library.feature.adm.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.br.unifor.for_library.feature.auth.UsuarioPublicoPayload
 import com.br.unifor.for_library.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
 import kotlinx.coroutines.async
@@ -47,16 +47,13 @@ class AdminDashboardViewModel : ViewModel() {
     }
 
     fun carregarDados() {
-
         viewModelScope.launch {
-
             _state.value = _state.value.copy(
                 isLoading = true,
                 error = null
             )
 
             try {
-
                 val user = supabase.auth.currentUserOrNull()
                     ?: throw Exception("Usuário não autenticado")
 
@@ -81,22 +78,17 @@ class AdminDashboardViewModel : ViewModel() {
                 }
 
                 val atividadesDef = async {
-
                     try {
-
                         supabase
                             .from("atividades_admin")
                             .select {
-
                                 order(
                                     column = "data_atividade",
                                     order = Order.DESCENDING
                                 )
-
                                 limit(10)
                             }
                             .decodeList<AtividadeAdmin>()
-
                     } catch (e: Exception) {
                         emptyList()
                     }
@@ -113,7 +105,6 @@ class AdminDashboardViewModel : ViewModel() {
                 )
 
             } catch (e: Exception) {
-
                 _state.value = _state.value.copy(
                     isLoading = false,
                     error = e.message ?: "Erro ao carregar dashboard"
@@ -126,54 +117,40 @@ class AdminDashboardViewModel : ViewModel() {
         tabela: String,
         filtro: (PostgrestFilterBuilder.() -> Unit)? = null
     ): Int {
-
         return try {
-
             val response = supabase
                 .from(tabela)
                 .select {
-
                     if (filtro != null) {
                         filter(filtro)
                     }
+                    count(Count.EXACT)
+                    limit(0)
                 }
-
-            response.decodeList<Map<String, Any>>().size
-
+            response.countOrNull()?.toInt() ?: 0
         } catch (e: Exception) {
             0
         }
     }
 
     private suspend fun buscarContagemUsuarios(): Int {
-
-        for (tabela in listOf("usuarios", "usuario")) {
-
-            try {
-
-                val list = supabase
-                    .from(tabela)
-                    .select {
-
-                        filter {
-
-                            or {
-                                eq("tipo", "ALUNO")
-                                eq("tipo", "aluno")
-                            }
+        return try {
+            val response = supabase
+                .from("usuarios")
+                .select {
+                    filter {
+                        or {
+                            eq("tipo", "Aluno")
+                            eq("tipo", "ALUNO")
+                            eq("tipo", "aluno")
                         }
                     }
-                    .decodeList<UsuarioPublicoPayload>()
-
-                if (list.isNotEmpty()) {
-                    return list.size
+                    count(Count.EXACT)
+                    limit(0)
                 }
-
-            } catch (e: Exception) {
-                continue
-            }
+            response.countOrNull()?.toInt() ?: 0
+        } catch (e: Exception) {
+            0
         }
-
-        return 0
     }
 }

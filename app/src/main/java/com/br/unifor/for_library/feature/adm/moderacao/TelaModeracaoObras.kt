@@ -30,6 +30,11 @@ fun TelaModeracaoObras(
     val state by viewModel.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Atualiza a lista sempre que entrar na tela
+    LaunchedEffect(Unit) {
+        viewModel.carregarObras()
+    }
+
     LaunchedEffect(state.erro) {
         state.erro?.let {
             snackbarHostState.showSnackbar(it)

@@ -12,7 +12,14 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Serializable
-private data class ObraAutoralDetalheDb(
+private data class UsuarioAnaliseObraDb(
+    val id: Int? = null,
+    val nome: String? = null,
+    val matricula: String? = null
+)
+
+@Serializable
+private data class AnaliseObraDetalheDb(
     val id: Int,
     val titulo: String,
     val genero: String,
@@ -20,7 +27,7 @@ private data class ObraAutoralDetalheDb(
     val arquivo_pdf_url: String? = null,
     val status: String = "Pendente",
     val data_envio: String? = null,
-    val usuarios: UsuarioObraDb? = null
+    val usuarios: UsuarioAnaliseObraDb? = null
 )
 
 @Serializable
@@ -42,6 +49,18 @@ data class AnaliseObraState(
     val erro: String? = null
 )
 
+@Serializable
+private data class LivroModeracaoInsert(
+    val titulo: String,
+    val autor: String,
+    val genero: String,
+    val sinopse: String? = null,
+    val arquivo_url: String? = null,
+    val capa_url: String? = null,
+    val total_paginas: Int = 0,
+    val ano_publicacao: Int? = null
+)
+
 class AnaliseObraViewModel(private val obraId: Int) : ViewModel() {
     private val _state = MutableStateFlow(AnaliseObraState())
     val state: StateFlow<AnaliseObraState> = _state.asStateFlow()
@@ -57,7 +76,7 @@ class AnaliseObraViewModel(private val obraId: Int) : ViewModel() {
                     .select(Columns.raw("*, usuarios(nome, matricula)")) {
                         filter { eq("id", obraId) }
                     }
-                    .decodeSingle<ObraAutoralDetalheDb>()
+                    .decodeSingle<AnaliseObraDetalheDb>()
 
                 _state.value = AnaliseObraState(
                     isLoading = false,
@@ -82,16 +101,46 @@ class AnaliseObraViewModel(private val obraId: Int) : ViewModel() {
         viewModelScope.launch {
             _state.value = _state.value.copy(processando = true)
             try {
+                // 1. Busca os dados atuais da obra com o nome do autor para replicar na tabela de livros
+                val obra = supabase.from("obras_autorais")
+                    .select(Columns.raw("*, usuarios(id, nome)")) {
+                        filter { eq("id", obraId) }
+                    }
+                    .decodeSingle<AnaliseObraDetalheDb>()
+
+                // Validação de integridade referencial: garante que o autor existe na tabela usuarios
+                if (obra.usuarios?.id == null) {
+                    throw IllegalStateException("Usuário autor da obra não encontrado no sistema.")
+                }
+
+                // 2. Insere na tabela de livros para que apareça no acervo
+                val novoLivro = LivroModeracaoInsert(
+                    titulo = obra.titulo,
+                    autor = obra.usuarios.nome ?: "Autor Desconhecido",
+                    genero = obra.genero,
+                    sinopse = obra.sinopse_curta,
+                    arquivo_url = obra.arquivo_pdf_url,
+                    total_paginas = 0
+                )
+                
+                println("ModeracaoDebug: Tentando inserir livro: $novoLivro")
+
+                supabase.from("livros").insert(novoLivro)
+
+                // 3. Atualiza o status da obra autoral para 'Aprovado'
                 supabase.from("obras_autorais")
                     .update(StatusObraUpdate(status = "Aprovado")) {
                         filter { eq("id", obraId) }
                     }
+
                 _state.value = _state.value.copy(processando = false)
                 onSucesso()
             } catch (e: Exception) {
+                println("ModeracaoDebug: Erro ao aprovar obra $obraId")
+                e.printStackTrace()
                 _state.value = _state.value.copy(
                     processando = false,
-                    erro = e.message ?: "Erro ao aprovar obra"
+                    erro = "Erro ao aprovar obra: ${e.localizedMessage ?: e.message}"
                 )
             }
         }
