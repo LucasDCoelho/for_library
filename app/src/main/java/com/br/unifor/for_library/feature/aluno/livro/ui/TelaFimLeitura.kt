@@ -84,6 +84,7 @@ fun PopupFimLeitura(
                     }
                 }
 
+<<<<<<< Updated upstream
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // â”€â”€ RF11.2: Mensagem de parabÃ©ns â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -124,11 +125,44 @@ fun PopupFimLeitura(
                         .fillMaxWidth()
                         .height(48.dp),
                     shape = RoundedCornerShape(4.dp),
+=======
+                Spacer(Modifier.height(20.dp))
+
+                // ── RF11.2: Mensagem de parabéns ────────────────────────────────────
+                Text(
+                    text = "Parabéns!",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = buildAnnotatedString {
+                        append("Você concluiu a leitura e ganhou ")
+                        withStyle(SpanStyle(color = AzulPrimario, fontWeight = FontWeight.Bold)) {
+                            append("$pontosGanhos pontos")
+                        }
+                        append(".")
+                    },
+                    fontSize = 14.sp,
+                    color = Color.DarkGray,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(Modifier.height(24.dp))
+
+                // ── RF11.3: Botão "Avaliar Livro" ────────────────────────────────────
+                Button(
+                    onClick = onAvaliarLivro,
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(8.dp),
+>>>>>>> Stashed changes
                     colors = ButtonDefaults.buttonColors(containerColor = AzulPrimario)
                 ) {
                     Text("Avaliar Livro", fontWeight = FontWeight.Bold)
                 }
 
+<<<<<<< Updated upstream
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // â”€â”€ RF11.4: BotÃ£o "Fechar" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -172,6 +206,18 @@ fun PopupFimLeitura(
                         )
                     }
                 }
+=======
+                Spacer(Modifier.height(8.dp))
+
+                // ── RF11.4: Botão "Fechar" ────────────────────────────────────────────
+                OutlinedButton(
+                    onClick = onFechar,
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Fechar", color = Color.DarkGray, fontWeight = FontWeight.Bold)
+                }
+>>>>>>> Stashed changes
             }
         }
     }

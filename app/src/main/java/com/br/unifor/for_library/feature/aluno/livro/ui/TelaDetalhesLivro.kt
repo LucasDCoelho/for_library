@@ -138,7 +138,13 @@ fun TelaDetalhesLivro(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
+<<<<<<< Updated upstream
                     Text(text = "Ano: 2023", color = Color.Gray, fontSize = 12.sp)
+=======
+                    livro.ano_publicacao?.let {
+                        Text(text = "Ano de publicação: $it", color = Color.Gray, fontSize = 12.sp)
+                    }
+>>>>>>> Stashed changes
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(

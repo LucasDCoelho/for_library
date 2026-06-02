@@ -136,6 +136,7 @@ fun TelaCadastro(
                 isError = emailJaEmUso || emailInvalido
             )
 
+<<<<<<< Updated upstream
             // ✅ Erro 1 — email já em uso (era duplicado com mensagem errada)
             if (emailJaEmUso) {
                 MensagemErro("Email já em uso")
@@ -148,6 +149,8 @@ fun TelaCadastro(
             Spacer(modifier = Modifier.height(14.dp))
 
             // Senha
+=======
+>>>>>>> Stashed changes
             OutlinedTextField(
                 value = senha,
                 onValueChange = { senha = it },

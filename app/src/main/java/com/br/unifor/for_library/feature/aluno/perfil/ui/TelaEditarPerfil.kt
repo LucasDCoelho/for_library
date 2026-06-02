@@ -102,11 +102,103 @@ fun TelaEditarPerfil(
                         .background(Color(0xFF212121)), // Fundo escuro igual imagem
                     contentAlignment = Alignment.Center
                 ) {
+<<<<<<< Updated upstream
                     Icon(
                         imageVector = Icons.Default.Person,
                         contentDescription = null,
                         tint = Color.LightGray,
                         modifier = Modifier.size(55.dp)
+=======
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                            .background(Color(0xFFF5F5F5)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val model = state.novaFotoUri ?: state.fotoUrl
+                        if (model != null) {
+                            AsyncImage(
+                                model = model,
+                                contentDescription = "Foto de Perfil",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = null,
+                                tint = Color.LightGray,
+                                modifier = Modifier.size(55.dp)
+                            )
+                        }
+                    }
+                    
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(azulPrimario)
+                            .clickable { photoPickerLauncher.launch("image/*") }
+                            .padding(6.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CameraAlt,
+                            contentDescription = "Mudar foto",
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Campos de Entrada
+                InputPerfil(
+                    label = "Nome de Exibição",
+                    value = state.nome,
+                    onValueChange = { viewModel.onNomeChange(it) }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                InputPerfil(
+                    label = "Biografia Curta",
+                    value = state.biografia,
+                    onValueChange = { viewModel.onBiografiaChange(it) },
+                    maxLines = 4
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                InputPerfil(
+                    label = "Matrícula",
+                    value = state.matricula,
+                    onValueChange = { },
+                    trailingIcon = Icons.Default.Lock,
+                    readOnly = true
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                InputPerfil(
+                    label = "Email Institucional",
+                    value = state.email,
+                    onValueChange = { },
+                    trailingIcon = Icons.Default.Lock,
+                    readOnly = true
+                )
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                if (state.error != null) {
+                    Text(
+                        text = state.error ?: "",
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+>>>>>>> Stashed changes
                     )
                 }
                 // BotÃ£o CÃ¢mera simulado (X na imagem, troquei por Ã­cone de cÃ¢mera para UX melhor)
